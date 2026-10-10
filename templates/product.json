@@ -240,6 +240,15 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "sds_link": {
+              "type": "sds-link",
+              "settings": {
+                "label": "Safety Data Sheet (PDF)",
+                "padding-block-start": 0,
+                "padding-block-end": 0
+              },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -247,7 +256,8 @@
             "divider_VJhene",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
-            "text_aEtTtq"
+            "text_aEtTtq",
+            "sds_link"
           ]
         },
         "disclosures": {

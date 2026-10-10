@@ -90,7 +90,7 @@ The theme shows nested items as a mega menu on desktop and a drawer on mobile.
   - Warranty Transfer → Warranty Transfer collection (or page)
   - Warranty Claim → `https://spark.permagard.com.au/warrantyclaim/`
 - **Car Care Tips** → blog `car-care-tips`
-- **SDS** → SDS page (built next)
+- **SDS** → page `sds` (see [sds.md](sds.md))
 - **About Us** → page `about-us`
 - **Contact** → page `contact-page`
 

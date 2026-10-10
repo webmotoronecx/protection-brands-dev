@@ -1,0 +1,78 @@
+{%- comment -%}
+  Product page link to the product's Safety Data Sheet.
+  Reads the `custom.sds` product metafield (a reference to an `sds_document` metaobject).
+  Renders nothing when the product has no SDS.
+{%- endcomment -%}
+
+{%- liquid
+  assign document = closest.product.metafields.custom.sds.value
+  assign file = document.file.value
+-%}
+
+{%- if file != blank -%}
+  <p
+    class="sds-link spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <a class="link" href="{{ file.url }}" target="_blank" rel="noopener">
+      {{- block.settings.label -}}
+    </a>
+  </p>
+{%- elsif request.design_mode -%}
+  <p class="sds-link" {{ block.shopify_attributes }}>
+    <em>SDS link: hidden until this product's "SDS" metafield is set.</em>
+  </p>
+{%- endif -%}
+
+{% stylesheet %}
+  .sds-link {
+    margin: 0;
+    font-size: 0.875em;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "SDS link",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Links to the PDF in the product's SDS metafield (custom.sds)."
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Link text",
+      "default": "Safety Data Sheet (PDF)"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "SDS link",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}
