@@ -273,10 +273,106 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "shop_by_category": {
+      "type": "collection-list",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>Shop by category</h2>",
+            "type_preset": "h3",
+            "width": "fit-content",
+            "alignment": "left"
+          },
+          "blocks": {}
+        },
+        "static-collection-card": {
+          "type": "_collection-card",
+          "name": "t:names.collection_card",
+          "static": true,
+          "settings": {
+            "placement": "below_image",
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "flex-end"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading"
+      ],
+      "name": "Shop by category",
+      "settings": {
+        "collection_list": [
+          "wash-shampoo",
+          "cleaners-sprays",
+          "microfibre-drying",
+          "kits-packs",
+          "power-emergency"
+        ],
+        "layout_type": "grid",
+        "carousel_on_mobile": true,
+        "columns": 5,
+        "mobile_columns": "2",
+        "max_collections": 8,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 24
+      }
+    },
+    "shop_by_brand": {
+      "type": "collection-list",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>Shop by brand</h2>",
+            "type_preset": "h3",
+            "width": "fit-content",
+            "alignment": "left"
+          },
+          "blocks": {}
+        },
+        "static-collection-card": {
+          "type": "_collection-card",
+          "name": "t:names.collection_card",
+          "static": true,
+          "settings": {
+            "placement": "below_image",
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "flex-end"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading"
+      ],
+      "name": "Shop by brand",
+      "settings": {
+        "collection_list": [
+          "permagard-car-care",
+          "cerface-ceramic",
+          "optivan-caravan-maintenance"
+        ],
+        "layout_type": "grid",
+        "carousel_on_mobile": true,
+        "columns": 5,
+        "mobile_columns": "2",
+        "max_collections": 8,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 24
+      }
     }
   },
   "order": [
     "hero_jVaWmY",
+    "shop_by_category",
+    "shop_by_brand",
     "product_list_fa6P9H"
   ]
 }
