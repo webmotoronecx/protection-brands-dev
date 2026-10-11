@@ -123,11 +123,13 @@ class PBHeroBottle extends HTMLElement {
     if (this.#disposed) return;
     if (label) label.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-    const materials = bottleMaterials(THREE, label, this.dataset.liquid || '#b5650e');
+    // Each bottle can have its own liquid colour (the second is the car care bottle).
+    const liquids = [this.dataset.liquid || '#b5650e', this.dataset.liquidSecond || this.dataset.liquid || '#b5650e'];
     const geometries = bottleGeometries(THREE);
     const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
 
-    for (const spec of layout) {
+    layout.forEach((spec, index) => {
+      const materials = bottleMaterials(THREE, label, liquids[index]);
       // group: position and tilt. spinner: turns around the bottle's own axis.
       const group = new THREE.Group();
       const spinner = new THREE.Group();
@@ -142,7 +144,7 @@ class PBHeroBottle extends HTMLElement {
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
       this.#bottles.push({ group, spinner, spec, spin: spec.phase });
-    }
+    });
 
     this.#resize();
     this.#resizer = new ResizeObserver(() => this.#resize());

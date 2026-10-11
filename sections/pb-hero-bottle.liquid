@@ -20,6 +20,7 @@
   data-label="{{ label_url }}"
   data-bottles="{{ section.settings.bottles }}"
   data-liquid="{{ section.settings.liquid_color }}"
+  data-liquid-second="{{ section.settings.liquid_color_2 }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
   style="--pb-hero-bg: {{ section.settings.background }};"
 >
@@ -282,6 +283,13 @@
       "id": "liquid_color",
       "label": "Liquid",
       "default": "#b5650e"
+    },
+    {
+      "type": "color",
+      "id": "liquid_color_2",
+      "label": "Liquid, second bottle",
+      "info": "The lower, right-hand bottle when showing two.",
+      "default": "#2f8fc0"
     },
     {
       "type": "range",
