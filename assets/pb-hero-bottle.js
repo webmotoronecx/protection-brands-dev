@@ -43,9 +43,11 @@ const LABEL = { bottom: 0.52, top: 4.98 };
    largest tilt (surface slope). */
 const LIQUID_LEVEL = 5.20;
 
-/* Sparkling liquid: small bubbles rising through each bottle (one instanced draw per bottle),
-   cut off at the moving surface, plus tiny glints twinkling in the liquid (shader). */
-const BUBBLES = { count: 90, radius: [0.025, 0.07], speed: [0.25, 0.6], spread: 0.8, bottom: 0.1 };
+/* Sparkling liquid: small bubbles suspended in each bottle, as in a gel: they don't rise,
+   they just drift slowly around where they are (one instanced draw per bottle), cut off at
+   the moving surface, plus tiny glints twinkling in the liquid (shader). drift is how far a
+   bubble wanders (scene units), speed how quickly (radians per second). */
+const BUBBLES = { count: 90, radius: [0.025, 0.07], drift: 0.07, speed: [0.25, 0.6], spread: 0.8, bottom: 0.1 };
 const SPARKLE = 1.6; // glint brightness
 const SLOSH = { stiffness: 10, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
@@ -638,6 +640,7 @@ function makeBubbles(THREE, surface) {
       radius: random(...BUBBLES.radius),
       speed: random(...BUBBLES.speed),
       phase: Math.random() * Math.PI * 2,
+      phase2: Math.random() * Math.PI * 2,
     };
   });
   return { mesh, bubbles, matrix: new THREE.Matrix4() };
@@ -645,12 +648,15 @@ function makeBubbles(THREE, surface) {
 
 function updateBubbles(fizz, dt, time) {
   const { mesh, bubbles, matrix } = fizz;
+  const { drift } = BUBBLES;
   bubbles.forEach((bubble, index) => {
-    bubble.y += bubble.speed * dt;
-    if (bubble.y > LIQUID_LEVEL + 0.1) bubble.y = BUBBLES.bottom;
-    const sway = Math.sin(time * 3 + bubble.phase) * 0.035;
+    // A slow, looping wander around the bubble's home position; never rises away.
+    const t = time * bubble.speed;
+    const x = bubble.x + Math.sin(t + bubble.phase) * drift;
+    const y = bubble.y + Math.sin(t * 0.7 + bubble.phase2) * drift * 0.8;
+    const z = bubble.z + Math.cos(t * 0.85 + bubble.phase) * drift;
     matrix.makeScale(bubble.radius, bubble.radius, bubble.radius);
-    matrix.setPosition(bubble.x + sway, bubble.y - HEIGHT / 2, bubble.z);
+    matrix.setPosition(x, y - HEIGHT / 2, z);
     mesh.setMatrixAt(index, matrix);
   });
   mesh.instanceMatrix.needsUpdate = true;
