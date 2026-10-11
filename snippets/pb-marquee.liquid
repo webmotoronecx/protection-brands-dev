@@ -1,0 +1,72 @@
+{%- doc -%}
+  Endless right-to-left scroll of the Protection Brands wordmark (assets/label-scroling.svg).
+  Used behind the homepage bottles and along the bottom of the inner-page footer.
+
+  Cost: one ~10 KB SVG (cached after the first page) and one CSS animation that moves only
+  `transform`, so it runs on the compositor. assets/pb-marquee.js pauses it while it is off
+  screen. It stands still for visitors who prefer reduced motion.
+
+  Size: set --pb-marquee-height on an ancestor (default clamp(4rem, 15.5vw, 22rem)).
+
+  @param {string} [class] - Extra classes on the wrapper.
+  @param {number} [duration] - Seconds per loop. Defaults to 60.
+  @param {string} [loading] - 'eager' when above the fold. Defaults to 'lazy'.
+{%- enddoc -%}
+
+<pb-marquee
+  class="pb-marquee{% if class != blank %} {{ class }}{% endif %}"
+  aria-hidden="true"
+  style="--pb-marquee-duration: {{ duration | default: 60 }}s;"
+>
+  {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
+  <span class="pb-marquee__track">
+    {%- for i in (1..4) -%}
+      <img
+        src="{{ 'label-scroling.svg' | asset_url }}"
+        alt=""
+        width="319"
+        height="27"
+        loading="{{ loading | default: 'lazy' }}"
+      >
+    {%- endfor -%}
+  </span>
+</pb-marquee>
+
+<script type="module" src="{{ 'pb-marquee.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  .pb-marquee {
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .pb-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: pb-marquee var(--pb-marquee-duration, 60s) linear infinite;
+  }
+
+  .pb-marquee.is-paused .pb-marquee__track {
+    animation-play-state: paused;
+  }
+
+  .pb-marquee__track img {
+    flex: none;
+    width: auto;
+    height: var(--pb-marquee-height, clamp(4rem, 15.5vw, 22rem));
+    margin-inline-end: 6vw;
+  }
+
+  @keyframes pb-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-marquee__track {
+      animation: none;
+    }
+  }
+{% endstylesheet %}

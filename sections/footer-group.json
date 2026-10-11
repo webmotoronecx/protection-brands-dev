@@ -52,7 +52,9 @@
       "settings": {
         "newsletter": true,
         "newsletter_heading": "Subscribe for news & promotions",
-        "word": "Protection"
+        "instagram_url": "https://www.instagram.com/protection_brands/",
+        "marquee": true,
+        "marquee_duration": 60
       }
     },
     "footer": {

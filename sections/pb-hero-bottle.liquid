@@ -58,18 +58,11 @@
 
   {%- case section.settings.background_style -%}
     {%- when 'scroll' -%}
-      {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
-      <div
-        class="pb-hero-bottle__marquee"
-        aria-hidden="true"
-        style="--pb-marquee-duration: {{ section.settings.scroll_duration }}s;"
-      >
-        <div class="pb-hero-bottle__marquee-track">
-          {%- for i in (1..4) -%}
-            <img src="{{ 'label-scroling.svg' | asset_url }}" alt="" width="319" height="27">
-          {%- endfor -%}
-        </div>
-      </div>
+      {%- render 'pb-marquee',
+        class: 'pb-hero-bottle__marquee',
+        duration: section.settings.scroll_duration,
+        loading: 'eager'
+      -%}
     {%- when 'text' -%}
       {%- if section.settings.background_text != blank -%}
         <span class="pb-hero-bottle__word" aria-hidden="true">{{ section.settings.background_text }}</span>
@@ -138,40 +131,13 @@
     transition: opacity 0.8s ease;
   }
 
-  /* Scrolling wordmark behind the bottles. Only transform animates, so it runs on the compositor. */
+  /* Scrolling wordmark (snippets/pb-marquee.liquid) behind the bottles. */
   .pb-hero-bottle__marquee {
     position: absolute;
     inset-inline: 0;
     inset-block-start: 50%;
     z-index: 0;
     translate: 0 -40%;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .pb-hero-bottle__marquee-track {
-    display: flex;
-    width: max-content;
-    animation: pb-hero-marquee var(--pb-marquee-duration, 60s) linear infinite;
-  }
-
-  .pb-hero-bottle__marquee-track img {
-    flex: none;
-    width: auto;
-    height: clamp(4rem, 15.5vw, 22rem);
-    margin-inline-end: 6vw;
-  }
-
-  @keyframes pb-hero-marquee {
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pb-hero-bottle__marquee-track {
-      animation: none;
-    }
   }
 
   /* Large faint word behind the bottles. */

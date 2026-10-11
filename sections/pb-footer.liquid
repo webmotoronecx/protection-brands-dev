@@ -1,7 +1,8 @@
 {%- comment -%}
   Protection Brands footer for inner pages (footer group in layout/theme.liquid): a rounded
   dark card with the newsletter signup on the left, up to four link columns on the right,
-  and a large faint word along the bottom.
+  a copyright line and social icons, and the scrolling wordmark (snippets/pb-marquee.liquid)
+  along the bottom.
 
   Column blocks: "Menu column" (a Shopify menu) or "Links column" (up to four links set
   here, e.g. the OptiVAN and Permagard sites and Instagram).
@@ -93,8 +94,46 @@
     {%- endif -%}
   </div>
 
-  {%- if section.settings.word != blank -%}
-    <p class="pb-footer__word" aria-hidden="true">{{ section.settings.word }}</p>
+  <div class="pb-footer__bottom">
+    <p class="pb-footer__copyright">
+      {%- if section.settings.copyright != blank -%}
+        {{ section.settings.copyright }}
+      {%- else -%}
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+      {%- endif -%}
+    </p>
+
+    {%- liquid
+      assign socials = 'instagram,facebook,youtube,tiktok,linkedin' | split: ','
+      assign has_social = false
+      for platform in socials
+        assign key = platform | append: '_url'
+        if section.settings[key] != blank
+          assign has_social = true
+        endif
+      endfor
+    -%}
+    {%- if has_social -%}
+      <ul class="pb-footer__social">
+        {%- for platform in socials -%}
+          {%- assign key = platform | append: '_url' -%}
+          {%- assign url = section.settings[key] -%}
+          {%- if url != blank -%}
+            <li>
+              <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ platform | capitalize }}">
+                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  {%- render 'icon', icon: platform -%}
+                </svg>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.marquee -%}
+    {%- render 'pb-marquee', class: 'pb-footer__marquee', duration: section.settings.marquee_duration -%}
   {%- endif -%}
 </footer>
 
@@ -229,19 +268,60 @@
     color: #fff;
   }
 
-  /* Large faint word, cut off by the bottom of the card. */
-  .pb-footer__word {
-    margin: clamp(40px, 6vw, 96px) calc(clamp(24px, 5vw, 84px) * -1) -0.18em;
-    color: rgb(255 255 255 / 0.045);
-    font-size: clamp(4rem, 17.5vw, 21rem);
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
+  .pb-footer__bottom {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+    margin-block-start: clamp(40px, 5vw, 72px);
+    padding-block-start: 24px;
+    border-block-start: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  .pb-footer__copyright {
+    margin: 0;
+    color: #7a7a7a;
+    font-size: 12px;
+  }
+
+  .pb-footer__social {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-footer__social a {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #9a9a9a;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .pb-footer__social a:is(:hover, :focus-visible) {
+    background: rgb(255 255 255 / 0.06);
+    color: #fff;
+  }
+
+  .pb-footer__social svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  /* Scrolling wordmark, full card width, cut off by the bottom of the card. */
+  .pb-footer__marquee {
+    --pb-marquee-height: clamp(4rem, 15vw, 20rem);
+
+    margin-block: clamp(24px, 3vw, 48px) calc(var(--pb-marquee-height) * -0.2);
+    margin-inline: calc(clamp(24px, 5vw, 84px) * -1);
   }
 
   @media screen and (max-width: 989px) {
@@ -282,9 +362,59 @@
     },
     {
       "type": "text",
-      "id": "word",
-      "label": "Background word",
-      "default": "Protection"
+      "id": "copyright",
+      "label": "Copyright line",
+      "info": "Empty shows \"© [year] [store name]. All rights reserved.\""
+    },
+    {
+      "type": "header",
+      "content": "Social links"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok"
+    },
+    {
+      "type": "url",
+      "id": "linkedin_url",
+      "label": "LinkedIn"
+    },
+    {
+      "type": "header",
+      "content": "Scrolling wordmark"
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Show scrolling wordmark",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "marquee_duration",
+      "label": "Scroll speed",
+      "info": "Seconds for one loop. Higher is slower.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 60
     }
   ],
   "blocks": [
