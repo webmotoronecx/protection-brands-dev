@@ -147,6 +147,16 @@
     animation: pb-intro-drift 1.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
+  /* Product page: gallery, then the details column, rise in. */
+  .product-information .media-gallery,
+  .product-information media-gallery {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .product-information .product-details > * {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+  }
+
   /* Product grid (collection and search pages): the first eight cards, one after another.
      nth-of-type, because the grid's first child is a script. */
   .product-grid > .product-grid__item:nth-of-type(-n + 8) {

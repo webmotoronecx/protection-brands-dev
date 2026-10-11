@@ -44,6 +44,13 @@ doesn't use them, but do them close to launch day.
       chosen once the Horizon theme is in the store, so set it after step 6, or now on the
       unpublished theme.
 
+### Product page extras
+
+- [ ] Optional product metafield **How to use** (`custom.how_to_use`, rich text or multi-line
+      text). Products with it show a "How to use" row under Add to cart.
+- [ ] Check the **Delivery & returns** wording on the product page (Theme editor → Product →
+      Product info rows (PB)); its link points to `/pages/delivery`.
+
 ## 5. Navigation (README §5)
 
 The main menu is shared by all themes, so a mega-menu layout would change Debut's menu

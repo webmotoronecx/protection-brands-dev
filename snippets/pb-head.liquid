@@ -7,6 +7,7 @@
 {{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
 {{ 'pb-search.css' | asset_url | stylesheet_tag }}
 {%- if template.name == 'product' -%}
+  {{ 'pb-product.css' | asset_url | stylesheet_tag }}
   {{ 'pb-sticky-cart.css' | asset_url | stylesheet_tag }}
 {%- endif -%}
 {%- if settings.pb_reveal -%}

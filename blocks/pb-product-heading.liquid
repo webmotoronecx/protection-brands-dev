@@ -1,0 +1,175 @@
+{%- comment -%}
+  Product page heading (Protection Brands): a small breadcrumb, the brand (vendor) in red,
+  the product title large, light and uppercase, and "Suitable for" tags from the
+  custom.suitable_for metafield (Permagard / CERFACE / OptiVAN).
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+
+  # Breadcrumb collection: the one the visitor came from, else the product's first collection
+  # (skipping the home page and catch-all collections).
+  assign crumb = collection
+  if crumb == blank
+    for item in product.collections
+      unless item.handle == 'frontpage' or item.handle == 'all'
+        assign crumb = item
+        break
+      endunless
+    endfor
+  endif
+
+  assign suitable_for = product.metafields.custom.suitable_for.value
+
+  assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
+  if heading_font == blank
+    assign heading_font = settings.type_body_font
+  endif
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="pb-product-heading"
+  style="--pb-product-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-product-heading-weight: {{ heading_font.weight }};"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.show_breadcrumb -%}
+    <nav class="pb-product-heading__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.all_products_collection_url }}">Shop</a>
+      {%- if crumb != blank -%}
+        <span aria-hidden="true">/</span>
+        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+      {%- endif -%}
+    </nav>
+  {%- endif -%}
+
+  {%- if block.settings.show_vendor and product.vendor != blank -%}
+    <p class="pb-product-heading__brand">{{ product.vendor }}</p>
+  {%- endif -%}
+
+  <h1 class="pb-product-heading__title">{{ product.title }}</h1>
+
+  {%- if suitable_for != blank -%}
+    <div class="pb-product-heading__tags">
+      <span class="pb-product-heading__tags-label">{{ block.settings.suitable_label }}</span>
+      <ul>
+        {%- for item in suitable_for -%}
+          <li>{{ item }}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .pb-product-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pb-product-heading__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #9a9a9a;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-product-heading__crumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pb-product-heading__crumbs a:is(:hover, :focus-visible) {
+    color: #111;
+  }
+
+  .pb-product-heading__brand {
+    margin: 6px 0 0;
+    color: var(--pb-accent, #ca0d0d);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pb-product-heading__title {
+    margin: 0;
+    color: #111;
+    font-family: var(--pb-product-heading-font, inherit);
+    font-size: clamp(1.9rem, 2.6vw, 2.75rem);
+    font-weight: var(--pb-product-heading-weight, 300);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  .pb-product-heading__tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-block-start: 4px;
+  }
+
+  .pb-product-heading__tags-label {
+    color: #6f6f6f;
+    font-size: 13px;
+  }
+
+  .pb-product-heading__tags ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-product-heading__tags li {
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #f4f4f4;
+    color: #111;
+    font-size: 12px;
+    font-weight: 500;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product heading (PB)",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show breadcrumb",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show brand",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "suitable_label",
+      "label": "Suitable for label",
+      "default": "Suitable for"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product heading (PB)"
+    }
+  ]
+}
+{% endschema %}
