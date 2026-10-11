@@ -325,6 +325,17 @@
     line-height: 0;
   }
 
+  /* No box around the logo on focus. Keyboard users still get a cue: the logo dims while
+     it has keyboard focus. */
+  .pb-landing-header__logo:focus,
+  .pb-landing-header__logo:focus-visible {
+    outline: none;
+  }
+
+  .pb-landing-header__logo:focus-visible img {
+    opacity: 0.6;
+  }
+
   .pb-landing-header__logo img {
     width: clamp(160px, 16vw, 225px);
     height: auto;
