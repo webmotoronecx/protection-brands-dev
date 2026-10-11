@@ -37,6 +37,19 @@
 
     {{ content_for_header }}
 
+    {%- comment -%}
+      Logo intro (assets/pb-intro.css) plays once per browsing session. Set before first
+      paint; if storage is blocked or this fails, the logo simply shows with no intro.
+    {%- endcomment -%}
+    <script>
+      try {
+        if (!sessionStorage.getItem('pb-logo-intro')) {
+          document.documentElement.setAttribute('data-pb-logo-intro', '');
+          sessionStorage.setItem('pb-logo-intro', '1');
+        }
+      } catch (error) {}
+    </script>
+
     <style>
       .pb-landing {
         --pb-landing-header-height: 88px;

@@ -75,6 +75,34 @@
     }
   }
 
+  /* Logo intro, first homepage view of the session (html[data-pb-logo-intro], set in
+     layout/pb-landing.liquid): the red swoosh sweeps in from the left, in the direction it
+     is drawn, then the wordmark slides in. A small element, so the clip reveal is cheap. */
+  @keyframes pb-logo-swoosh {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes pb-logo-wordmark {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+
+  html[data-pb-logo-intro] .pb-landing .pb-logo__swoosh {
+    animation: pb-logo-swoosh 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.15s backwards;
+  }
+
+  html[data-pb-logo-intro] .pb-landing .pb-logo__wordmark {
+    animation: pb-logo-wordmark 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.55s backwards;
+  }
+
   .pb-landing .pb-landing-header {
     animation: pb-intro-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }

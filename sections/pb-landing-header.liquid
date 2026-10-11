@@ -17,10 +17,6 @@
       endunless
   endcase
 
-  assign logo_file = 'logo-protectionbrands.svg'
-  if light
-    assign logo_file = 'logo-protectionbrands-dark.svg'
-  endif
 -%}
 
 <header class="pb-landing-header{% if light %} pb-landing-header--light{% endif %}">
@@ -48,12 +44,7 @@
         | image_tag: alt: shop.name, loading: 'eager', widths: '300, 450, 600', sizes: '225px'
       }}
     {%- else -%}
-      <img
-        src="{{ logo_file | asset_url }}"
-        alt="{{ shop.name | escape }}"
-        width="225"
-        height="46"
-      >
+      {%- render 'pb-logo' -%}
     {%- endif -%}
   </a>
 
@@ -322,6 +313,7 @@
 
   .pb-landing-header__logo {
     display: block;
+    color: inherit; /* the inline logo's wordmark uses the header's text colour */
     line-height: 0;
   }
 
@@ -332,11 +324,11 @@
     outline: none;
   }
 
-  .pb-landing-header__logo:focus-visible img {
+  .pb-landing-header__logo:focus-visible :is(img, svg) {
     opacity: 0.6;
   }
 
-  .pb-landing-header__logo img {
+  .pb-landing-header__logo :is(img, svg) {
     width: clamp(160px, 16vw, 225px);
     height: auto;
   }
@@ -367,7 +359,7 @@
 
   /* Phones: smaller logo and tighter icons so search, account and cart fit beside it. */
   @media screen and (max-width: 749px) {
-    .pb-landing-header__logo img {
+    .pb-landing-header__logo :is(img, svg) {
       width: 128px;
     }
 
