@@ -176,12 +176,29 @@
   background: transparent;
 }
 
+.search-modal .predictive-search-results__card--product .resource-card__media {
+  position: relative;
+  overflow: hidden;
+}
+
 .search-modal .predictive-search-results__card--product .resource-card__image {
   width: 100%;
   height: 100%;
   aspect-ratio: 1;
   object-fit: contain;
   mix-blend-mode: multiply;
+}
+
+/* Horizon swaps in the second photo on hover; keep it inside the square image area (it is
+   otherwise placed against the whole card and covers the title and price). */
+.search-modal .predictive-search-results__card--product .resource-card__image--secondary {
+  position: absolute;
+  inset: 0;
+}
+
+/* No link underline anywhere in the card on hover. */
+.search-modal .predictive-search-results__card--product :is(a, a *, .resource-card, .resource-card *) {
+  text-decoration: none;
 }
 
 .search-modal .predictive-search-results__card--product .resource-card__content {
