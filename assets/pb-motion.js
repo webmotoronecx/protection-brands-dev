@@ -7,6 +7,8 @@
   Reveals:
   - Every section in #MainContent that starts below the first screen fades and slides in once.
   - Any element with [data-reveal] reveals its children with a stagger instead.
+  - Product cards (.product-grid__item) below the first screen reveal in batches as they
+    scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
   hidden by this script, so without JS everything is visible.
 
@@ -91,6 +93,18 @@
         start: 'top 90%',
         once: true,
         onEnter: (batch) => gsap.to(batch, { ...to, stagger: 0.08 }),
+      });
+    }
+
+    // Product cards below the first screen, in batches as they scroll in.
+    const cards = [...document.querySelectorAll('.product-grid > .product-grid__item')].filter(belowFold);
+    if (cards.length) {
+      gsap.set(cards, from);
+      revealed.push(...cards);
+      ScrollTrigger.batch(cards, {
+        start: 'top 92%',
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { ...to, stagger: 0.06 }),
       });
     }
 

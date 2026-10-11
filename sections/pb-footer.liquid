@@ -8,7 +8,8 @@
   here, e.g. the OptiVAN and Permagard sites and Instagram).
 {%- endcomment -%}
 
-<footer class="pb-footer" style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};">
+{%- comment -%} data-reveal: its children rise in one after another as it scrolls in (assets/pb-motion.js). {%- endcomment -%}
+<footer class="pb-footer" data-reveal style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};">
   <div class="pb-footer__top">
     {%- if section.settings.newsletter -%}
       <div class="pb-footer__newsletter">
