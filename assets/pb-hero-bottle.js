@@ -55,7 +55,17 @@ const PARALLAX = { bottleX: 1.6, bottleY: 1, wordmarkX: 110, wordmarkY: 36 };
 
 /* Intro: when the 3D first appears, the bottles drop in from above, the second (blue) a
    moment after the first (amber). Distances in scene units. */
-const INTRO = { duration: 1.4, distance: 11, stagger: 0.18 };
+const INTRO = { fall: 0.7, settle: 0.9, distance: 11, stagger: 0.18, bounce: 0.6 };
+INTRO.duration = INTRO.fall + INTRO.settle;
+
+/* Falling with a small bounce: speeds up as it falls (like gravity), dips just past its
+   resting place on landing, springs back up a touch and settles. Seconds in, scene units out. */
+function introDrop(seconds) {
+  if (seconds <= 0) return INTRO.distance;
+  if (seconds < INTRO.fall) return INTRO.distance * (1 - (seconds / INTRO.fall) ** 2);
+  const after = seconds - INTRO.fall;
+  return -INTRO.bounce * Math.exp(-4.5 * after) * Math.sin(13 * after);
+}
 
 /* Reflections & lighting. These defaults are the designed look; each one can be changed in
    the theme editor (Hero bottle (3D) → Reflections & lighting), which passes it in as a
@@ -362,13 +372,11 @@ class PBHeroBottle extends HTMLElement {
     const rect = this.getBoundingClientRect();
     const scrolled = Math.min(Math.max(-rect.top / rect.height, 0), 1);
 
-    // Intro offset per bottle: eases out from INTRO.distance to 0.
+    // Intro offset per bottle: falls from INTRO.distance above, bounces a little, settles.
     const now = performance.now() / 1000;
     const introOffset = (index) => {
       if (!this.#introStart) return 0;
-      const t = Math.min(Math.max((now - this.#introStart - index * INTRO.stagger) / INTRO.duration, 0), 1);
-      const remaining = (1 - t) ** 3;
-      return remaining * INTRO.distance;
+      return introDrop(now - this.#introStart - index * INTRO.stagger);
     };
 
     this.#bottles.forEach(({ group, spec }, index) => {
