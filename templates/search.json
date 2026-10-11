@@ -18,7 +18,9 @@
         "fallback_title": "Products",
         "marquee": true,
         "marquee_motion": "mouse",
-        "marquee_duration": 60
+        "marquee_duration": 60,
+        "category_source": "tags",
+        "all_label": "All"
       }
     },
     "search": {

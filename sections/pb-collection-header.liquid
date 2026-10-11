@@ -38,9 +38,24 @@
     else
       assign title = current.title
   endcase
+  # On a tag page (e.g. /collections/all/professional) the title is the tag.
+  if request.page_type == 'collection' and current_tags.size > 0
+    assign title = current_tags.first
+  endif
   if title == blank
     assign title = section.settings.fallback_title
   endif
+
+  # Category row from product tags, like the old site: the current collection's tags, or all
+  # products' tags on pages without a collection (search, cart, 404...).
+  assign tag_collection = current
+  if tag_collection == blank
+    assign tag_collection = collections.all
+  endif
+  assign current_tag_handles = ''
+  for tag in current_tags
+    assign current_tag_handles = current_tag_handles | append: ',' | append: tag | handle | append: ','
+  endfor
 -%}
 
 <style>
@@ -114,7 +129,38 @@
     <div class="pb-collection-header__description rte">{{ current.description }}</div>
   {%- endif -%}
 
-  {%- if section.settings.categories != blank -%}
+  {%- if section.settings.category_source == 'tags' and tag_collection.all_tags.size > 0 -%}
+    <nav class="pb-collection-header__nav" aria-label="{{ section.settings.nav_label | escape }}">
+      <ul class="pb-collection-header__categories">
+        <li>
+          <a
+            href="{{ tag_collection.url }}"
+            {% if request.page_type == 'collection' and current_tags.size == 0 %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{- section.settings.all_label -}}
+          </a>
+        </li>
+        {%- for tag in tag_collection.all_tags -%}
+          {%- liquid
+            assign tag_handle = tag | handle
+            assign tag_key = ',' | append: tag_handle | append: ','
+          -%}
+          <li>
+            <a
+              href="{{ tag_collection.url }}/{{ tag_handle }}"
+              {% if current_tag_handles contains tag_key %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- tag -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- elsif section.settings.category_source == 'collections' and section.settings.categories != blank -%}
     <nav class="pb-collection-header__nav" aria-label="{{ section.settings.nav_label | escape }}">
       <ul class="pb-collection-header__categories">
         {%- for category in section.settings.categories -%}
@@ -132,7 +178,9 @@
       </ul>
     </nav>
   {%- elsif request.design_mode -%}
-    <p class="pb-collection-header__hint">Pick the categories for this row in the section settings.</p>
+    {%- if section.settings.category_source == 'collections' -%}
+      <p class="pb-collection-header__hint">Pick the categories for this row in the section settings.</p>
+    {%- endif -%}
   {%- endif -%}
 </div>
 
@@ -341,10 +389,38 @@
       "default": false
     },
     {
+      "type": "select",
+      "id": "category_source",
+      "label": "Category row",
+      "options": [
+        {
+          "value": "tags",
+          "label": "Product tags (like the old site)"
+        },
+        {
+          "value": "collections",
+          "label": "Chosen collections"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "tags"
+    },
+    {
+      "type": "text",
+      "id": "all_label",
+      "label": "\"All\" link label",
+      "default": "All",
+      "visible_if": "{{ section.settings.category_source == 'tags' }}"
+    },
+    {
       "type": "collection_list",
       "id": "categories",
       "label": "Categories",
-      "limit": 16
+      "limit": 16,
+      "info": "Used when Category row is \"Chosen collections\"."
     },
     {
       "type": "text",
