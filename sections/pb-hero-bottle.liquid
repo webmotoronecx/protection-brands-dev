@@ -97,7 +97,12 @@
           <span class="pb-hero-bottle__line pb-hero-bottle__line--second">{{ line_2 }}</span>
         </h2>
         {%- if link != blank and button != blank -%}
-          <a class="pb-hero-bottle__button" href="{{ link }}">{{ button }}</a>
+          <a class="pb-hero-bottle__button" href="{{ link }}">
+            <span class="pb-hero-bottle__button-label">{{ button }}</span>
+            <svg class="pb-hero-bottle__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 8h11M9 4l4 4-4 4"/>
+            </svg>
+          </a>
         {%- endif -%}
       </div>
     {%- endif -%}
@@ -223,9 +228,16 @@
     color: #efe6e6;
   }
 
+  /* Shop now. Hover/focus: red sweeps in from the left, the label nudges left and an arrow
+     slides in on the right; press scales it down a touch. Transforms and opacity only. */
   .pb-hero-bottle__button {
+    --pb-button-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
+    overflow: hidden;
     padding: 11px 18px;
     border-radius: 6px;
     background: #000;
@@ -235,12 +247,62 @@
     line-height: 1;
     text-decoration: none;
     text-transform: uppercase;
-    transition: background-color 0.2s ease;
+    transition: transform 0.2s var(--pb-button-ease);
   }
 
-  .pb-hero-bottle__button:is(:hover, :focus-visible) {
+  .pb-hero-bottle__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: var(--pb-accent, #ca0d0d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--pb-button-ease);
   }
+
+  .pb-hero-bottle__button-label {
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button-arrow {
+    position: absolute;
+    inset-inline-end: 10px;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible)::before {
+    transform: scaleX(1);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible) .pb-hero-bottle__button-label {
+    transform: translateX(-7px);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible) .pb-hero-bottle__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pb-hero-bottle__button:active {
+    transform: scale(0.96);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle__button,
+    .pb-hero-bottle__button::before,
+    .pb-hero-bottle__button-label,
+    .pb-hero-bottle__button-arrow {
+      transition: none;
+    }
+  }
+
 
   .pb-hero-bottle__text--start {
     grid-column: 1;
