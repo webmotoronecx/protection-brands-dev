@@ -112,6 +112,30 @@ sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper:
   rotate: 90deg;
 }
 
+/* Desktop and tablet: bottom right, over the details column, so it never covers the photos
+   and thumbnails on the left. Horizon centres it with translateX(-50%); that is replaced in
+   every state (hidden, shown, and the starting style it animates in from). */
+@media screen and (min-width: 750px) {
+  sticky-add-to-cart .sticky-add-to-cart__bar {
+    left: auto; /* stylelint-disable-line csstools/use-logical -- pairs with Horizon's physical left */
+    right: max(20px, var(--page-margin, 20px)); /* stylelint-disable-line csstools/use-logical */
+    width: min(560px, calc(100vw - 40px));
+    transform: translateY(calc(100% + 40px));
+
+    @starting-style {
+      transform: translateY(calc(100% + 40px));
+    }
+  }
+
+  sticky-add-to-cart .sticky-add-to-cart__bar[data-stuck='true'] {
+    transform: translateY(0);
+  }
+
+  sticky-add-to-cart:not([data-variant-available='true']) .sticky-add-to-cart__bar {
+    transform: translateY(calc(100% + 40px));
+  }
+}
+
 @media screen and (max-width: 749px) {
   sticky-add-to-cart .sticky-add-to-cart__bar {
     width: 100%;
