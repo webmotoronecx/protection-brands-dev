@@ -1,7 +1,8 @@
 {%- comment -%}
-  Protection Brands collection header: the collection title, large, light and uppercase,
-  with a row of category links under it (current collection in red). On phones the row
-  scrolls sideways. Categories are picked in the theme editor.
+  Protection Brands collection header: a rounded dark card with the scrolling wordmark
+  (snippets/pb-marquee.liquid, inverted file) along the top, the collection title, large,
+  light and uppercase, and a row of category links (current one underlined in red). On
+  phones the row scrolls sideways. Categories are picked in the theme editor.
 {%- endcomment -%}
 
 {%- liquid
@@ -24,6 +25,15 @@
   class="pb-collection-header"
   style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
 >
+  {%- if section.settings.marquee -%}
+    {%- render 'pb-marquee',
+      class: 'pb-collection-header__marquee',
+      file: 'label-scroling-invert.svg',
+      duration: section.settings.marquee_duration,
+      loading: 'eager'
+    -%}
+  {%- endif -%}
+
   <h1 class="pb-collection-header__title">{{ current.title | default: section.settings.fallback_title }}</h1>
 
   {%- if section.settings.show_description and current.description != blank -%}
@@ -54,13 +64,34 @@
 
 {% stylesheet %}
   .pb-collection-header {
-    padding: 32px var(--page-margin, 24px) 40px;
+    --pb-collection-pad-x: clamp(24px, 4.5vw, 64px);
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin: 0 10px 14px;
+    padding: clamp(96px, 9vw, 130px) var(--pb-collection-pad-x) clamp(32px, 3.5vw, 52px);
+    border-radius: 12px;
+    background:
+      radial-gradient(ellipse 60% 90% at 20% 60%, #2c2c2c 0%, transparent 70%),
+      linear-gradient(120deg, #1d1d1d 0%, #141414 60%, #161616 100%);
+    color: #fff;
+  }
+
+  /* Wordmark along the top, cut off by the top of the card. */
+  .pb-collection-header__marquee {
+    --pb-marquee-height: clamp(4rem, 14vw, 17rem);
+
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(var(--pb-marquee-height) * -0.2);
+    z-index: -1;
   }
 
   .pb-collection-header__title {
-    max-width: 12ch;
+    max-width: 16ch;
     margin: 0;
-    color: #111;
+    color: #fff;
     font-family: var(--pb-collection-heading-font, inherit);
     font-size: clamp(2.25rem, 3.4vw, 3.5rem);
     font-weight: var(--pb-collection-heading-weight, 300);
@@ -72,11 +103,11 @@
   .pb-collection-header__description {
     max-width: 60ch;
     margin-block-start: 16px;
-    color: #555;
+    color: #cfcfcf;
   }
 
   .pb-collection-header__nav {
-    margin-block-start: clamp(32px, 4vw, 56px);
+    margin-block-start: clamp(40px, 6vw, 88px);
   }
 
   .pb-collection-header__categories {
@@ -89,32 +120,40 @@
   }
 
   .pb-collection-header__categories a {
-    color: #111;
+    color: #fff;
     font-size: 17px;
     text-decoration: none;
     white-space: nowrap;
-    transition: color 0.2s ease;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
   }
 
   .pb-collection-header__categories a:is(:hover, :focus-visible) {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    text-decoration-line: underline;
+    text-decoration-color: rgb(255 255 255 / 0.5);
   }
 
   .pb-collection-header__categories a[aria-current='page'] {
-    color: var(--pb-accent, #ca0d0d);
+    text-decoration-line: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
   }
 
   .pb-collection-header__hint {
     margin: 24px 0 0;
-    color: #888;
+    color: #9a9a9a;
     font-size: 14px;
   }
 
-  /* Phones: one row that scrolls sideways, edge to edge. */
+  /* Phones: one row that scrolls sideways, edge to edge of the card. */
   @media screen and (max-width: 749px) {
+    .pb-collection-header {
+      --pb-collection-pad-x: 18px;
+
+      margin-inline: 8px;
+    }
+
     .pb-collection-header__nav {
-      margin-inline: calc(var(--page-margin, 16px) * -1);
+      margin-inline: calc(var(--pb-collection-pad-x) * -1);
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -127,7 +166,8 @@
       flex-wrap: nowrap;
       gap: 28px;
       width: max-content;
-      padding-inline: var(--page-margin, 16px);
+      padding-inline: var(--pb-collection-pad-x);
+      padding-block-end: 8px;
     }
 
     .pb-collection-header__categories a {
@@ -166,6 +206,23 @@
       "id": "fallback_title",
       "label": "Title when there is no collection",
       "default": "Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Show scrolling wordmark",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "marquee_duration",
+      "label": "Scroll speed",
+      "info": "Seconds for one loop. Higher is slower.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 60
     }
   ],
   "presets": [

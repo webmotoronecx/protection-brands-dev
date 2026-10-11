@@ -1,6 +1,7 @@
 {%- doc -%}
-  Endless right-to-left scroll of the Protection Brands wordmark (assets/label-scroling.svg).
-  Used behind the homepage bottles and along the bottom of the inner-page footer.
+  Endless right-to-left scroll of the Protection Brands wordmark (assets/label-scroling.svg,
+  or label-scroling-invert.svg, which fades upwards instead). Used behind the homepage
+  bottles, along the bottom of the inner-page footer and the top of the collection header.
 
   Cost: one ~10 KB SVG (cached after the first page) and one CSS animation that moves only
   `transform`, so it runs on the compositor. assets/pb-marquee.js pauses it while it is off
@@ -11,6 +12,7 @@
   @param {string} [class] - Extra classes on the wrapper.
   @param {number} [duration] - Seconds per loop. Defaults to 60.
   @param {string} [loading] - 'eager' when above the fold. Defaults to 'lazy'.
+  @param {string} [file] - SVG asset name. Defaults to 'label-scroling.svg'.
 {%- enddoc -%}
 
 <pb-marquee
@@ -22,7 +24,7 @@
   <span class="pb-marquee__track">
     {%- for i in (1..4) -%}
       <img
-        src="{{ 'label-scroling.svg' | asset_url }}"
+        src="{{ file | default: 'label-scroling.svg' | asset_url }}"
         alt=""
         width="319"
         height="27"
