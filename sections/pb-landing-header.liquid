@@ -51,29 +51,93 @@
 
 {%- assign menu = section.settings.menu -%}
 <pb-menu>
-  <dialog id="PBMenu" class="pb-menu" aria-label="{{ menu.title | default: 'Menu' | escape }}">
+  <dialog id="PBMenu" class="pb-menu" tabindex="-1" aria-label="{{ menu.title | default: 'Menu' | escape }}">
     <button type="button" class="pb-menu__close" aria-label="Close menu" data-pb-menu-close>
       <span class="pb-menu__close-line"></span>
       <span class="pb-menu__close-line"></span>
     </button>
 
-    {%- if menu.links.size > 0 -%}
-      <nav class="pb-menu__nav">
-        <ul class="pb-menu__links">
-          {%- for link in menu.links -%}
-            <li>
-              <a
-                href="{{ link.url }}"
-                {% if link.current %}
-                  aria-current="page"
+    <div class="pb-menu__body">
+      {%- if menu.links.size > 0 -%}
+        <nav class="pb-menu__nav" aria-label="{{ menu.title | escape }}">
+          <ul class="pb-menu__links">
+            {%- for link in menu.links -%}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- link.title -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+
+      {%- if section.settings.categories != blank -%}
+        <nav class="pb-menu__nav" aria-labelledby="PBMenuCategories">
+          <h2 id="PBMenuCategories" class="pb-menu__heading">{{ section.settings.categories_heading }}</h2>
+          <ul class="pb-menu__links pb-menu__links--small">
+            {%- for collection in section.settings.categories -%}
+              <li>
+                <a
+                  href="{{ collection.url }}"
+                  {% if collection.url == request.path %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- collection.title -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.newsletter -%}
+      <div class="pb-menu__newsletter">
+        {%- form 'customer', id: 'PBMenuNewsletter', class: 'pb-menu__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <h2 class="pb-menu__heading">{{ section.settings.newsletter_heading }}</h2>
+          {%- if section.settings.newsletter_text != blank -%}
+            <p class="pb-menu__text">{{ section.settings.newsletter_text }}</p>
+          {%- endif -%}
+
+          {%- if form.posted_successfully? -%}
+            {%- comment -%} After the page reloads, pb-menu.js reopens the menu to show this. {%- endcomment -%}
+            <p class="pb-menu__message" role="status" data-pb-menu-open-on-load>Thanks for subscribing.</p>
+          {%- else -%}
+            <div class="pb-menu__field">
+              <label class="visually-hidden" for="PBMenuEmail">Email address</label>
+              <input
+                id="PBMenuEmail"
+                type="email"
+                name="contact[email]"
+                value="{{ form.email }}"
+                placeholder="Email address"
+                autocomplete="email"
+                autocorrect="off"
+                autocapitalize="off"
+                required
+                {% if form.errors %}
+                  aria-invalid="true"
+                  aria-describedby="PBMenuEmailError"
                 {% endif %}
               >
-                {{- link.title -}}
-              </a>
-            </li>
-          {%- endfor -%}
-        </ul>
-      </nav>
+              <button type="submit" class="pb-menu__submit">Subscribe</button>
+            </div>
+            {%- if form.errors -%}
+              <div id="PBMenuEmailError" class="pb-menu__message pb-menu__message--error" data-pb-menu-open-on-load>
+                {{ form.errors | default_errors }}
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endform -%}
+      </div>
     {%- endif -%}
   </dialog>
 </pb-menu>
@@ -174,13 +238,25 @@
     padding: 0;
     border: 0;
     border-radius: 10px;
-    background: #0f0f0f;
+    overflow-y: auto;
+    background: #040404;
     color: #fff;
     opacity: 0;
     translate: -24px 0;
     transition:
       opacity 0.35s ease,
       translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-menu[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Focus starts on the panel itself (pb-menu.js), so no ring shows on the close button
+     after a mouse click; keyboard users tab to it as normal. */
+  .pb-menu:focus {
+    outline: none;
   }
 
   .pb-menu.is-open {
@@ -221,8 +297,98 @@
     rotate: -45deg;
   }
 
-  .pb-menu__nav {
-    padding: 30vh 32px 48px 12%;
+  /* Main links and categories side by side; newsletter pinned to the bottom. */
+  .pb-menu__body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 40px 48px;
+    flex: 1 0 auto;
+    padding: 96px 32px 40px 12%;
+  }
+
+  .pb-menu__heading {
+    margin: 0 0 18px;
+    color: #8a8a8a;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-menu__newsletter {
+    padding: 32px 32px 40px 12%;
+    border-block-start: 1px solid #1c1c1c;
+  }
+
+  .pb-menu__text {
+    max-width: 36ch;
+    margin: -8px 0 18px;
+    color: #bdbdbd;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .pb-menu__field {
+    display: flex;
+    gap: 12px;
+    max-width: 440px;
+  }
+
+  .pb-menu__field input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+    border: 0;
+    border-block-end: 1px solid #3a3a3a;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+  }
+
+  .pb-menu__field input::placeholder {
+    color: #6f6f6f;
+  }
+
+  .pb-menu__field input:focus-visible {
+    outline: none;
+    border-block-end-color: #fff;
+  }
+
+  .pb-menu__submit {
+    padding: 0 18px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-menu__submit:is(:hover, :focus-visible) {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  .pb-menu__message {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .pb-menu__message--error {
+    margin-block-start: 10px;
+    color: #ff6b6b;
+  }
+
+  .pb-menu__message--error :is(ul, p) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .pb-menu__links {
@@ -243,6 +409,10 @@
     transition: color 0.2s ease;
   }
 
+  .pb-menu__links--small a {
+    font-size: 15px;
+  }
+
   .pb-menu__links a:is(:hover, :focus-visible, [aria-current='page']) {
     color: var(--pb-accent, #ca0d0d);
   }
@@ -254,8 +424,13 @@
       width: calc(100vw - var(--pb-menu-inset) * 2);
     }
 
-    .pb-menu__nav {
-      padding: 22vh 24px 40px;
+    .pb-menu__body {
+      grid-template-columns: 1fr;
+      padding: 84px 24px 32px;
+    }
+
+    .pb-menu__newsletter {
+      padding: 28px 24px 32px;
     }
   }
 
@@ -284,6 +459,36 @@
       "label": "Floating menu",
       "default": "main-menu",
       "info": "Opened from the menu button. Top-level links only."
+    },
+    {
+      "type": "text",
+      "id": "categories_heading",
+      "label": "Categories heading",
+      "default": "Categories"
+    },
+    {
+      "type": "collection_list",
+      "id": "categories",
+      "label": "Categories",
+      "limit": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter",
+      "label": "Show newsletter signup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Subscribe to our newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter text",
+      "default": "New products, offers and car care tips."
     }
   ]
 }

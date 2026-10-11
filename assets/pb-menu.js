@@ -3,7 +3,8 @@
 
   A native <dialog> opened with showModal(), so the browser handles focus trapping, Esc and
   making the page behind inert. Opens from any button with [data-pb-menu-toggle]; closes from
-  [data-pb-menu-close], Esc, or a click outside the panel.
+  [data-pb-menu-close], Esc, or a click outside the panel. It also opens by itself when it
+  contains [data-pb-menu-open-on-load] (the newsletter form's thank-you or error).
 
   The panel slides and fades in (transform and opacity only). While it is open,
   html[data-pb-menu-open] is set, which locks page scrolling and pauses the 3D hero, and a
@@ -47,6 +48,9 @@ class PBMenu extends HTMLElement {
       { signal }
     );
 
+    // After the newsletter form posts, the page reloads; reopen to show the result.
+    if (dialog.querySelector('[data-pb-menu-open-on-load]')) this.open();
+
     // Esc: animate out instead of the browser's instant close.
     dialog.addEventListener(
       'cancel',
@@ -72,7 +76,11 @@ class PBMenu extends HTMLElement {
     const dialog = this.dialog;
     clearTimeout(this.#closing);
     this.#closing = undefined;
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) {
+      dialog.showModal();
+      // Focus the panel, not the close button, so no focus ring shows after a mouse click.
+      dialog.focus();
+    }
     // Next frame, so the closed styles apply first and the transition runs.
     requestAnimationFrame(() => dialog.classList.add('is-open'));
     this.#setOpen(true);
