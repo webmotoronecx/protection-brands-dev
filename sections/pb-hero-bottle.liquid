@@ -12,7 +12,17 @@
   endif
 
   assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
+
+  # Headings use a light weight of the body font (Manrope 300), loaded only here.
+  assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
+  if heading_font == blank
+    assign heading_font = settings.type_body_font
+  endif
 -%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
 
 <pb-hero-bottle
   class="pb-hero-bottle{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
@@ -30,7 +40,7 @@
   data-shadow="{{ section.settings.shadow | divided_by: 100.0 }}"
   data-shadow-blur="{{ section.settings.shadow_blur | times: 0.48 }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
-  style="--pb-hero-bg: {{ section.settings.background }};"
+  style="--pb-hero-bg: {{ section.settings.background }}; --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
 >
   {%- if section.settings.poster != blank -%}
     {{
@@ -74,21 +84,26 @@
         assign line_1 = section.settings.start_line_1
         assign line_2 = section.settings.start_line_2
         assign link = section.settings.start_link
+        assign button = section.settings.start_button
         assign modifier = 'start'
       else
         assign line_1 = section.settings.end_line_1
         assign line_2 = section.settings.end_line_2
         assign link = section.settings.end_link
+        assign button = section.settings.end_button
         assign modifier = 'end'
       endif
     -%}
     {%- if line_1 != blank or line_2 != blank -%}
-      <p class="pb-hero-bottle__text pb-hero-bottle__text--{{ modifier }}">
-        {%- if link != blank -%}<a href="{{ link }}">{%- endif -%}
-        <span class="pb-hero-bottle__line">{{ line_1 }}</span>
-        <span class="pb-hero-bottle__line pb-hero-bottle__line--muted">{{ line_2 }}</span>
-        {%- if link != blank -%}</a>{%- endif -%}
-      </p>
+      <div class="pb-hero-bottle__text pb-hero-bottle__text--{{ modifier }}">
+        <h2 class="pb-hero-bottle__heading">
+          <span class="pb-hero-bottle__line">{{ line_1 }}</span>
+          <span class="pb-hero-bottle__line pb-hero-bottle__line--second">{{ line_2 }}</span>
+        </h2>
+        {%- if link != blank and button != blank -%}
+          <a class="pb-hero-bottle__button" href="{{ link }}">{{ button }}</a>
+        {%- endif -%}
+      </div>
     {%- endif -%}
   {%- endfor -%}
 </pb-hero-bottle>
@@ -202,30 +217,55 @@
   .pb-hero-bottle__text {
     position: relative;
     z-index: 2;
-    margin: 0;
-    font-size: clamp(1.75rem, 3vw, 2.75rem);
-    font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
   }
 
-  .pb-hero-bottle__text a {
-    color: inherit;
-    text-decoration: none;
+  .pb-hero-bottle__text--start {
+    align-items: flex-end;
+  }
+
+  .pb-hero-bottle__text--end {
+    align-items: flex-start;
+  }
+
+  .pb-hero-bottle__heading {
+    margin: 0;
+    color: #fff;
+    font-family: var(--pb-hero-heading-font, inherit);
+    font-size: clamp(2rem, 3.4vw, 3.75rem);
+    font-weight: var(--pb-hero-heading-weight, 300);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
   }
 
   .pb-hero-bottle__line {
     display: block;
   }
 
-  .pb-hero-bottle__line--muted {
-    color: #8a8a8a;
-    transition: color 0.2s ease;
+  .pb-hero-bottle__line--second {
+    color: #efe6e6;
   }
 
-  .pb-hero-bottle__text a:is(:hover, :focus-visible) .pb-hero-bottle__line--muted {
+  .pb-hero-bottle__button {
+    display: inline-flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 6px;
+    background: #000;
     color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible) {
+    background: var(--pb-accent, #c62b23);
   }
 
   .pb-hero-bottle__text--start {
@@ -255,6 +295,7 @@
       justify-self: start;
       align-self: start;
       margin: 0;
+      align-items: flex-start;
       text-align: start;
     }
 
@@ -264,6 +305,7 @@
       justify-self: end;
       align-self: end;
       margin: 0;
+      align-items: flex-end;
       text-align: end;
     }
   }
@@ -294,7 +336,13 @@
     {
       "type": "url",
       "id": "start_link",
-      "label": "Left link"
+      "label": "Left button link"
+    },
+    {
+      "type": "text",
+      "id": "start_button",
+      "label": "Left button label",
+      "default": "Shop now"
     },
     {
       "type": "text",
@@ -311,7 +359,13 @@
     {
       "type": "url",
       "id": "end_link",
-      "label": "Right link"
+      "label": "Right button link"
+    },
+    {
+      "type": "text",
+      "id": "end_button",
+      "label": "Right button label",
+      "default": "Shop now"
     },
     {
       "type": "header",
