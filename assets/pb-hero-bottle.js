@@ -57,7 +57,7 @@ const LOOK = {
   gloss: 1, // clear-coat shine on the plastic, liquid and label
   keyLight: 1, // main light from the upper right
   rimLight: 0.25, // coloured light from behind, along the left edges
-  rimColor: '#c62b23',
+  rimColor: '#ca0d0d',
   shadow: 0.35, // darkness of the shadow behind the bottles
   shadowBlur: 24, // softness of the shadows
 };

@@ -30,7 +30,7 @@
         "gloss": 100,
         "key_light": 100,
         "rim_light": 10,
-        "rim_color": "#c62b23",
+        "rim_color": "#ca0d0d",
         "shadow": 35,
         "shadow_blur": 50,
         "background": "#0b0b0b",
