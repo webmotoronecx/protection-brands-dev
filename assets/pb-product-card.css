@@ -75,7 +75,7 @@
   height: var(--pb-quick-add-size);
   padding: 0;
   border: 0;
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--pb-accent);
   color: var(--pb-on-accent);
   backdrop-filter: none;
