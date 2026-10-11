@@ -184,6 +184,18 @@
     color: #111;
   }
 
+  /* Light header sticks to the top while the page scrolls. Like Horizon's own sticky header,
+     the header group's box is removed so the section can stick to the page, not the group. */
+  #header-group:has(.pb-landing-header--light) {
+    display: contents;
+  }
+
+  .pb-landing-header-section:has(> .pb-landing-header--light) {
+    position: sticky;
+    top: 0;
+    z-index: var(--layer-menu-drawer, 40);
+  }
+
   @media screen and (max-width: 749px) {
     .pb-landing-header--light {
       height: 72px;
