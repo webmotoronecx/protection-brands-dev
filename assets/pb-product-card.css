@@ -1,0 +1,110 @@
+/*
+  Protection Brands product cards.
+  Grey card, square contained image, two-line title, bold price, and an always-visible
+  square quick-add button in the card's bottom-right corner. Every card in a row is the
+  same height.
+
+  Scoped to grid cards (.product-grid__card): collection, search, product lists,
+  recommendations.
+  Background, corners and padding are set here rather than in each template's card
+  settings, so every grid matches. Change the variables below.
+*/
+
+:root {
+  --pb-card-bg: #f4f4f4;
+  --pb-accent: #c62b23;
+  --pb-accent-hover: #a8221b;
+  --pb-on-accent: #ffffff;
+  --pb-card-radius: 12px;
+  --pb-card-padding: 16px;
+  --pb-quick-add-size: 44px;
+  --pb-title-lines: 2;
+}
+
+/* Card: positioning context for the quick-add button, which now sits at the card's
+   corner instead of the image's. */
+.product-card .product-grid__card.product-grid__card {
+  position: relative;
+  height: 100%;
+  padding: var(--pb-card-padding);
+  border-radius: var(--pb-card-radius);
+  background: var(--pb-card-bg);
+}
+
+.product-grid__card .card-gallery {
+  position: static;
+  background: transparent;
+}
+
+/* Image: square, whole product visible, white photo backgrounds blend into the card. */
+.product-grid__card .product-media-container.media-fit img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.product-grid__card .product-media-container {
+  background: transparent;
+}
+
+/* Text: keep clear of the button, title always takes exactly two lines. */
+.product-grid__card > :not(.card-gallery, .product-grid-view-zoom-out--details) {
+  padding-inline-end: calc(var(--pb-quick-add-size) + var(--padding-sm, 12px));
+}
+
+.product-grid__card [role='heading'] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--pb-title-lines);
+  overflow: hidden;
+  min-height: calc(var(--pb-title-lines) * 1lh);
+  margin: 0;
+}
+
+/* Quick add: fixed square, always shown. Whether it renders at all on desktop/mobile is
+   still controlled by the theme's quick add settings (--quick-add-display). */
+.product-grid__card .quick-add {
+  --quick-add-inset-inline-end: var(--pb-card-padding);
+  --quick-add-inset-block-end: var(--pb-card-padding);
+}
+
+.product-grid__card button.quick-add__button,
+.product-grid__card button.quick-add__button:is(:hover, :focus-visible) {
+  --quick-add-collapsed-width: var(--pb-quick-add-size);
+  --quick-add-icon-width: var(--pb-quick-add-size);
+
+  opacity: 1;
+  width: var(--pb-quick-add-size);
+  height: var(--pb-quick-add-size);
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: var(--pb-accent);
+  color: var(--pb-on-accent);
+  backdrop-filter: none;
+  scale: 1;
+}
+
+.product-grid__card button.quick-add__button:is(:hover, :focus-visible) {
+  background: var(--pb-accent-hover);
+}
+
+.product-grid__card button.quick-add__button:disabled {
+  opacity: 0.5;
+}
+
+.product-grid__card .quick-add__button[data-added='true'] .add-to-cart__added {
+  color: var(--pb-on-accent);
+}
+
+@media screen and (max-width: 749px) {
+  :root {
+    --pb-card-padding: 12px;
+    --pb-card-radius: 8px;
+    --pb-quick-add-size: 36px;
+  }
+}
+
+/* Price: bold, current price only weight change. */
+.product-grid__card .price {
+  font-weight: 700;
+}
