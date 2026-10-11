@@ -9,10 +9,17 @@
 }
 
 /* Gallery: each photo on the light grey rounded tile, whole product visible. */
-.product-information .product-media-container {
+/* Higher specificity than the gallery's own inline style, which paints the slides
+   (.product-media-container.constrain-height) and the slider white. */
+.product-information media-gallery .product-media-container.product-media-container {
   overflow: hidden;
   border-radius: 12px;
   background: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information media-gallery slideshow-container,
+.product-information media-gallery .product-media-container img {
+  background: transparent;
 }
 
 .product-information .product-media-container img {
