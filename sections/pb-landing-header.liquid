@@ -57,18 +57,32 @@
     {%- endif -%}
   </a>
 
-  <a
-    class="pb-landing-header__cart"
-    href="{{ routes.cart_url }}"
-    aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}"
-  >
-    {{- 'icon-cart.svg' | inline_asset_content -}}
-    {%- if cart.item_count > 0 -%}
-      <span class="pb-landing-header__count" aria-hidden="true">
-        {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
-      </span>
+  <div class="pb-landing-header__actions">
+    {%- if shop.customer_accounts_enabled -%}
+      <a class="pb-landing-header__icon" href="{{ routes.account_url }}" aria-label="Account">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5.5 19.2c0-3 2.9-5.2 6.5-5.2s6.5 2.2 6.5 5.2v.8h-13v-.8Z"/>
+        </svg>
+      </a>
     {%- endif -%}
-  </a>
+
+    <a
+      class="pb-landing-header__icon pb-landing-header__cart"
+      href="{{ routes.cart_url }}"
+      aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}"
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M5.5 8h13l-1 12h-11l-1-12Z"/>
+        <path d="M9 10V6.5a3 3 0 0 1 6 0V10"/>
+      </svg>
+      {%- if cart.item_count > 0 -%}
+        <span class="pb-landing-header__count" aria-hidden="true">
+          {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
+        </span>
+      {%- endif -%}
+    </a>
+  </div>
 </header>
 
 {%- assign menu = section.settings.menu -%}
@@ -183,22 +197,70 @@
   }
 
   /* Light: white inner-page header, in the page flow. */
+  /* Light header. Heights are unitless so the compact scale can be worked out in CSS.
+     The header keeps its full height in the layout, so nothing below moves when it
+     compacts; only the white bar (::before) and the contents animate, with transforms. */
   .pb-landing-header--light {
+    --pb-header-h: 104;
+    --pb-header-h-compact: 68;
+    --pb-header-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
     position: relative;
-    height: 104px;
-    background: #fff;
+    isolation: isolate;
+    height: calc(var(--pb-header-h) * 1px);
     color: #111;
-    transition:
-      background-color 0.3s ease,
-      box-shadow 0.3s ease;
   }
 
-  /* Once the page scrolls (assets/pb-header.js): see-through white over a blur. */
+  .pb-landing-header--light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #fff;
+    transform-origin: top;
+    transition:
+      transform 0.4s var(--pb-header-ease),
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .pb-landing-header--light > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+    transition:
+      translate 0.4s var(--pb-header-ease),
+      scale 0.4s var(--pb-header-ease);
+  }
+
+  /* Once the page scrolls (assets/pb-header.js): the bar shrinks to the compact height and
+     turns see-through over a blur; the contents move up into it and the logo gets smaller. */
   .pb-landing-header--light.is-scrolled {
-    background: rgb(255 255 255 / 0.7);
-    box-shadow: 0 1px 0 rgb(0 0 0 / 0.06);
+    pointer-events: none;
+  }
+
+  .pb-landing-header--light.is-scrolled > * {
+    pointer-events: auto;
+  }
+
+  .pb-landing-header--light.is-scrolled::before {
+    transform: scaleY(calc(var(--pb-header-h-compact) / var(--pb-header-h)));
+    background: rgb(255 255 255 / 0.72);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     backdrop-filter: blur(16px) saturate(1.4);
+  }
+
+  .pb-landing-header--light.is-scrolled > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+    translate: 0 calc((var(--pb-header-h-compact) - var(--pb-header-h)) / 2 * 1px);
+  }
+
+  .pb-landing-header--light.is-scrolled > .pb-landing-header__logo {
+    scale: 0.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header--light::before,
+    .pb-landing-header--light > * {
+      transition: none;
+    }
   }
 
   /* Light header sticks to the top while the page scrolls. Like Horizon's own sticky header,
@@ -217,7 +279,8 @@
 
   @media screen and (max-width: 749px) {
     .pb-landing-header--light {
-      height: 72px;
+      --pb-header-h: 72;
+      --pb-header-h-compact: 56;
     }
   }
 
@@ -252,9 +315,14 @@
     height: auto;
   }
 
-  .pb-landing-header__cart {
-    position: relative;
+  .pb-landing-header__actions {
     justify-self: end;
+    display: flex;
+    gap: 4px;
+  }
+
+  .pb-landing-header__icon {
+    position: relative;
     display: grid;
     place-items: center;
     width: 44px;
@@ -262,9 +330,7 @@
     color: inherit;
   }
 
-  .pb-landing-header__cart svg {
-    --icon-stroke-width: 1.5px;
-
+  .pb-landing-header__icon svg {
     width: 24px;
     height: 24px;
   }
