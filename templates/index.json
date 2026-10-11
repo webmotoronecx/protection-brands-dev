@@ -15,11 +15,11 @@
       "settings": {
         "start_line_1": "Professional",
         "start_line_2": "Products",
-        "start_link": "/collections/all",
+        "start_link": "/collections/all/professional",
         "start_button": "Shop now",
         "end_line_1": "Car care",
         "end_line_2": "Products",
-        "end_link": "/collections/all",
+        "end_link": "/collections/all/car-care",
         "end_button": "Shop now",
         "bottles": "2",
         "liquid_color": "#b5650e",
