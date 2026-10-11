@@ -25,6 +25,7 @@
         "liquid_color": "#b5650e",
         "liquid_color_2": "#2f8fc0",
         "bottle_size": 100,
+        "liquid_wobble": true,
         "mouse_strength": 60,
         "highlights": 100,
         "gloss": 100,

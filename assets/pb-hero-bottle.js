@@ -34,6 +34,15 @@ const LIQUID = [
 const CAP = [[0, 5.62], [0.455, 5.62], [0.455, 6.18], [0.42, 6.24], [0.28, 6.27], [0, 6.27]];
 const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
 const LABEL = { bottom: 0.52, top: 4.98 };
+
+/* Liquid wobble: the liquid is cut by a surface that stays level in the world and sloshes
+   against each bottle's acceleration (a damped spring per axis). LIQUID_LEVEL is the fill
+   height from the base, up into the shoulder like the real bottle, so the surface shows
+   through the clear plastic above the label.
+   SLOSH: spring stiffness and damping, how strongly acceleration tips the surface, and the
+   largest tilt (surface slope). */
+const LIQUID_LEVEL = 5.27;
+const SLOSH = { stiffness: 55, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
 
 /* Layout of the bottles: position, resting tilt [x, y, z], float phase, and depth (how far
@@ -134,6 +143,8 @@ class PBHeroBottle extends HTMLElement {
   #resizer;
   #stop;
   #bottles = [];
+  #THREE;
+  #surfacePoint;
   #pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
   #marquee;
   #texts = [];
@@ -147,6 +158,8 @@ class PBHeroBottle extends HTMLElement {
     let THREE;
     try {
       THREE = await import(this.dataset.three);
+      this.#THREE = THREE;
+      this.#surfacePoint = new THREE.Vector3();
     } catch {
       return; // Keep the still image.
     }
@@ -204,7 +217,12 @@ class PBHeroBottle extends HTMLElement {
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
-      this.#bottles.push({ group, spec });
+      this.#bottles.push({
+        group,
+        spec,
+        surface: materials.liquid.userData.surface,
+        slosh: { x: 0, vx: 0, z: 0, vz: 0, px: null, py: 0, pz: 0, ry: 0, speedX: 0, speedY: 0, speedZ: 0 },
+      });
     });
 
     this.#resize();
@@ -332,6 +350,47 @@ class PBHeroBottle extends HTMLElement {
     );
   }
 
+  /* Keeps each bottle's liquid surface level in the world and sloshes it against the
+     bottle's acceleration. */
+  #updateLiquids(dt) {
+    const wobble = this.dataset.wobble !== 'false' && !reducedMotion.matches;
+    const point = this.#surfacePoint;
+
+    for (const { group, surface, slosh } of this.#bottles) {
+      if (!surface) continue;
+      const { x, y, z } = group.position;
+
+      if (wobble && dt > 0 && slosh.px !== null) {
+        const speedX = (x - slosh.px) / dt;
+        const speedY = (y - slosh.py) / dt;
+        const speedZ = (z - slosh.pz) / dt;
+        const turn = (group.rotation.y - slosh.ry) / dt;
+        // Acceleration tips the surface; a landing jolt (vertical) and turning add a little.
+        const pushX = ((speedX - slosh.speedX) / dt) * SLOSH.gain + ((speedY - slosh.speedY) / dt) * SLOSH.gain * 0.25;
+        const pushZ = ((speedZ - slosh.speedZ) / dt) * SLOSH.gain + turn * 0.04;
+        const targetX = Math.min(Math.max(pushX, -SLOSH.max), SLOSH.max);
+        const targetZ = Math.min(Math.max(pushZ, -SLOSH.max), SLOSH.max);
+
+        slosh.vx += (SLOSH.stiffness * (targetX - slosh.x) - SLOSH.damping * slosh.vx) * dt;
+        slosh.vz += (SLOSH.stiffness * (targetZ - slosh.z) - SLOSH.damping * slosh.vz) * dt;
+        slosh.x = Math.min(Math.max(slosh.x + slosh.vx * dt, -SLOSH.max), SLOSH.max);
+        slosh.z = Math.min(Math.max(slosh.z + slosh.vz * dt, -SLOSH.max), SLOSH.max);
+        slosh.speedX = speedX;
+        slosh.speedY = speedY;
+        slosh.speedZ = speedZ;
+      }
+      slosh.px = x;
+      slosh.py = y;
+      slosh.pz = z;
+      slosh.ry = group.rotation.y;
+
+      group.updateMatrixWorld();
+      point.set(0, LIQUID_LEVEL - HEIGHT / 2, 0);
+      surface.pbSurfacePoint.value.copy(group.localToWorld(point));
+      surface.pbSurfaceNormal.value.set(slosh.x, 1, slosh.z).normalize();
+    }
+  }
+
   #start() {
     if (this.#stop) return;
     this.#last = performance.now() / 1000;
@@ -392,6 +451,8 @@ class PBHeroBottle extends HTMLElement {
         scrolled * 3 +
         introOffset(index);
     });
+
+    this.#updateLiquids(dt);
 
     if (this.#introStart && now - this.#introStart > INTRO.duration + INTRO.stagger * this.#bottles.length) {
       this.#introStart = 0;
@@ -462,20 +523,58 @@ function bottleGeometries(THREE) {
   return { liquid, label, cap, shell };
 }
 
+/* Cuts the liquid at a surface plane given in world space (point + normal, set every frame
+   by #updateLiquids), and shades the inside faces that show through the cut as the surface. */
+function addLiquidSurface(THREE, material, colour) {
+  const uniforms = {
+    pbSurfacePoint: { value: new THREE.Vector3() },
+    pbSurfaceNormal: { value: new THREE.Vector3(0, 1, 0) },
+    pbSurfaceColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), 0.25) },
+  };
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPbWorld;')
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\nvPbWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;'
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nvarying vec3 vPbWorld;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;\nuniform vec3 pbSurfaceColour;'
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        '#include <clipping_planes_fragment>\nif (dot(vPbWorld - pbSurfacePoint, pbSurfaceNormal) > 0.0) discard;'
+      )
+      .replace(
+        '#include <dithering_fragment>',
+        '#include <dithering_fragment>\nif (!gl_FrontFacing) gl_FragColor.rgb = mix(gl_FragColor.rgb, pbSurfaceColour, 0.55);'
+      );
+  };
+  return uniforms;
+}
+
 function bottleMaterials(THREE, labelTexture, liquidColour, gloss) {
   const liquid = new THREE.Color(liquidColour);
+  // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint. Both sides
+  // are drawn: the inside faces showing through the cut become the liquid's top surface.
+  const liquidMaterial = new THREE.MeshPhysicalMaterial({
+    color: liquid,
+    emissive: liquid,
+    emissiveIntensity: 0.28,
+    roughness: 0.08,
+    clearcoat: gloss,
+    clearcoatRoughness: 0.04,
+    transparent: true,
+    opacity: 0.92,
+    side: THREE.DoubleSide,
+  });
+  liquidMaterial.userData.surface = addLiquidSurface(THREE, liquidMaterial, liquid);
+
   return {
-    // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint.
-    liquid: new THREE.MeshPhysicalMaterial({
-      color: liquid,
-      emissive: liquid,
-      emissiveIntensity: 0.28,
-      roughness: 0.08,
-      clearcoat: gloss,
-      clearcoatRoughness: 0.04,
-      transparent: true,
-      opacity: 0.92,
-    }),
+    liquid: liquidMaterial,
     label: new THREE.MeshPhysicalMaterial({
       color: labelTexture ? 0xffffff : 0x111111,
       map: labelTexture,
