@@ -10,6 +10,10 @@
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
   hidden by this script, so without JS everything is visible.
 
+  Scroller: at 990px and up Horizon scrolls .page-wrapper, not the window (see
+  assets/scroll-container.js). Lenis and ScrollTrigger are both pointed at whichever element
+  scrolls. Crossing 990px mid-visit rebuilds Lenis and shows anything not yet revealed.
+
   Off for prefers-reduced-motion and in the theme editor.
 */
 (() => {
@@ -19,33 +23,56 @@
 
   if (!gsap || reducedMotion.matches || window.Shopify?.designMode) return;
 
+  const squeeze = window.matchMedia('(min-width: 990px)');
+  const pageWrapper = document.querySelector('.page-wrapper');
+  const scroller = () => (squeeze.matches && pageWrapper ? pageWrapper : window);
+
   let lenis = null;
 
   /* Smooth scroll ---------------------------------------------------------------- */
 
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const root = document.documentElement;
+
+  const startLenis = () => {
+    lenis?.destroy();
+    const wrapper = scroller();
+    lenis =
+      wrapper === window
+        ? new Lenis({ anchors: true, autoRaf: false })
+        : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false });
+    if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+    if (root.hasAttribute('scroll-lock')) lenis.stop();
+  };
 
   if (config.smoothScroll && Lenis && finePointer) {
-    lenis = new Lenis({ anchors: true, autoRaf: false });
+    startLenis();
 
     // One loop: Lenis runs on GSAP's ticker, and ScrollTrigger reads Lenis' position.
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.add((time) => lenis?.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
-    if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
 
     // Horizon sets html[scroll-lock] while drawers and dialogs are open.
-    const root = document.documentElement;
-    const syncLock = () => (root.hasAttribute('scroll-lock') ? lenis.stop() : lenis.start());
-    new MutationObserver(syncLock).observe(root, { attributes: true, attributeFilter: ['scroll-lock'] });
-    syncLock();
+    new MutationObserver(() => (root.hasAttribute('scroll-lock') ? lenis?.stop() : lenis?.start())).observe(root, {
+      attributes: true,
+      attributeFilter: ['scroll-lock'],
+    });
+
+    squeeze.addEventListener('change', startLenis);
   }
 
   /* Reveals ---------------------------------------------------------------------- */
 
   const revealed = [];
+  const showAll = () => {
+    ScrollTrigger?.getAll().forEach((trigger) => trigger.kill());
+    gsap.killTweensOf(revealed);
+    gsap.set(revealed, { clearProps: 'transform,opacity' });
+  };
 
   if (config.reveal && ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.defaults({ scroller: scroller() });
 
     const belowFold = (el) => el.getBoundingClientRect().top > window.innerHeight;
     // Opacity, not visibility: hidden content must stay reachable by keyboard.
@@ -88,6 +115,9 @@
 
     // Fonts and lazy images change page height after load; re-measure once.
     window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+
+    // The scroller changes at 990px. Rather than rebuild, show whatever hasn't revealed yet.
+    squeeze.addEventListener('change', showAll, { once: true });
   }
 
   /* Reduced motion switched on mid-visit: stop everything, show everything. */
@@ -95,10 +125,10 @@
     'change',
     () => {
       if (!reducedMotion.matches) return;
+      squeeze.removeEventListener('change', startLenis);
       lenis?.destroy();
-      ScrollTrigger?.getAll().forEach((trigger) => trigger.kill());
-      gsap.killTweensOf(revealed);
-      gsap.set(revealed, { clearProps: 'all' });
+      lenis = null;
+      showAll();
     },
     { once: true }
   );
