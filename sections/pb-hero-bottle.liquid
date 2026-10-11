@@ -166,9 +166,11 @@
   }
 
   /* Scrolling wordmark (snippets/pb-marquee.liquid) behind the bottles. */
+  /* Wider than the hero on both sides, so its own clipped edges stay off screen when it
+     drifts with the mouse (up to 110px, PARALLAX in pb-hero-bottle.js). The hero clips it. */
   .pb-hero-bottle__marquee {
     position: absolute;
-    inset-inline: 0;
+    inset-inline: -160px;
     inset-block-start: 50%;
     z-index: 0;
     translate: 0 -40%;

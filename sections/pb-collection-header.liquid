@@ -156,8 +156,10 @@
   .pb-collection-header__marquee {
     --pb-marquee-height: clamp(4rem, 14vw, 17rem);
 
+    /* Wider than the card, so its clipped edges stay hidden when it drifts with the mouse
+       (up to 40px, pb-marquee.js); the card clips it. */
     position: absolute;
-    inset-inline: 0;
+    inset-inline: -80px;
     inset-block-start: calc(var(--pb-marquee-height) * -0.2);
     z-index: -1;
   }
