@@ -82,8 +82,8 @@
         class="pb-hero-bottle__poster pb-hero-bottle__poster--render"
         src="{{ 'pb-hero-poster-wide.webp' | asset_url }}"
         alt="{{ poster_alt | escape }}"
-        width="3240"
-        height="1350"
+        width="4320"
+        height="1800"
         loading="eager"
         fetchpriority="high"
       >
@@ -216,10 +216,15 @@
     opacity: 1;
   }
 
-  /* The still stays fully visible until the 3D has faded in over it, then goes. */
+  /* With a still image, the 3D replaces it in a single frame (pb-hero-bottle.js draws the 3D
+     in the still's pose first), so neither fades: no moment where both show. */
   .pb-hero-bottle.is-ready .pb-hero-bottle__poster {
     opacity: 0;
-    transition: opacity 0.3s ease 0.8s;
+    transition: none;
+  }
+
+  .pb-hero-bottle--has-poster .pb-hero-bottle__canvas {
+    transition: none;
   }
 
   .pb-hero-bottle__text {

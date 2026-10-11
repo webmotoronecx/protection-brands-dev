@@ -194,6 +194,24 @@ class PBHeroBottle extends HTMLElement {
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
+      // The front bottle casts a soft shadow onto the one behind it. A lit shadow can't show
+      // on the black label, so this is a blurred dark shape behind its left edge that dims the
+      // amber bottle's liquid, print and sheen where they overlap. It moves with the bottle.
+      if (index === 1) {
+        const shade = new THREE.Mesh(
+          new THREE.PlaneGeometry(2.4, 6.6),
+          new THREE.MeshBasicMaterial({
+            map: softShadowTexture(THREE),
+            transparent: true,
+            opacity: Math.min(0.9, look.shadow * 2.6),
+            depthWrite: false,
+          })
+        );
+        shade.position.set(-1.05, -0.25, -0.15);
+        shade.renderOrder = 3;
+        group.add(shade);
+      }
+
       this.#bottles.push({ group, spec });
     });
 
@@ -207,11 +225,22 @@ class PBHeroBottle extends HTMLElement {
       return;
     }
 
-    this.#listen();
-    // With a still image on screen, the still did the entrance; the 3D takes over in place.
-    if (!this.classList.contains('pb-hero-bottle--has-poster')) this.#introStart = performance.now() / 1000;
+    const hasPoster = this.classList.contains('pb-hero-bottle--has-poster');
+    if (!hasPoster) this.#introStart = performance.now() / 1000;
     this.#render(0);
+
+    if (hasPoster) {
+      // The still did the entrance. Swap to the 3D only once its drop-in has finished, and in
+      // a single frame (no crossfade): the 3D is drawn in the still's exact pose, so the two
+      // never show together. Float and mouse-follow start after the swap.
+      const poster = this.querySelector('.pb-hero-bottle__poster');
+      await Promise.all((poster?.getAnimations() ?? []).map((animation) => animation.finished.catch(() => {})));
+      if (this.#disposed) return;
+      this.#render(0);
+    }
+
     this.classList.add('is-ready');
+    this.#listen();
   }
 
   #addLights(THREE, look) {
@@ -398,6 +427,22 @@ class PBHeroBottle extends HTMLElement {
 }
 
 const THREE_DEG = (degrees) => (degrees * Math.PI) / 180;
+
+/* A soft, dark, bottle-shaped blur on a transparent canvas, for the front bottle's shadow. */
+function softShadowTexture(THREE) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 320;
+  const context = canvas.getContext('2d');
+  context.filter = 'blur(18px)';
+  context.fillStyle = '#000';
+  context.beginPath();
+  context.roundRect(30, 30, 68, 260, 30);
+  context.fill();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
 
 function loadTexture(THREE, url) {
   const loader = new THREE.TextureLoader();
