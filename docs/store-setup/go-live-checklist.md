@@ -72,8 +72,8 @@ Placeholders from stock Horizon that must be replaced:
 - [ ] **Footer email signup**: check the wording ("Join our email list…"). Signups go to
       Shopify customers. Confirm that's wanted.
 - [ ] **Header**: menu set to the main menu (or `main-menu-2026`).
-- [ ] **Colours and fonts**: the new design once it's ready. Horizon defaults (Inter,
-      black and white) until then.
+- [ ] **Colours**: the new design once it's ready. Fonts are Manrope; colours are Horizon's
+      defaults (black and white) until then.
 
 ## 8. Pages
 
