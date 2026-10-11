@@ -41,8 +41,8 @@ const LABEL = { bottom: 0.52, top: 4.98 };
    through the clear plastic above the label.
    SLOSH: spring stiffness and damping, how strongly acceleration tips the surface, and the
    largest tilt (surface slope). */
-const LIQUID_LEVEL = 5.27;
-const SLOSH = { stiffness: 55, damping: 3.2, gain: 0.006, max: 0.6 };
+const LIQUID_LEVEL = 5.20;
+const SLOSH = { stiffness: 10, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
 
 /* Layout of the bottles: position, resting tilt [x, y, z], float phase, and depth (how far
@@ -204,7 +204,9 @@ class PBHeroBottle extends HTMLElement {
     const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
 
     layout.forEach((spec, index) => {
-      const materials = bottleMaterials(THREE, label, liquids[index], look.gloss);
+      // The second (car care) bottle can have a gel finish: clearer, glossier, a faint shimmer.
+      const finish = index === 1 ? this.dataset.finishSecond || 'gel' : 'liquid';
+      const materials = bottleMaterials(THREE, label, liquids[index], look.gloss, finish);
       const group = new THREE.Group();
       for (const [name, geometry] of Object.entries(geometries)) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
@@ -525,11 +527,13 @@ function bottleGeometries(THREE) {
 
 /* Cuts the liquid at a surface plane given in world space (point + normal, set every frame
    by #updateLiquids), and shades the inside faces that show through the cut as the surface. */
-function addLiquidSurface(THREE, material, colour) {
+function addLiquidSurface(THREE, material, colour, tint = 0.25, rim = 0) {
   const uniforms = {
     pbSurfacePoint: { value: new THREE.Vector3() },
     pbSurfaceNormal: { value: new THREE.Vector3(0, 1, 0) },
-    pbSurfaceColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), 0.25) },
+    pbSurfaceColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), tint) },
+    pbRim: { value: rim },
+    pbRimColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), 0.5) },
   };
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
@@ -542,7 +546,7 @@ function addLiquidSurface(THREE, material, colour) {
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec3 vPbWorld;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;\nuniform vec3 pbSurfaceColour;'
+        '#include <common>\nvarying vec3 vPbWorld;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;\nuniform vec3 pbSurfaceColour;\nuniform float pbRim;\nuniform vec3 pbRimColour;'
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -550,28 +554,54 @@ function addLiquidSurface(THREE, material, colour) {
       )
       .replace(
         '#include <dithering_fragment>',
-        '#include <dithering_fragment>\nif (!gl_FrontFacing) gl_FragColor.rgb = mix(gl_FragColor.rgb, pbSurfaceColour, 0.55);'
+        '#include <dithering_fragment>\n' +
+          // Rim glow: brighter where the surface turns away from the viewer (gel finish).
+          'float pbFacing = abs(dot(normalize(normal), normalize(vViewPosition)));\n' +
+          'gl_FragColor.rgb += pbRimColour * pbRim * pow(1.0 - pbFacing, 2.5);\n' +
+          'if (!gl_FrontFacing) gl_FragColor.rgb = mix(gl_FragColor.rgb, pbSurfaceColour, 0.55);'
       );
   };
   return uniforms;
 }
 
-function bottleMaterials(THREE, labelTexture, liquidColour, gloss) {
+/* Liquid looks. Gel: a little see-through, glass-smooth clear coat, bright highlights, a
+   faint iridescent shimmer, and edges that glow (rim) the way light catches gelatin. */
+const LIQUID_FINISHES = {
+  liquid: {
+    opacity: 0.92,
+    emissiveIntensity: 0.28,
+    roughness: 0.08,
+    clearcoatRoughness: 0.04,
+    surfaceTint: 0.25,
+    rim: 0,
+  },
+  gel: {
+    opacity: 0.8,
+    emissiveIntensity: 0.24,
+    roughness: 0.02,
+    clearcoatRoughness: 0.01,
+    specularIntensity: 1,
+    iridescence: 0.35,
+    iridescenceIOR: 1.3,
+    surfaceTint: 0.4,
+    rim: 0.75,
+  },
+};
+
+function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liquid') {
   const liquid = new THREE.Color(liquidColour);
   // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint. Both sides
   // are drawn: the inside faces showing through the cut become the liquid's top surface.
+  const { surfaceTint, rim, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
   const liquidMaterial = new THREE.MeshPhysicalMaterial({
     color: liquid,
     emissive: liquid,
-    emissiveIntensity: 0.28,
-    roughness: 0.08,
     clearcoat: gloss,
-    clearcoatRoughness: 0.04,
     transparent: true,
-    opacity: 0.92,
     side: THREE.DoubleSide,
+    ...look,
   });
-  liquidMaterial.userData.surface = addLiquidSurface(THREE, liquidMaterial, liquid);
+  liquidMaterial.userData.surface = addLiquidSurface(THREE, liquidMaterial, liquid, surfaceTint, rim);
 
   return {
     liquid: liquidMaterial,
