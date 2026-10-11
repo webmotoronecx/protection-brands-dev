@@ -9,6 +9,14 @@
  */
 {
   "sections": {
+    "pb_breadcrumb": {
+      "type": "pb-breadcrumb-bar",
+      "settings": {
+        "shop_label": "Shop",
+        "show_product": false,
+        "marquee": true
+      }
+    },
     "main": {
       "type": "product-information",
       "blocks": {
@@ -153,7 +161,7 @@
                 "pb_heading": {
                   "type": "pb-product-heading",
                   "settings": {
-                    "show_breadcrumb": true,
+                    "show_breadcrumb": false,
                     "show_vendor": true,
                     "suitable_label": "Suitable for"
                   }
@@ -441,6 +449,7 @@
     }
   },
   "order": [
+    "pb_breadcrumb",
     "main",
     "product_recommendations_qggXJq"
   ]

@@ -1,0 +1,154 @@
+{%- comment -%}
+  Breadcrumb bar (Protection Brands): a slim version of the dark title bar
+  (sections/pb-collection-header.liquid) with "Shop / <collection>" in white. Used at the top
+  of the product page. The collection is the one the visitor came from, else the product's
+  first collection (skipping the home page and catch-all collections).
+{%- endcomment -%}
+
+{%- liquid
+  assign crumb = collection
+  if crumb == blank and product != blank
+    for item in product.collections
+      unless item.handle == 'frontpage' or item.handle == 'all'
+        assign crumb = item
+        break
+      endunless
+    endfor
+  endif
+-%}
+
+<div class="pb-breadcrumb-bar">
+  {%- if section.settings.marquee -%}
+    {%- render 'pb-marquee',
+      class: 'pb-breadcrumb-bar__marquee',
+      file: 'label-scroling-invert.svg',
+      static: true,
+      follow_mouse: true,
+      loading: 'eager'
+    -%}
+  {%- endif -%}
+
+  <nav class="pb-breadcrumb-bar__crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="{{ routes.all_products_collection_url }}">{{ section.settings.shop_label }}</a></li>
+      {%- if crumb != blank -%}
+        <li><a href="{{ crumb.url }}">{{ crumb.title }}</a></li>
+      {%- endif -%}
+      {%- if section.settings.show_product and product != blank -%}
+        <li><span aria-current="page">{{ product.title }}</span></li>
+      {%- endif -%}
+    </ol>
+  </nav>
+</div>
+
+{% stylesheet %}
+  .pb-breadcrumb-bar {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin: 0 10px 14px;
+    padding: 24px clamp(20px, 2.8vw, 44px);
+    border-radius: 12px;
+    background:
+      radial-gradient(ellipse 60% 90% at 20% 60%, #1c1c1c 0%, transparent 70%),
+      linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
+    color: #fff;
+  }
+
+  /* Wordmark behind, larger than the bar so only part of it shows. */
+  .pb-breadcrumb-bar__marquee {
+    --pb-marquee-height: clamp(5rem, 12vw, 12rem);
+
+    position: absolute;
+    inset-inline: -80px;
+    inset-block-start: 50%;
+    z-index: -1;
+    translate: 0 -55%;
+  }
+
+  .pb-breadcrumb-bar__crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 17px;
+  }
+
+  .pb-breadcrumb-bar__crumbs li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .pb-breadcrumb-bar__crumbs li + li::before {
+    content: '/';
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .pb-breadcrumb-bar__crumbs a {
+    color: #fff;
+    text-decoration: none;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+
+  .pb-breadcrumb-bar__crumbs a:is(:hover, :focus-visible) {
+    text-decoration-line: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-breadcrumb-bar__crumbs [aria-current] {
+    overflow: hidden;
+    color: rgb(255 255 255 / 0.5);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-breadcrumb-bar {
+      margin-inline: 8px;
+      padding: 18px;
+    }
+
+    .pb-breadcrumb-bar__crumbs ol {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Breadcrumb bar (PB)",
+  "tag": "section",
+  "class": "pb-breadcrumb-bar-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "shop_label",
+      "label": "First link label",
+      "default": "Shop"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product",
+      "label": "Show product name",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Show wordmark behind",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Breadcrumb bar (PB)"
+    }
+  ]
+}
+{% endschema %}
