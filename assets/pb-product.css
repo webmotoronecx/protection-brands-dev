@@ -20,6 +20,16 @@
   mix-blend-mode: multiply;
 }
 
+/* Like the product cards: the photo sits inside the grey tile with padding around it, so the
+   tile shows even around square photos with their own background. */
+.product-information media-gallery .product-media-container .product-media {
+  padding: clamp(16px, 3vw, 40px);
+}
+
+.product-information media-gallery .product-media-container .product-media img {
+  border-radius: 8px;
+}
+
 .product-information slideshow-controls {
   --thumbnail-radius: 8px;
 }
