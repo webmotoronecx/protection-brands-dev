@@ -9,6 +9,18 @@
  */
 {
   "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Cart",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60
+      }
+    },
     "cart-section": {
       "type": "main-cart",
       "blocks": {
@@ -249,6 +261,7 @@
     }
   },
   "order": [
+    "pb_title_bar",
     "cart-section",
     "product_list_NNFgcy"
   ]

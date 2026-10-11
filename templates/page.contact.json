@@ -9,6 +9,18 @@
  */
 {
   "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Contact us",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60
+      }
+    },
     "main": {
       "type": "main-page",
       "blocks": {
@@ -35,7 +47,8 @@
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {},
+          "disabled": true
         },
         "content": {
           "type": "text",
@@ -140,6 +153,7 @@
     }
   },
   "order": [
+    "pb_title_bar",
     "main",
     "form"
   ]

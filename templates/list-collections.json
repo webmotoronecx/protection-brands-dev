@@ -9,6 +9,18 @@
  */
 {
   "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Shop by collection",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60
+      }
+    },
     "collection_list_Wfgh3m": {
       "type": "main-collection-list",
       "blocks": {
@@ -77,7 +89,8 @@
           },
           "block_order": [
             "text_fRMQMR"
-          ]
+          ],
+          "disabled": true
         },
         "static-collection-card": {
           "type": "_collection-card",
@@ -164,6 +177,7 @@
     }
   },
   "order": [
+    "pb_title_bar",
     "collection_list_Wfgh3m"
   ]
 }

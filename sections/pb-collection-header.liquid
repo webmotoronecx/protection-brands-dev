@@ -7,6 +7,11 @@
 
   On the search page it shows the search title, the result count and a search box instead
   of a collection title (used by templates/search.json).
+
+  It is the title bar for every inner page. The title comes from the page itself
+  (collection, page, blog; an article shows its blog's name) or, for pages without one
+  (cart, collections list, 404), from the "Title" setting. On the cart it also shows the
+  item count and hides the cart's own small heading.
 {%- endcomment -%}
 
 {%- liquid
@@ -23,6 +28,18 @@
   assign is_search = false
   if request.page_type == 'search'
     assign is_search = true
+  endif
+
+  case request.page_type
+    when 'page'
+      assign title = page.title
+    when 'blog', 'article'
+      assign title = blog.title
+    else
+      assign title = current.title
+  endcase
+  if title == blank
+    assign title = section.settings.fallback_title
   endif
 -%}
 
@@ -83,7 +100,14 @@
       </button>
     </form>
   {%- else -%}
-    <h1 class="pb-collection-header__title">{{ current.title | default: section.settings.fallback_title }}</h1>
+    <h1 class="pb-collection-header__title">{{ title }}</h1>
+
+    {%- if request.page_type == 'cart' and cart.item_count > 0 -%}
+      <p class="pb-collection-header__meta">
+        {{ cart.item_count }}
+        {{ cart.item_count | pluralize: 'item', 'items' }}
+      </p>
+    {%- endif -%}
   {%- endif -%}
 
   {%- if section.settings.show_description and current.description != blank -%}
@@ -148,6 +172,11 @@
     line-height: 1.05;
     letter-spacing: -0.01em;
     text-transform: uppercase;
+  }
+
+  /* The cart's own small "Cart (n)" heading repeats the title bar; hide it when the bar is there. */
+  body:has(.pb-collection-header) .cart-title {
+    display: none;
   }
 
   .pb-collection-header__meta {
@@ -299,7 +328,7 @@
 
 {% schema %}
 {
-  "name": "Collection header (PB)",
+  "name": "Title bar (PB)",
   "tag": "section",
   "class": "pb-collection-header-section",
   "settings": [
@@ -331,7 +360,8 @@
     {
       "type": "text",
       "id": "fallback_title",
-      "label": "Title when there is no collection",
+      "label": "Title",
+      "info": "Used on pages without a title of their own: cart, collections list, 404, all products.",
       "default": "Products"
     },
     {
@@ -372,7 +402,7 @@
   ],
   "presets": [
     {
-      "name": "Collection header (PB)"
+      "name": "Title bar (PB)"
     }
   ]
 }

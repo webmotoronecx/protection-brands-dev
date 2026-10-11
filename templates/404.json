@@ -9,6 +9,18 @@
  */
 {
   "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Page not found",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60
+      }
+    },
     "main": {
       "type": "main-404",
       "blocks": {
@@ -35,7 +47,8 @@
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
+          "blocks": {},
+          "disabled": true
         },
         "text_Ua9XAW": {
           "type": "text",
@@ -266,6 +279,7 @@
     }
   },
   "order": [
+    "pb_title_bar",
     "main",
     "product_list_iA96Tq"
   ]
