@@ -11,6 +11,50 @@
   "type": "footer",
   "name": "t:names.footer",
   "sections": {
+    "pb_footer": {
+      "type": "pb-footer",
+      "blocks": {
+        "col_information": {
+          "type": "menu",
+          "settings": {
+            "heading": "Information",
+            "menu": "footer"
+          }
+        },
+        "col_shop": {
+          "type": "menu",
+          "settings": {
+            "heading": "Shop",
+            "menu": "main-menu"
+          }
+        },
+        "col_brands": {
+          "type": "links",
+          "settings": {
+            "heading": "Our brands",
+            "new_tab": true,
+            "label_1": "OptiVAN",
+            "url_1": "https://optivan.com.au/",
+            "label_2": "OptiVAN Instagram",
+            "url_2": "https://www.instagram.com/protection_brands/",
+            "label_3": "Permagard",
+            "url_3": "https://permagardautomotive.com.au/",
+            "label_4": "Permagard Instagram",
+            "url_4": "https://www.instagram.com/permagard_australia/"
+          }
+        }
+      },
+      "block_order": [
+        "col_information",
+        "col_shop",
+        "col_brands"
+      ],
+      "settings": {
+        "newsletter": true,
+        "newsletter_heading": "Subscribe for news & promotions",
+        "word": "Protection"
+      }
+    },
     "footer": {
       "type": "footer",
       "blocks": {
@@ -460,7 +504,8 @@
         "background_color": "{{ settings.color_palette.color1 }}",
         "padding-block-start": 36,
         "padding-block-end": 36
-      }
+      },
+      "disabled": true
     },
     "utilities": {
       "type": "footer-utilities",
@@ -497,10 +542,12 @@
         "divider_thickness": 1,
         "padding-block-start": 12,
         "padding-block-end": 16
-      }
+      },
+      "disabled": true
     }
   },
   "order": [
+    "pb_footer",
     "footer",
     "utilities"
   ]

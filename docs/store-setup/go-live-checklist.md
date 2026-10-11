@@ -75,8 +75,12 @@ Placeholders from stock Horizon that must be replaced:
 - [ ] **Logo** and **favicon** (Theme settings → Logo and favicon).
 - [ ] **Announcement bar**: replace "Welcome to our store", or remove it.
 - [ ] **Home hero**: add the banner image; replace "Browse our latest products".
-- [ ] **Footer email signup**: check the wording ("Join our email list…"). Signups go to
-      Shopify customers. Confirm that's wanted.
+- [ ] **Inner-page footer** (Footer (PB)): set each column's menu (Information = `footer`,
+      Shop = `main-menu` by default). "Our brands" holds the OptiVAN/Permagard site and
+      Instagram links. Horizon's old footer and copyright/policy bar are switched off, not
+      deleted; re-enable them in the theme editor if a copyright line or policy links are needed.
+- [ ] **Newsletter signups** (footer and homepage menu): go to Shopify customers, tagged
+      `newsletter`, with email marketing on. Confirm that's wanted.
 - [ ] **Header**: menu set to the main menu (or `main-menu-2026`).
 - [ ] **Colours**: the new design once it's ready. Fonts are Manrope; colours are Horizon's
       defaults (black and white) until then.
