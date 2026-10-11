@@ -94,6 +94,21 @@
   color: var(--pb-on-accent);
 }
 
+/* Filters sidebar (collection and search pages): sticks below the compact header while the
+   products scroll; scrolls on its own if taller than the screen. Desktop/tablet only; phones
+   use Horizon's filter drawer. */
+@media screen and (min-width: 750px) {
+  .facets-block-wrapper--vertical {
+    position: sticky;
+    top: 84px;
+    align-self: start;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+}
+
 @media screen and (max-width: 749px) {
   :root {
     --pb-card-padding: 12px;

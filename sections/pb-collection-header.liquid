@@ -1,9 +1,12 @@
 {%- comment -%}
   Protection Brands collection header: a rounded dark card with the wordmark
   (snippets/pb-marquee.liquid, inverted file) along the top, following the mouse or
-  scrolling, the collection title, large,
-  light and uppercase, and a row of category links (current one underlined in red). On
-  phones the row scrolls sideways. Categories are picked in the theme editor.
+  scrolling, the collection title, large, light and uppercase, and a row of category links
+  (current one underlined in red). On phones the row scrolls sideways. Categories are picked
+  in the theme editor.
+
+  On the search page it shows the search title, the result count and a search box instead
+  of a collection title (used by templates/search.json).
 {%- endcomment -%}
 
 {%- liquid
@@ -15,6 +18,11 @@
   assign current = collection
   if current == blank
     assign current = closest.collection
+  endif
+
+  assign is_search = false
+  if request.page_type == 'search'
+    assign is_search = true
   endif
 -%}
 
@@ -43,7 +51,40 @@
     -%}
   {%- endif -%}
 
-  <h1 class="pb-collection-header__title">{{ current.title | default: section.settings.fallback_title }}</h1>
+  {%- if is_search -%}
+    <h1 class="pb-collection-header__title">{{ section.settings.search_title }}</h1>
+
+    {%- if search.performed -%}
+      <p class="pb-collection-header__meta" role="status">
+        {{ search.results_count }}
+        {{ search.results_count | pluralize: 'result', 'results' }} for &ldquo;{{ search.terms | escape }}&rdquo;
+      </p>
+    {%- endif -%}
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="pb-collection-header__search">
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="visually-hidden" for="PBSearchInput">Search products</label>
+      <input
+        id="PBSearchInput"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="Search products"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <button type="submit" aria-label="Search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="11" cy="11" r="6.5"/>
+          <path d="m16 16 4 4"/>
+        </svg>
+      </button>
+    </form>
+  {%- else -%}
+    <h1 class="pb-collection-header__title">{{ current.title | default: section.settings.fallback_title }}</h1>
+  {%- endif -%}
 
   {%- if section.settings.show_description and current.description != blank -%}
     <div class="pb-collection-header__description rte">{{ current.description }}</div>
@@ -107,6 +148,77 @@
     line-height: 1.05;
     letter-spacing: -0.01em;
     text-transform: uppercase;
+  }
+
+  .pb-collection-header__meta {
+    margin: 14px 0 0;
+    color: #bdbdbd;
+    font-size: 15px;
+  }
+
+  /* Search box: dark field with a red button, like the footer signup. */
+  .pb-collection-header__search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 520px;
+    margin-block-start: 28px;
+    padding: 8px 8px 8px 20px;
+    border-radius: 8px;
+    background: rgb(0 0 0 / 0.55);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .pb-collection-header__search:focus-within {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  }
+
+  .pb-collection-header__search input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 17px;
+  }
+
+  .pb-collection-header__search input::placeholder {
+    color: #6f6f6f;
+  }
+
+  .pb-collection-header__search input:focus-visible {
+    outline: none;
+  }
+
+  /* Hide the browser's own clear (x) button; the field is cleared by selecting the text. */
+  .pb-collection-header__search input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .pb-collection-header__search button {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-collection-header__search button:is(:hover, :focus-visible) {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  .pb-collection-header__search svg {
+    width: 20px;
+    height: 20px;
   }
 
   .pb-collection-header__description {
@@ -209,6 +321,12 @@
       "label": "Category row label",
       "info": "Read out by screen readers.",
       "default": "Categories"
+    },
+    {
+      "type": "text",
+      "id": "search_title",
+      "label": "Search page title",
+      "default": "Search results"
     },
     {
       "type": "text",

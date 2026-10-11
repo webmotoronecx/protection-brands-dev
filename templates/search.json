@@ -9,6 +9,18 @@
  */
 {
   "sections": {
+    "pb_search_header": {
+      "type": "pb-collection-header",
+      "settings": {
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "fallback_title": "Products",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60
+      }
+    },
     "search": {
       "type": "search-header",
       "blocks": {
@@ -48,7 +60,8 @@
         "alignment": "flex-start",
         "padding-block-start": 40,
         "padding-block-end": 0
-      }
+      },
+      "disabled": true
     },
     "main": {
       "type": "search-results",
@@ -175,6 +188,7 @@
     }
   },
   "order": [
+    "pb_search_header",
     "search",
     "main"
   ]

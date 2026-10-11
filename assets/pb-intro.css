@@ -43,6 +43,11 @@
     animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
   }
 
+  .pb-collection-header__meta,
+  .pb-collection-header__search {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.17s backwards;
+  }
+
   .pb-collection-header__nav,
   .pb-collection-header__hint {
     animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.22s backwards;

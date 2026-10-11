@@ -41,8 +41,8 @@
     const wrapper = scroller();
     lenis =
       wrapper === window
-        ? new Lenis({ anchors: true, autoRaf: false })
-        : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false });
+        ? new Lenis({ anchors: true, autoRaf: false, allowNestedScroll: true })
+        : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false, allowNestedScroll: true });
     if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
     if (root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open')) lenis.stop();
   };
