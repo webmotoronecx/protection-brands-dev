@@ -116,7 +116,37 @@
       </button>
     </form>
   {%- else -%}
-    <h1 class="pb-collection-header__title">{{ title }}</h1>
+    {%- if request.page_type == 'collection' and section.settings.show_sort -%}
+      {%- comment -%}
+        Item count and sort beside the title. Sorting reloads the page with ?sort_by=,
+        keeping the current tag (the form posts to the current path).
+      {%- endcomment -%}
+      <div class="pb-collection-header__row">
+        <h1 class="pb-collection-header__title">{{ title }}</h1>
+        <div class="pb-collection-header__tools">
+          <p class="pb-collection-header__count">
+            {{ current.products_count }}
+            {{ current.products_count | pluralize: 'item', 'items' }}
+          </p>
+          {%- if current.sort_options.size > 0 -%}
+            <form class="pb-collection-header__sort" action="{{ request.path }}" method="get">
+              <label class="visually-hidden" for="PBSortBy">Sort by</label>
+              <select id="PBSortBy" name="sort_by" onchange="this.form.submit()">
+                {%- assign sort_by = current.sort_by | default: current.default_sort_by -%}
+                {%- for option in current.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                    {{- option.name -}}
+                  </option>
+                {%- endfor -%}
+              </select>
+              <noscript><button type="submit">Sort</button></noscript>
+            </form>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- else -%}
+      <h1 class="pb-collection-header__title">{{ title }}</h1>
+    {%- endif -%}
 
     {%- if request.page_type == 'cart' and cart.item_count > 0 -%}
       <p class="pb-collection-header__meta">
@@ -211,6 +241,51 @@
     inset-inline: -80px;
     inset-block-start: calc(var(--pb-marquee-height) * -0.2);
     z-index: -1;
+  }
+
+  /* Title with the count and sort on the right (stacked on phones). */
+  .pb-collection-header__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .pb-collection-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .pb-collection-header__count {
+    margin: 0;
+    color: #bdbdbd;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .pb-collection-header__sort select {
+    padding: 9px 34px 9px 14px;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 6px;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.5 6 4.5 4.5L12.5 6'/%3E%3C/svg%3E") no-repeat right 12px center / 12px;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .pb-collection-header__sort select:is(:hover, :focus-visible) {
+    border-color: rgb(255 255 255 / 0.6);
+    outline: none;
+  }
+
+  .pb-collection-header__sort option {
+    background: #111;
+    color: #fff;
   }
 
   .pb-collection-header__title {
@@ -398,6 +473,13 @@
       "id": "show_description",
       "label": "Show collection description",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show item count and sort (collections)",
+      "info": "Turn off Horizon's own count/sort row in the product grid's Filters settings to avoid showing both.",
+      "default": true
     },
     {
       "type": "select",

@@ -19,7 +19,8 @@
         "marquee_duration": 60,
         "marquee_motion": "mouse",
         "category_source": "tags",
-        "all_label": "All"
+        "all_label": "All",
+        "show_sort": true
       }
     },
     "section": {
@@ -122,8 +123,8 @@
             "text_label_case": "default",
             "show_swatch_label": false,
             "show_filter_label": false,
-            "enable_sorting": true,
-            "enable_grid_density": true,
+            "enable_sorting": false,
+            "enable_grid_density": false,
             "padding-block-start": 8,
             "padding-block-end": 8,
             "padding-inline-start": 0,
