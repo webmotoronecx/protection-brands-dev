@@ -50,9 +50,12 @@
     }
   }
 
+  /* The homepage footer links are the one exception to "start visible": they start fully
+     transparent, by request. They are small, at the bottom, and never the page's main
+     content, so first paint and LCP are unaffected; CSS only, so they always end visible. */
   @keyframes pb-intro-drop {
     from {
-      opacity: 0.4;
+      opacity: 0;
       transform: translateY(-14px);
     }
   }
