@@ -94,6 +94,26 @@
   color: var(--pb-on-accent);
 }
 
+/* Collection and search results: the grid's outer edges line up with the title bar and
+   footer cards, 10px from the screen edge (8px on phones), at any screen width. Horizon
+   builds the results layout from --page-margin and caps it at --page-width, so both are
+   changed here, for the results only. */
+.product-grid-container {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .product-grid-container {
+    --page-margin: 8px;
+  }
+
+  /* Horizon adds its own side padding on phones; the 8px margin replaces it. */
+  .product-grid-container .main-collection-grid {
+    padding-inline: 0;
+  }
+}
+
 /* Filters sidebar (collection and search pages): sticks below the compact header while the
    products scroll; scrolls on its own if taller than the screen. Desktop/tablet only; phones
    use Horizon's filter drawer. */
