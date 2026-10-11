@@ -22,6 +22,13 @@
   data-liquid="{{ section.settings.liquid_color }}"
   data-liquid-second="{{ section.settings.liquid_color_2 }}"
   data-size="{{ section.settings.bottle_size | divided_by: 100.0 }}"
+  data-highlights="{{ section.settings.highlights | divided_by: 100.0 }}"
+  data-gloss="{{ section.settings.gloss | divided_by: 100.0 }}"
+  data-key-light="{{ section.settings.key_light | divided_by: 100.0 }}"
+  data-rim-light="{{ section.settings.rim_light | divided_by: 40.0 }}"
+  data-rim-color="{{ section.settings.rim_color }}"
+  data-shadow="{{ section.settings.shadow | divided_by: 100.0 }}"
+  data-shadow-blur="{{ section.settings.shadow_blur | times: 0.48 }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
   style="--pb-hero-bg: {{ section.settings.background }};"
 >
@@ -364,6 +371,78 @@
       "step": 10,
       "unit": "%",
       "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Reflections & lighting"
+    },
+    {
+      "type": "range",
+      "id": "highlights",
+      "label": "White reflections",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "gloss",
+      "label": "Gloss",
+      "info": "Shine on the plastic, liquid and label.",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "key_light",
+      "label": "Main light",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "rim_light",
+      "label": "Rim light",
+      "info": "Coloured light from behind, along the bottles' left edges.",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "rim_color",
+      "label": "Rim light colour",
+      "default": "#c62b23"
+    },
+    {
+      "type": "range",
+      "id": "shadow",
+      "label": "Shadow darkness",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "Shadow softness",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
     },
     {
       "type": "header",

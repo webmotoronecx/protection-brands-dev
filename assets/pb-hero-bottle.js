@@ -46,7 +46,32 @@ const LAYOUTS = {
 };
 
 const FLOAT = 0.18; // float height
-const SHADOW_OPACITY = 0.35; // darkness of the shadow behind the bottles
+
+/* Reflections & lighting. These defaults are the designed look; each one can be changed in
+   the theme editor (Hero bottle (3D) → Reflections & lighting), which passes it in as a
+   data attribute on <pb-hero-bottle>. */
+const LOOK = {
+  highlights: 1, // white studio reflections on the plastic and label
+  gloss: 1, // clear-coat shine on the plastic, liquid and label
+  keyLight: 1, // main light from the upper right
+  rimLight: 0.25, // coloured light from behind, along the left edges
+  rimColor: '#c62b23',
+  shadow: 0.35, // darkness of the shadow behind the bottles
+  shadowBlur: 24, // softness of the shadows
+};
+
+function readLook(dataset) {
+  const number = (value, fallback) => (value === undefined || value === '' || isNaN(value) ? fallback : Number(value));
+  return {
+    highlights: number(dataset.highlights, LOOK.highlights),
+    gloss: number(dataset.gloss, LOOK.gloss),
+    keyLight: number(dataset.keyLight, LOOK.keyLight),
+    rimLight: number(dataset.rimLight, LOOK.rimLight),
+    rimColor: dataset.rimColor || LOOK.rimColor,
+    shadow: number(dataset.shadow, LOOK.shadow),
+    shadowBlur: number(dataset.shadowBlur, LOOK.shadowBlur),
+  };
+}
 const DPR_CAP = coarsePointer.matches ? 1.5 : 1.75;
 
 class PBHeroBottle extends HTMLElement {
@@ -90,6 +115,7 @@ class PBHeroBottle extends HTMLElement {
   #stop;
   #bottles = [];
   #pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  #marquee;
   #last = 0;
 
   async #init() {
@@ -120,12 +146,16 @@ class PBHeroBottle extends HTMLElement {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.VSMShadowMap;
 
+    const look = readLook(this.dataset);
+    this.#marquee = this.querySelector('.pb-hero-bottle__marquee');
+
     this.#scene = new THREE.Scene();
     this.#environment = studioEnvironment(THREE, renderer);
     this.#scene.environment = this.#environment;
+    this.#scene.environmentIntensity = look.highlights;
 
     this.#camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-    this.#addLights(THREE);
+    this.#addLights(THREE, look);
 
     const label = await loadTexture(THREE, this.dataset.label).catch(() => null);
     if (this.#disposed) return;
@@ -137,7 +167,7 @@ class PBHeroBottle extends HTMLElement {
     const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
 
     layout.forEach((spec, index) => {
-      const materials = bottleMaterials(THREE, label, liquids[index]);
+      const materials = bottleMaterials(THREE, label, liquids[index], look.gloss);
       const group = new THREE.Group();
       for (const [name, geometry] of Object.entries(geometries)) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
@@ -168,11 +198,11 @@ class PBHeroBottle extends HTMLElement {
     this.classList.add('is-ready');
   }
 
-  #addLights(THREE) {
-    const key = new THREE.DirectionalLight(0xffffff, 1.4);
+  #addLights(THREE, look) {
+    const key = new THREE.DirectionalLight(0xffffff, 1.4 * look.keyLight);
     key.position.set(4, 6, 8);
-    // Brand-red rim from behind, picks out the edges against the dark background.
-    const rim = new THREE.DirectionalLight(0xc62b23, 0.25);
+    // Rim light from behind, picks out the edges against the dark background.
+    const rim = new THREE.DirectionalLight(new THREE.Color(look.rimColor), look.rimLight);
     rim.position.set(-6, 3, -6);
     const fill = new THREE.DirectionalLight(0xffffff, 0.5);
     fill.position.set(-5, -2, 6);
@@ -184,7 +214,7 @@ class PBHeroBottle extends HTMLElement {
     shadowLight.castShadow = true;
     const shadow = shadowLight.shadow;
     shadow.mapSize.set(512, 512); // lower resolution = softer and cheaper
-    shadow.radius = 24;
+    shadow.radius = look.shadowBlur;
     shadow.blurSamples = 24;
     shadow.bias = -0.0005;
     Object.assign(shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 30 });
@@ -193,7 +223,7 @@ class PBHeroBottle extends HTMLElement {
     // Backdrop: invisible except for the shadow that falls on it.
     const backdrop = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
-      new THREE.ShadowMaterial({ color: 0x000000, opacity: SHADOW_OPACITY })
+      new THREE.ShadowMaterial({ color: 0x000000, opacity: look.shadow })
     );
     backdrop.position.z = -2.5;
     backdrop.receiveShadow = true;
@@ -305,6 +335,13 @@ class PBHeroBottle extends HTMLElement {
       group.position.y = spec.position[1] + Math.sin(time * 1.1 + spec.phase) * FLOAT + scrolled * 3;
     }
 
+    // The scrolling wordmark drifts the other way, so it reads as a layer further back.
+    if (this.#marquee) {
+      const x = -pointer.x * 40 * strength;
+      const y = -pointer.y * 14 * strength;
+      this.#marquee.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    }
+
     this.#renderer.render(this.#scene, this.#camera);
   }
 }
@@ -354,7 +391,7 @@ function bottleGeometries(THREE) {
   return { liquid, label, cap, shell };
 }
 
-function bottleMaterials(THREE, labelTexture, liquidColour) {
+function bottleMaterials(THREE, labelTexture, liquidColour, gloss) {
   const liquid = new THREE.Color(liquidColour);
   return {
     // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint.
@@ -363,7 +400,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour) {
       emissive: liquid,
       emissiveIntensity: 0.28,
       roughness: 0.08,
-      clearcoat: 1,
+      clearcoat: gloss,
       clearcoatRoughness: 0.04,
       transparent: true,
       opacity: 0.92,
@@ -372,7 +409,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour) {
       color: labelTexture ? 0xffffff : 0x111111,
       map: labelTexture,
       roughness: 0.42,
-      clearcoat: 0.2,
+      clearcoat: 0.2 * gloss,
       clearcoatRoughness: 0.3,
     }),
     cap: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55 }),
@@ -381,7 +418,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour) {
       roughness: 0.06,
       transparent: true,
       opacity: 0.16,
-      clearcoat: 1,
+      clearcoat: gloss,
       clearcoatRoughness: 0.05,
       depthWrite: false,
     }),
