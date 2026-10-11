@@ -13,6 +13,18 @@
 
   assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
 
+  # Built-in still: assets/pb-hero-poster-*.webp are renders of the 3D scene at rest (two
+  # bottles, default size, colours and label), so they line up with it exactly. Used when no
+  # still image is uploaded and the bottles still match what was rendered.
+  assign builtin_poster = false
+  if section.settings.poster == blank and section.settings.bottles == '2' and section.settings.bottle_size == 100 and section.settings.label == blank
+    assign liquid_1 = section.settings.liquid_color | downcase
+    assign liquid_2 = section.settings.liquid_color_2 | downcase
+    if liquid_1 == '#b5650e' and liquid_2 == '#2f8fc0'
+      assign builtin_poster = true
+    endif
+  endif
+
   # Headings use a light weight of the body font (Manrope 300), loaded only here.
   assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
   if heading_font == blank
@@ -25,7 +37,7 @@
 </style>
 
 <pb-hero-bottle
-  class="pb-hero-bottle{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
+  class="pb-hero-bottle{% if section.settings.poster != blank or builtin_poster %} pb-hero-bottle--has-poster{% endif %}"
   data-three="{{ 'three.module.min.js' | asset_url }}"
   data-label="{{ label_url }}"
   data-bottles="{{ section.settings.bottles }}"
@@ -54,6 +66,28 @@
         widths: '800, 1200, 1600, 2400',
         alt: poster_alt
     }}
+  {%- elsif builtin_poster -%}
+    {%- comment -%}
+      Wide render fills the hero by height at any landscape size (as the 3D does); the phone
+      render matches the 3D's fit-by-width framing on phones.
+    {%- endcomment -%}
+    <picture>
+      <source
+        media="(max-width: 749px)"
+        srcset="{{ 'pb-hero-poster-mobile.webp' | asset_url }}"
+        width="780"
+        height="1688"
+      >
+      <img
+        class="pb-hero-bottle__poster pb-hero-bottle__poster--render"
+        src="{{ 'pb-hero-poster-wide.webp' | asset_url }}"
+        alt="{{ poster_alt | escape }}"
+        width="3240"
+        height="1350"
+        loading="eager"
+        fetchpriority="high"
+      >
+    </picture>
   {%- endif -%}
 
   {%- case section.settings.background_style -%}
@@ -165,6 +199,10 @@
     object-fit: contain;
   }
 
+  .pb-hero-bottle__poster--render {
+    object-fit: cover;
+  }
+
   /* The canvas starts empty and fades in over the still image once its first frame is drawn. */
   .pb-hero-bottle__canvas {
     z-index: 1;
@@ -176,8 +214,10 @@
     opacity: 1;
   }
 
+  /* The still stays fully visible until the 3D has faded in over it, then goes. */
   .pb-hero-bottle.is-ready .pb-hero-bottle__poster {
     opacity: 0;
+    transition: opacity 0.3s ease 0.8s;
   }
 
   .pb-hero-bottle__text {

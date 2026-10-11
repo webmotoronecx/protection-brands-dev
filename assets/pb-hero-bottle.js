@@ -125,6 +125,7 @@ class PBHeroBottle extends HTMLElement {
   #texts = [];
   #last = 0;
   #introStart = 0; // seconds (performance.now), 0 once the intro has finished
+  #clock = 0; // seconds of animation so far; the float starts from the still image's pose
 
   async #init() {
     if (this.#disposed) return;
@@ -203,7 +204,8 @@ class PBHeroBottle extends HTMLElement {
     }
 
     this.#listen();
-    this.#introStart = performance.now() / 1000;
+    // With a still image on screen, the still did the entrance; the 3D takes over in place.
+    if (!this.classList.contains('pb-hero-bottle--has-poster')) this.#introStart = performance.now() / 1000;
     this.#render(0);
     this.classList.add('is-ready');
   }
@@ -332,6 +334,7 @@ class PBHeroBottle extends HTMLElement {
   #render(time) {
     const dt = Math.min(Math.max(time - this.#last, 0), 0.05);
     this.#last = time;
+    this.#clock += dt;
 
     const pointer = this.#pointer;
     const strength = Number(this.dataset.strength ?? 0.6);
@@ -361,7 +364,7 @@ class PBHeroBottle extends HTMLElement {
       group.position.y =
         spec.position[1] -
         pointer.y * 0.6 * spec.depth * strength +
-        Math.sin(time * 1.1 + spec.phase) * FLOAT +
+        Math.sin(this.#clock * 1.1 + spec.phase) * FLOAT +
         scrolled * 3 +
         introOffset(index);
     });
