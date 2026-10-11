@@ -85,7 +85,7 @@ const LOOK = {
   keyLight: 1, // main light from the upper right
   rimLight: 0.25, // coloured light from behind, along the left edges
   rimColor: '#ca0d0d',
-  shadow: 0.35, // darkness of the shadow behind the bottles
+  shadow: 0.45, // darkness of the shadow behind the bottles
   shadowBlur: 24, // softness of the shadows
 };
 
@@ -145,7 +145,10 @@ class PBHeroBottle extends HTMLElement {
   #bottles = [];
   #THREE;
   #surfacePoint;
-  #pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  #pointer = { x: 0, y: 0, targetX: 0, targetY: 0, clientX: -1, clientY: -1, moved: false };
+  #hovered = -1; // index of the bottle under the mouse, -1 for none
+  #raycaster;
+  #ndc;
   #marquee;
   #texts = [];
   #last = 0;
@@ -160,6 +163,8 @@ class PBHeroBottle extends HTMLElement {
       THREE = await import(this.dataset.three);
       this.#THREE = THREE;
       this.#surfacePoint = new THREE.Vector3();
+      this.#raycaster = new THREE.Raycaster();
+      this.#ndc = new THREE.Vector2();
     } catch {
       return; // Keep the still image.
     }
@@ -315,14 +320,28 @@ class PBHeroBottle extends HTMLElement {
     const pointer = this.#pointer;
     const strength = Number(this.dataset.strength ?? 0.6);
 
-    if (strength > 0 && !coarsePointer.matches) {
+    if (!coarsePointer.matches) {
       window.addEventListener(
         'pointermove',
         (event) => {
           pointer.targetX = (event.clientX / window.innerWidth) * 2 - 1;
           pointer.targetY = (event.clientY / window.innerHeight) * 2 - 1;
+          pointer.clientX = event.clientX;
+          pointer.clientY = event.clientY;
+          pointer.moved = true;
         },
         { passive: true, signal }
+      );
+
+      // Clicking a bottle goes where its heading's Shop now button goes.
+      this.addEventListener(
+        'click',
+        (event) => {
+          if (this.#hovered < 0 || event.target.closest('a, button')) return;
+          const href = this.#texts[this.#hovered]?.querySelector('a')?.href;
+          if (href) window.location.href = href;
+        },
+        { signal }
       );
     }
 
@@ -350,6 +369,31 @@ class PBHeroBottle extends HTMLElement {
       },
       { signal }
     );
+  }
+
+  /* Which bottle is under the mouse: one ray from the camera through the pointer, checked
+     only when the pointer has moved. Bottle 1 (amber) goes with the first heading, bottle 2
+     (blue) with the second: the matching heading and its Shop now button react (CSS). */
+  #updateHover(rect) {
+    const { clientX, clientY } = this.#pointer;
+    let hovered = -1;
+    const inside = clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+    if (inside && this.#bottles.length) {
+      this.#ndc.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+      this.#raycaster.setFromCamera(this.#ndc, this.#camera);
+      const hit = this.#raycaster.intersectObjects(
+        this.#bottles.map(({ group }) => group),
+        true
+      )[0];
+      if (hit) hovered = this.#bottles.findIndex(({ group }) => group === hit.object.parent);
+    }
+    if (hovered === this.#hovered) return;
+
+    this.#hovered = hovered;
+    if (hovered < 0) delete this.dataset.hover;
+    else this.dataset.hover = String(hovered + 1);
+    this.#texts.forEach((text, index) => text.classList.toggle('is-active', index === hovered));
+    this.style.cursor = hovered < 0 ? '' : 'pointer';
   }
 
   /* Keeps each bottle's liquid surface level in the world and sloshes it against the
@@ -441,6 +485,9 @@ class PBHeroBottle extends HTMLElement {
     };
 
     this.#bottles.forEach(({ group, spec }, index) => {
+      // The bottle under the mouse grows a little.
+      const scale = group.scale.x + ((index === this.#hovered ? 1.05 : 1) - group.scale.x) * ease * 2;
+      group.scale.setScalar(scale);
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
       group.rotation.y = spec.tilt[1] + pointer.x * 0.8 * strength;
       group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
@@ -455,6 +502,10 @@ class PBHeroBottle extends HTMLElement {
     });
 
     this.#updateLiquids(dt);
+    if (pointer.moved) {
+      pointer.moved = false;
+      this.#updateHover(rect);
+    }
 
     if (this.#introStart && now - this.#introStart > INTRO.duration + INTRO.stagger * this.#bottles.length) {
       this.#introStart = 0;

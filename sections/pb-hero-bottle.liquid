@@ -294,7 +294,53 @@
     transform: scale(0.96);
   }
 
+  /* Bottle hover (pb-hero-bottle.js sets data-hover and .is-active): the matching heading
+     grows a little towards its bottle and its Shop now button plays its hover; the other
+     heading fades back. */
+  .pb-hero-bottle__text {
+    transition: opacity 0.4s ease;
+  }
+
+  .pb-hero-bottle__heading {
+    transition: transform 0.5s var(--pb-hover-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .pb-hero-bottle__text--start .pb-hero-bottle__heading {
+    transform-origin: right center;
+  }
+
+  .pb-hero-bottle__text--end .pb-hero-bottle__heading {
+    transform-origin: left center;
+  }
+
+  .pb-hero-bottle[data-hover] .pb-hero-bottle__text:not(.is-active) {
+    opacity: 0.35;
+  }
+
+  .pb-hero-bottle__text--start.is-active .pb-hero-bottle__heading {
+    transform: translateX(10px) scale(1.05);
+  }
+
+  .pb-hero-bottle__text--end.is-active .pb-hero-bottle__heading {
+    transform: translateX(-10px) scale(1.05);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button::before {
+    transform: scaleX(1);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button-label {
+    transform: translateX(-7px);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle__text,
+    .pb-hero-bottle__heading,
     .pb-hero-bottle__button,
     .pb-hero-bottle__button::before,
     .pb-hero-bottle__button-label,
