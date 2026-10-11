@@ -6,10 +6,19 @@
 {%- endcomment -%}
 
 {%- liquid
+  # Automatic: dark over the homepage hero, light on every other page.
   assign light = false
+  case section.settings.style
+    when 'light'
+      assign light = true
+    when 'auto'
+      unless template.name == 'index'
+        assign light = true
+      endunless
+  endcase
+
   assign logo_file = 'logo-protectionbrands.svg'
-  if section.settings.style == 'light'
-    assign light = true
+  if light
     assign logo_file = 'logo-protectionbrands-dark.svg'
   endif
 -%}
@@ -477,6 +486,10 @@
       "label": "Style",
       "options": [
         {
+          "value": "auto",
+          "label": "Automatic"
+        },
+        {
           "value": "dark",
           "label": "Dark, over the page"
         },
@@ -485,7 +498,8 @@
           "label": "Light"
         }
       ],
-      "default": "dark"
+      "default": "auto",
+      "info": "Automatic is dark over the homepage hero and light on every other page."
     },
     {
       "type": "image_picker",

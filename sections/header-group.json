@@ -14,7 +14,7 @@
     "pb_header": {
       "type": "pb-landing-header",
       "settings": {
-        "style": "light",
+        "style": "auto",
         "menu": "main-menu",
         "categories_heading": "Categories",
         "newsletter": true,
