@@ -2116,5 +2116,28 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Motion (Protection Brands)",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "GSAP and Lenis. Turned off automatically for visitors who ask for reduced motion, and in the theme editor."
+      },
+      {
+        "type": "checkbox",
+        "id": "pb_smooth_scroll",
+        "label": "Smooth scrolling (desktop)",
+        "info": "Mouse and trackpad only. Touch devices keep native scrolling.",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "pb_reveal",
+        "label": "Reveal sections on scroll",
+        "info": "Sections below the first screen fade and slide in once.",
+        "default": true
+      }
+    ]
   }
 ]

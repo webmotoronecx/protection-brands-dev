@@ -1,0 +1,35 @@
+{%- doc -%}
+  Protection Brands additions to <head>: product card styles and the motion scripts.
+  Rendered once from layout/theme.liquid. Motion scripts load only when a Motion theme
+  setting is on, and never in the theme editor.
+{%- enddoc -%}
+
+{{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign pb_motion = false
+  if settings.pb_smooth_scroll or settings.pb_reveal
+    assign pb_motion = true
+  endif
+  if request.design_mode
+    assign pb_motion = false
+  endif
+-%}
+
+{%- if pb_motion -%}
+  <script>
+    window.PBMotion = {
+      smoothScroll: {{ settings.pb_smooth_scroll | json }},
+      reveal: {{ settings.pb_reveal | json }}
+    };
+  </script>
+  {%- if settings.pb_smooth_scroll -%}
+    {{ 'lenis.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
+  {%- endif -%}
+  <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+  {%- if settings.pb_reveal -%}
+    <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+  {%- endif -%}
+  <script src="{{ 'pb-motion.js' | asset_url }}" defer></script>
+{%- endif -%}
