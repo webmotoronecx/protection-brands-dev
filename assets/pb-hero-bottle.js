@@ -46,7 +46,7 @@ const LAYOUTS = {
 };
 
 const FLOAT = 0.18; // float height
-const SHADOW_OPACITY = 0.55; // darkness of the shadow behind the bottles
+const SHADOW_OPACITY = 0.35; // darkness of the shadow behind the bottles
 const DPR_CAP = coarsePointer.matches ? 1.5 : 1.75;
 
 class PBHeroBottle extends HTMLElement {
@@ -183,9 +183,9 @@ class PBHeroBottle extends HTMLElement {
     shadowLight.position.set(3, 3, 10);
     shadowLight.castShadow = true;
     const shadow = shadowLight.shadow;
-    shadow.mapSize.set(1024, 1024);
-    shadow.radius = 14;
-    shadow.blurSamples = 16;
+    shadow.mapSize.set(512, 512); // lower resolution = softer and cheaper
+    shadow.radius = 24;
+    shadow.blurSamples = 24;
     shadow.bias = -0.0005;
     Object.assign(shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 30 });
     this.#scene.add(shadowLight);
