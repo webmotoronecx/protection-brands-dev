@@ -19,25 +19,28 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const coarsePointer = window.matchMedia('(pointer: coarse)');
 
-/* Bottle geometry, in units of the body radius. Heights measured from the base. */
+/* Bottle geometry, in units of the body radius, heights from the base. Measured from the
+   500 ml product photo: body 370 px wide, 1,170 px from base to cap top. */
 const SHELL = [
-  [0, 0], [0.85, 0], [0.96, 0.03], [1, 0.15], [1, 7.02], [0.98, 7.16],
-  [0.9, 7.3], [0.72, 7.44], [0.52, 7.52], [0.46, 7.56], [0.46, 7.66],
+  [0, 0], [0.6, 0], [0.8, 0.03], [0.9, 0.06], [0.95, 0.1], [0.98, 0.17], [1, 0.25],
+  [1, 5.22], [0.97, 5.27], [0.92, 5.32], [0.79, 5.38], [0.68, 5.43], [0.57, 5.49],
+  [0.47, 5.53], [0.41, 5.56], [0.4, 5.66],
 ];
 const LIQUID = [
-  [0, 0.04], [0.83, 0.04], [0.94, 0.08], [0.97, 0.18], [0.97, 7.0],
-  [0.95, 7.12], [0.88, 7.22], [0, 7.22],
+  [0, 0.04], [0.58, 0.04], [0.85, 0.08], [0.94, 0.14], [0.97, 0.27], [0.97, 5.2],
+  [0.93, 5.26], [0.86, 5.3], [0, 5.3],
 ];
-const CAP = [[0, 7.64], [0.5, 7.64], [0.5, 8.17], [0.47, 8.22], [0, 8.22]];
-const LABEL = { bottom: 0.7, top: 7.0 };
-const HEIGHT = 8.22;
+const CAP = [[0, 5.62], [0.455, 5.62], [0.455, 6.18], [0.42, 6.24], [0.28, 6.27], [0, 6.27]];
+const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
+const LABEL = { bottom: 0.52, top: 4.98 };
+const HEIGHT = 6.27;
 
 /* Layout of the bottles: position, resting tilt, and float phase. */
 const LAYOUTS = {
   1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0 }],
   2: [
-    { position: [-1.35, 1.2, 0], tilt: [0.1, 0, 0.22], phase: 0 },
-    { position: [1.35, -1.7, 0.6], tilt: [0.06, 0, 0.14], phase: 1.9 },
+    { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 0 },
+    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, 0.15], phase: 1.9 },
   ],
 };
 
@@ -181,8 +184,8 @@ class PBHeroBottle extends HTMLElement {
     // Fit the bottles: by height on wide screens, by width on narrow ones.
     const camera = this.#camera;
     const two = this.#bottles.length > 1;
-    const needHeight = two ? 17.5 : 13;
-    const needWidth = two ? 8 : 5;
+    const needHeight = two ? 11.5 : 9.5;
+    const needWidth = two ? 6.5 : 5;
     const tan = Math.tan(THREE_DEG(camera.fov / 2));
     camera.aspect = width / height;
     // Bottle size setting: 1 = fit, larger moves the camera closer.
@@ -316,31 +319,18 @@ function bottleGeometries(THREE) {
     const x = position.getX(i);
     const y = position.getY(i);
     const z = position.getZ(i);
-    if (y > 7.68 && y < 8.15 && Math.hypot(x, z) > 0.45) {
+    if (y > CAP_RIBS.bottom && y < CAP_RIBS.top && Math.hypot(x, z) > CAP_RIBS.radius) {
       const scale = 1 + 0.025 * Math.sign(Math.cos(Math.atan2(x, z) * 45));
       position.setXYZ(i, x * scale, y, z * scale);
     }
   }
   cap.computeVertexNormals();
 
-  // Label: open cylinder just outside the shell. thetaStart = PI puts the middle of the
-  // artwork (the front panel) facing the camera.
+  // Label: open cylinder just outside the shell, the artwork wrapped once around it.
+  // thetaStart = PI puts the middle of the artwork (the front) facing the camera.
   const labelHeight = LABEL.top - LABEL.bottom;
   const label = new THREE.CylinderGeometry(1.006, 1.006, labelHeight, 128, 1, true, Math.PI);
   label.translate(0, LABEL.bottom + labelHeight / 2, 0);
-
-  // The flat artwork is three equal panels, but on the real bottle the front panel fills the
-  // whole visible face. Give the middle third of the artwork the front half of the bottle,
-  // and the side panels a quarter each.
-  const uv = label.attributes.uv;
-  for (let i = 0; i < uv.count; i++) {
-    const around = uv.getX(i); // 0..1 around the bottle, 0.5 = front
-    const art =
-      around < 0.25 ? (around / 0.25) * (1 / 3)
-      : around > 0.75 ? 2 / 3 + ((around - 0.75) / 0.25) * (1 / 3)
-      : 1 / 3 + ((around - 0.25) / 0.5) * (1 / 3);
-    uv.setX(i, art);
-  }
 
   return { liquid, label, cap, shell };
 }
