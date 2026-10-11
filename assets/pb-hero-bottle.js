@@ -80,9 +80,9 @@ function introDrop(seconds) {
    the theme editor (Hero bottle (3D) → Reflections & lighting), which passes it in as a
    data attribute on <pb-hero-bottle>. */
 const LOOK = {
-  highlights: 1, // white studio reflections on the plastic and label
-  gloss: 1, // clear-coat shine on the plastic, liquid and label
-  keyLight: 1, // main light from the upper right
+  highlights: 0.5, // white studio reflections on the plastic and label
+  gloss: 0.5, // clear-coat shine on the plastic, liquid and label
+  keyLight: 0.5, // main light from the upper right
   rimLight: 0.25, // coloured light from behind, along the left edges
   rimColor: '#ca0d0d',
   shadow: 0.45, // darkness of the shadow behind the bottles
