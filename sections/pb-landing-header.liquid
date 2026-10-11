@@ -1,7 +1,7 @@
 {%- comment -%}
   Minimal header for the landing layout (layout/pb-landing.liquid): menu button on the left,
   logo in the middle, cart on the right, floating over the page.
-  The menu button is a placeholder until the floating menu is built; it does nothing yet.
+  The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
 {%- endcomment -%}
 
 <header class="pb-landing-header">
@@ -10,6 +10,8 @@
     class="pb-landing-header__menu"
     aria-label="Menu"
     aria-expanded="false"
+    aria-controls="PBMenu"
+    aria-haspopup="dialog"
     data-pb-menu-toggle
   >
     <span class="pb-landing-header__menu-line"></span>
@@ -46,6 +48,37 @@
     {%- endif -%}
   </a>
 </header>
+
+{%- assign menu = section.settings.menu -%}
+<pb-menu>
+  <dialog id="PBMenu" class="pb-menu" aria-label="{{ menu.title | default: 'Menu' | escape }}">
+    <button type="button" class="pb-menu__close" aria-label="Close menu" data-pb-menu-close>
+      <span class="pb-menu__close-line"></span>
+      <span class="pb-menu__close-line"></span>
+    </button>
+
+    {%- if menu.links.size > 0 -%}
+      <nav class="pb-menu__nav">
+        <ul class="pb-menu__links">
+          {%- for link in menu.links -%}
+            <li>
+              <a
+                href="{{ link.url }}"
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- link.title -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+  </dialog>
+</pb-menu>
+
+<script type="module" src="{{ 'pb-menu.js' | asset_url }}"></script>
 
 {% stylesheet %}
   .pb-landing-header {
@@ -123,6 +156,114 @@
     line-height: 14px;
     text-align: center;
   }
+
+  /* Floating menu ------------------------------------------------------------------------ */
+
+  html[data-pb-menu-open] {
+    overflow: hidden;
+  }
+
+  .pb-menu {
+    --pb-menu-inset: 22px;
+
+    width: min(50vw, 640px);
+    max-width: none;
+    height: calc(100dvh - var(--pb-menu-inset) * 2);
+    max-height: none;
+    margin: var(--pb-menu-inset);
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: #0f0f0f;
+    color: #fff;
+    opacity: 0;
+    translate: -24px 0;
+    transition:
+      opacity 0.35s ease,
+      translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-menu.is-open {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .pb-menu::backdrop {
+    background: rgb(0 0 0 / 0.35);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .pb-menu__close {
+    position: absolute;
+    inset-block-start: 20px;
+    inset-inline-start: 20px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pb-menu__close-line {
+    grid-area: 1 / 1;
+    width: 24px;
+    height: 1.5px;
+    background: currentColor;
+    rotate: 45deg;
+  }
+
+  .pb-menu__close-line + .pb-menu__close-line {
+    rotate: -45deg;
+  }
+
+  .pb-menu__nav {
+    padding: 30vh 32px 48px 12%;
+  }
+
+  .pb-menu__links {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-menu__links a {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+
+  .pb-menu__links a:is(:hover, :focus-visible, [aria-current='page']) {
+    color: var(--pb-accent, #c62b23);
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-menu {
+      --pb-menu-inset: 12px;
+
+      width: calc(100vw - var(--pb-menu-inset) * 2);
+    }
+
+    .pb-menu__nav {
+      padding: 22vh 24px 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-menu {
+      transition: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -136,6 +277,13 @@
       "id": "logo",
       "label": "Logo",
       "info": "Empty uses the Protection Brands logo. Shown on a dark background, so use a light version."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Floating menu",
+      "default": "main-menu",
+      "info": "Opened from the menu button. Top-level links only."
     }
   ]
 }

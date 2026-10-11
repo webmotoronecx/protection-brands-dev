@@ -54,6 +54,8 @@ and switch the header to it in the theme editor.
       SDS, About Us, Contact.
 - [ ] Footer menu (`footer`): policies, Delivery, Terms & Conditions, Privacy Policy,
       Contact.
+- [ ] Homepage floating menu: uses `main-menu` by default (Theme editor → Home page →
+      Landing header → Floating menu). Top-level links only for now.
 - [ ] Homepage footer row: uses the `footer` menu by default (Theme editor → Home page →
       Landing footer). The design shows, in order: Contact Us, Delivery & Returns, Warranty
       Claim, Privacy Policy, About Us, Terms & Conditions, Care Instructions, Refer a Friend,

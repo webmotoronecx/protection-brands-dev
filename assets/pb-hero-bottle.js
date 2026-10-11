@@ -274,13 +274,18 @@ class PBHeroBottle extends HTMLElement {
 
     // Run frames only while the hero is on screen and the tab is visible.
     let onScreen = false;
-    const update = () => (onScreen && !document.hidden ? this.#start() : this.#stop?.());
+    // Also paused while the floating menu (assets/pb-menu.js) covers the page.
+    const update = () =>
+      onScreen && !document.hidden && !document.documentElement.hasAttribute('data-pb-menu-open')
+        ? this.#start()
+        : this.#stop?.();
     this.#observer = new IntersectionObserver(([entry]) => {
       onScreen = entry.isIntersecting;
       update();
     });
     this.#observer.observe(this);
     document.addEventListener('visibilitychange', update, { signal });
+    document.addEventListener('pb:menu', update, { signal });
 
     reducedMotion.addEventListener(
       'change',
