@@ -35,13 +35,14 @@ const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
 const LABEL = { bottom: 0.52, top: 4.98 };
 const HEIGHT = 6.27;
 
-/* Layout of the bottles: position, resting tilt [x, y, z] and float phase.
+/* Layout of the bottles: position, resting tilt [x, y, z], float phase, and depth (how far
+   the bottle moves with the mouse; the front bottle moves most, for parallax).
    Positive z tilt leans the top to the left, negative to the right. */
 const LAYOUTS = {
-  1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0 }],
+  1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0, depth: 0.8 }],
   2: [
-    { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 0 },
-    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, -0.15], phase: 1.9 },
+    { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 0, depth: 0.55 },
+    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, -0.15], phase: 1.9, depth: 1 },
   ],
 };
 
@@ -332,7 +333,13 @@ class PBHeroBottle extends HTMLElement {
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
       group.rotation.y = spec.tilt[1] + pointer.x * 0.6 * strength;
       group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
-      group.position.y = spec.position[1] + Math.sin(time * 1.1 + spec.phase) * FLOAT + scrolled * 3;
+      // Drift towards the mouse; the front bottle moves further than the one behind.
+      group.position.x = spec.position[0] + pointer.x * 0.9 * spec.depth * strength;
+      group.position.y =
+        spec.position[1] -
+        pointer.y * 0.6 * spec.depth * strength +
+        Math.sin(time * 1.1 + spec.phase) * FLOAT +
+        scrolled * 3;
     }
 
     // The scrolling wordmark drifts the other way, so it reads as a layer further back.
