@@ -168,3 +168,17 @@
   font-size: 16px;
   font-weight: 700;
 }
+
+/* Product rows ("You may also like", product list sections on pages): the cards' outer edges
+   line up with the title bar and footer cards, 10px from the screen edge (8px on phones),
+   the same as the collection grid. Horizon lays these out from --page-margin/--page-width. */
+.shopify-section:has(> product-recommendations, .section-resource-list) {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .shopify-section:has(> product-recommendations, .section-resource-list) {
+    --page-margin: 8px;
+  }
+}
