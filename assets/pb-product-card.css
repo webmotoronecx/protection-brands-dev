@@ -130,5 +130,6 @@
 
 /* Price: bold, current price only weight change. */
 .product-grid__card .price {
+  font-size: 16px;
   font-weight: 700;
 }
