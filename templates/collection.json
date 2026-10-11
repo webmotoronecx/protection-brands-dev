@@ -16,7 +16,8 @@
         "nav_label": "Categories",
         "fallback_title": "Products",
         "marquee": true,
-        "marquee_duration": 60
+        "marquee_duration": 60,
+        "marquee_motion": "mouse"
       }
     },
     "section": {

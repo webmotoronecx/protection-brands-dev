@@ -1,6 +1,7 @@
 {%- comment -%}
-  Protection Brands collection header: a rounded dark card with the scrolling wordmark
-  (snippets/pb-marquee.liquid, inverted file) along the top, the collection title, large,
+  Protection Brands collection header: a rounded dark card with the wordmark
+  (snippets/pb-marquee.liquid, inverted file) along the top, following the mouse or
+  scrolling, the collection title, large,
   light and uppercase, and a row of category links (current one underlined in red). On
   phones the row scrolls sideways. Categories are picked in the theme editor.
 {%- endcomment -%}
@@ -26,10 +27,18 @@
   style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
 >
   {%- if section.settings.marquee -%}
+    {%- liquid
+      assign marquee_static = true
+      if section.settings.marquee_motion == 'scroll'
+        assign marquee_static = false
+      endif
+    -%}
     {%- render 'pb-marquee',
       class: 'pb-collection-header__marquee',
       file: 'label-scroling-invert.svg',
       duration: section.settings.marquee_duration,
+      static: marquee_static,
+      follow_mouse: marquee_static,
       loading: 'eager'
     -%}
   {%- endif -%}
@@ -214,9 +223,27 @@
       "default": true
     },
     {
+      "type": "select",
+      "id": "marquee_motion",
+      "label": "Wordmark motion",
+      "options": [
+        {
+          "value": "mouse",
+          "label": "Follows the mouse"
+        },
+        {
+          "value": "scroll",
+          "label": "Scrolls"
+        }
+      ],
+      "default": "mouse",
+      "visible_if": "{{ section.settings.marquee }}"
+    },
+    {
       "type": "range",
       "id": "marquee_duration",
       "label": "Scroll speed",
+      "visible_if": "{{ section.settings.marquee and section.settings.marquee_motion == 'scroll' }}",
       "info": "Seconds for one loop. Higher is slower.",
       "min": 20,
       "max": 120,

@@ -13,11 +13,16 @@
   @param {number} [duration] - Seconds per loop. Defaults to 60.
   @param {string} [loading] - 'eager' when above the fold. Defaults to 'lazy'.
   @param {string} [file] - SVG asset name. Defaults to 'label-scroling.svg'.
+  @param {boolean} [static] - Don't scroll; the wordmark stands still.
+  @param {boolean} [follow_mouse] - Drift slightly against the mouse (pb-marquee.js).
 {%- enddoc -%}
 
 <pb-marquee
-  class="pb-marquee{% if class != blank %} {{ class }}{% endif %}"
+  class="pb-marquee{% if static %} pb-marquee--static{% endif %}{% if class != blank %} {{ class }}{% endif %}"
   aria-hidden="true"
+  {% if follow_mouse %}
+    data-follow-mouse
+  {% endif %}
   style="--pb-marquee-duration: {{ duration | default: 60 }}s;"
 >
   {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
@@ -51,6 +56,12 @@
 
   .pb-marquee.is-paused .pb-marquee__track {
     animation-play-state: paused;
+  }
+
+  /* Standing still: start a little left so no empty edge shows when it drifts. */
+  .pb-marquee--static .pb-marquee__track {
+    margin-inline-start: -80px;
+    animation: none;
   }
 
   .pb-marquee__track img {
