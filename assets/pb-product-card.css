@@ -17,7 +17,7 @@
   --pb-on-accent: #ffffff;
   --pb-card-radius: 12px;
   --pb-card-padding: 16px;
-  --pb-quick-add-size: 44px;
+  --pb-quick-add-size: 30px;
   --pb-title-lines: 2;
 }
 
@@ -98,7 +98,6 @@
   :root {
     --pb-card-padding: 12px;
     --pb-card-radius: 8px;
-    --pb-quick-add-size: 36px;
   }
 }
 
