@@ -30,6 +30,11 @@ class PBMenu extends HTMLElement {
       'click',
       (event) => {
         if (event.target.closest('[data-pb-menu-toggle]')) this.toggle();
+        // Header search icon: open Horizon's search dialog, closing the menu first if open.
+        if (event.target.closest('[data-pb-search-open]')) {
+          if (this.dialog.open) this.close();
+          document.getElementById('search-modal')?.showDialog?.();
+        }
       },
       { signal }
     );

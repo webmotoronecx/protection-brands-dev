@@ -58,6 +58,21 @@
   </a>
 
   <div class="pb-landing-header__actions">
+    {%- comment -%} Opens Horizon's search dialog (snippets/search-modal.liquid) via assets/pb-menu.js. {%- endcomment -%}
+    <button
+      type="button"
+      class="pb-landing-header__icon"
+      aria-label="Search"
+      aria-haspopup="dialog"
+      aria-controls="search-modal"
+      data-pb-search-open
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <circle cx="11" cy="11" r="6.5"/>
+        <path d="m16 16 4 4"/>
+      </svg>
+    </button>
+
     {%- if shop.customer_accounts_enabled -%}
       <a class="pb-landing-header__icon" href="{{ routes.account_url }}" aria-label="Account">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
@@ -327,12 +342,37 @@
     place-items: center;
     width: 44px;
     height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
     color: inherit;
+    cursor: pointer;
   }
 
   .pb-landing-header__icon svg {
     width: 24px;
     height: 24px;
+  }
+
+  /* Phones: smaller logo and tighter icons so search, account and cart fit beside it. */
+  @media screen and (max-width: 749px) {
+    .pb-landing-header__logo img {
+      width: 128px;
+    }
+
+    .pb-landing-header__actions {
+      gap: 0;
+    }
+
+    .pb-landing-header__icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .pb-landing-header__icon svg {
+      width: 22px;
+      height: 22px;
+    }
   }
 
   .pb-landing-header__count {
