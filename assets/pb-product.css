@@ -167,3 +167,70 @@ product-recommendations h2 {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+/* Image zoom (click a photo): light grey background like the product tiles, so white photo
+   backgrounds blend in; round white close button; thumbnails on white rounded tiles with a
+   black outline on the current one. Horizon's own opening animation (the photo growing from
+   the page) is kept. */
+.product-information .dialog-zoomed-gallery__dialog {
+  background-color: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information .dialog-zoomed-gallery .product-media-container {
+  border-radius: 0;
+  background: transparent;
+}
+
+.product-information .dialog-zoomed-gallery img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.product-information .dialog-zoomed-gallery__close-button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  mix-blend-mode: normal;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.product-information .dialog-zoomed-gallery__close-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.product-information .dialog-zoomed-gallery__close-button:is(:hover, :focus-visible) {
+  color: var(--pb-accent, #ca0d0d);
+  transform: scale(1.06);
+}
+
+.product-information .dialog-thumbnails-list__thumbnail {
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+}
+
+.product-information .dialog-thumbnails-list__thumbnail img {
+  border-radius: 8px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* One crisp outline on the current thumbnail (replaces Horizon's double outline). */
+.product-information .dialog-thumbnails-list__thumbnail[aria-selected='true'],
+.product-information .dialog-thumbnails-list:has(.dialog-thumbnails-list__thumbnail[aria-selected='true'])::after {
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
+  border: 0;
+  border-radius: 8px;
+}
