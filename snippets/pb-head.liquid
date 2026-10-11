@@ -10,8 +10,14 @@
 {%- endif -%}
 
 {%- liquid
+  # Smooth scrolling on inner pages only: the homepage is a single screen.
+  assign pb_smooth = settings.pb_smooth_scroll
+  if template.name == 'index'
+    assign pb_smooth = false
+  endif
+
   assign pb_motion = false
-  if settings.pb_smooth_scroll or settings.pb_reveal
+  if pb_smooth or settings.pb_reveal
     assign pb_motion = true
   endif
   if request.design_mode
@@ -22,12 +28,22 @@
 {%- if pb_motion -%}
   <script>
     window.PBMotion = {
-      smoothScroll: {{ settings.pb_smooth_scroll | json }},
+      smoothScroll: {{ pb_smooth | json }},
       reveal: {{ settings.pb_reveal | json }}
     };
   </script>
-  {%- if settings.pb_smooth_scroll -%}
+  {%- if pb_smooth -%}
     {{ 'lenis.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      Lenis stops itself with overflow: clip, which resets the scroll position. On desktop the
+      scroller is .page-wrapper, so opening the menu, cart drawer or a dialog would jump the
+      page to the top. overflow: hidden locks scrolling and keeps the position.
+    {%- endcomment -%}
+    <style>
+      .page-wrapper.lenis.lenis-stopped {
+        overflow: hidden;
+      }
+    </style>
     <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
   {%- endif -%}
   <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>

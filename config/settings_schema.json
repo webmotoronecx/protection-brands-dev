@@ -2128,7 +2128,7 @@
         "type": "checkbox",
         "id": "pb_smooth_scroll",
         "label": "Smooth scrolling (desktop)",
-        "info": "Mouse and trackpad only. Touch devices keep native scrolling.",
+        "info": "Inner pages only (the homepage is a single screen). Mouse and trackpad only; touch devices keep native scrolling.",
         "default": false
       },
       {

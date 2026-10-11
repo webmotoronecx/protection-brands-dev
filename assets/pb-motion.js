@@ -44,7 +44,7 @@
         ? new Lenis({ anchors: true, autoRaf: false })
         : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false });
     if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
-    if (root.hasAttribute('scroll-lock')) lenis.stop();
+    if (root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open')) lenis.stop();
   };
 
   if (config.smoothScroll && Lenis && finePointer) {
@@ -54,10 +54,12 @@
     gsap.ticker.add((time) => lenis?.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
 
-    // Horizon sets html[scroll-lock] while drawers and dialogs are open.
-    new MutationObserver(() => (root.hasAttribute('scroll-lock') ? lenis?.stop() : lenis?.start())).observe(root, {
+    // Pause while something covers the page: Horizon's drawers and dialogs set
+    // html[scroll-lock], the PB floating menu sets html[data-pb-menu-open].
+    const locked = () => root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open');
+    new MutationObserver(() => (locked() ? lenis?.stop() : lenis?.start())).observe(root, {
       attributes: true,
-      attributeFilter: ['scroll-lock'],
+      attributeFilter: ['scroll-lock', 'data-pb-menu-open'],
     });
 
     squeeze.addEventListener('change', startLenis);

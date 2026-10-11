@@ -83,7 +83,8 @@
       "color1": "#333333",
       "color2": "#EEF1EA",
       "color3": "#DFDFDF"
-    }
+    },
+    "pb_smooth_scroll": true
   },
   "presets": {
     "Default": {
