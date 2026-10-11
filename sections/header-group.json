@@ -11,6 +11,17 @@
   "type": "header",
   "name": "t:names.header",
   "sections": {
+    "pb_header": {
+      "type": "pb-landing-header",
+      "settings": {
+        "style": "light",
+        "menu": "main-menu",
+        "categories_heading": "Categories",
+        "newsletter": true,
+        "newsletter_heading": "Subscribe to our newsletter",
+        "newsletter_text": "New products, offers and car care tips."
+      }
+    },
     "header_announcements_9jGBFp": {
       "type": "header-announcements",
       "blocks": {
@@ -39,7 +50,8 @@
         "padding-block-start": 15,
         "padding-block-end": 15,
         "divider_color": "{{ settings.color_palette.color3 }}"
-      }
+      },
+      "disabled": true
     },
     "header_section": {
       "type": "header",
@@ -98,10 +110,12 @@
         "enable_transparent_header_home": false,
         "enable_transparent_header_product": false,
         "enable_transparent_header_collection": false
-      }
+      },
+      "disabled": true
     }
   },
   "order": [
+    "pb_header",
     "header_announcements_9jGBFp",
     "header_section"
   ]

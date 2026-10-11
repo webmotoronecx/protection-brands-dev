@@ -1,10 +1,20 @@
 {%- comment -%}
-  Minimal header for the landing layout (layout/pb-landing.liquid): menu button on the left,
-  logo in the middle, cart on the right, floating over the page.
+  Protection Brands header: menu button on the left, logo in the middle, cart on the right.
+  Dark style floats over the homepage hero (layout/pb-landing.liquid); light style is the
+  white inner-page header (header group in layout/theme.liquid).
   The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
 {%- endcomment -%}
 
-<header class="pb-landing-header">
+{%- liquid
+  assign light = false
+  assign logo_file = 'logo-protectionbrands.svg'
+  if section.settings.style == 'light'
+    assign light = true
+    assign logo_file = 'logo-protectionbrands-dark.svg'
+  endif
+-%}
+
+<header class="pb-landing-header{% if light %} pb-landing-header--light{% endif %}">
   <button
     type="button"
     class="pb-landing-header__menu"
@@ -27,7 +37,7 @@
       }}
     {%- else -%}
       <img
-        src="{{ 'logo-protectionbrands.svg' | asset_url }}"
+        src="{{ logo_file | asset_url }}"
         alt="{{ shop.name | escape }}"
         width="225"
         height="46"
@@ -155,6 +165,20 @@
     height: var(--pb-landing-header-height);
     padding-inline: var(--page-margin, 24px);
     color: #fff;
+  }
+
+  /* Light: white inner-page header, in the page flow. */
+  .pb-landing-header--light {
+    position: relative;
+    height: 104px;
+    background: #fff;
+    color: #111;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-landing-header--light {
+      height: 72px;
+    }
   }
 
   .pb-landing-header__menu {
@@ -443,15 +467,31 @@
 
 {% schema %}
 {
-  "name": "Landing header",
+  "name": "Header (PB)",
   "tag": "div",
   "class": "pb-landing-header-section",
   "settings": [
     {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Dark, over the page"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        }
+      ],
+      "default": "dark"
+    },
+    {
       "type": "image_picker",
       "id": "logo",
       "label": "Logo",
-      "info": "Empty uses the Protection Brands logo. Shown on a dark background, so use a light version."
+      "info": "Empty uses the Protection Brands logo: white text on Dark, black text on Light."
     },
     {
       "type": "link_list",
