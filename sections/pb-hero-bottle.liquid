@@ -43,7 +43,7 @@
   data-shadow-blur="{{ section.settings.shadow_blur | times: 0.48 }}"
   data-wobble="{{ section.settings.liquid_wobble }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
-  style="--pb-hero-bg: {{ section.settings.background }}; --pb-hero-glow: {{ section.settings.glow_color }}; --pb-hero-glow-strength: {{ section.settings.glow_strength }}%; --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
+  style="--pb-hero-bg: {{ section.settings.background }}; --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
 >
   {%- if section.settings.poster != blank -%}
     {{
@@ -123,14 +123,11 @@
       max(48px, var(--pb-landing-footer-height, 0px));
     overflow: hidden;
     color: #fff;
-    /* Red glow rising from the bottom (strongest bottom right, fading out by about half
-       height), over the soft centre light on the dark background. */
-    --pb-hero-glow-colour: color-mix(in srgb, var(--pb-hero-glow, #9a2219) var(--pb-hero-glow-strength, 100%), transparent);
-
-    background:
-      radial-gradient(ellipse 85% 75% at 100% 100%, var(--pb-hero-glow-colour) 0%, transparent 100%),
-      linear-gradient(to top, color-mix(in srgb, var(--pb-hero-glow-colour) 55%, transparent) 0%, transparent 42%),
-      radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--pb-hero-bg) 92%, #fff) 0%, var(--pb-hero-bg) 70%);
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      color-mix(in srgb, var(--pb-hero-bg) 92%, #fff) 0%,
+      var(--pb-hero-bg) 70%
+    );
   }
 
   .pb-hero-bottle__poster,
@@ -655,22 +652,6 @@
       "id": "background",
       "label": "Background",
       "default": "#0b0b0b"
-    },
-    {
-      "type": "color",
-      "id": "glow_color",
-      "label": "Bottom glow",
-      "default": "#9a2219"
-    },
-    {
-      "type": "range",
-      "id": "glow_strength",
-      "label": "Bottom glow strength",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "default": 100
     },
     {
       "type": "image_picker",

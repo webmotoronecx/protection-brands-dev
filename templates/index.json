@@ -36,8 +36,6 @@
         "shadow": 35,
         "shadow_blur": 50,
         "background": "#0b0b0b",
-        "glow_color": "#9a2219",
-        "glow_strength": 100,
         "background_style": "scroll",
         "scroll_duration": 60,
         "background_text": "Protection"
