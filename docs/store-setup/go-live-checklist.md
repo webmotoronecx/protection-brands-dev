@@ -99,7 +99,7 @@ Placeholders from stock Horizon that must be replaced:
 Use **Preview** (and the share-preview link on a phone, iOS and Android):
 
 - [ ] Every main-menu and footer link lands on a working page.
-- [ ] Home page category and brand grids show images and the right collections.
+- [ ] Home page: 3D bottles load, follow the mouse, and both headings link to the right collections.
 - [ ] Collection filters narrow correctly; sorting works.
 - [ ] Search dropdown finds "shampoo", "microfibre", "jump starter".
 - [ ] Product page: images, price, add to cart, SDS link where set.

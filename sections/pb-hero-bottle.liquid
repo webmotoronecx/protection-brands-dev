@@ -37,6 +37,10 @@
     }}
   {%- endif -%}
 
+  {%- if section.settings.background_text != blank -%}
+    <span class="pb-hero-bottle__word" aria-hidden="true">{{ section.settings.background_text }}</span>
+  {%- endif -%}
+
   <canvas class="pb-hero-bottle__canvas" aria-hidden="true"></canvas>
 
   {%- for side in (1..2) -%}
@@ -73,8 +77,8 @@
     display: grid;
     grid-template-columns: 1fr minmax(0, 1.1fr) 1fr;
     align-items: center;
-    min-height: max(560px, 90svh);
-    padding: 48px var(--page-margin, 24px);
+    min-height: max(560px, 100svh);
+    padding: max(48px, var(--pb-landing-header-height, 0px)) var(--page-margin, 24px) 48px;
     overflow: hidden;
     color: #fff;
     background: radial-gradient(
@@ -91,6 +95,26 @@
     width: 100%;
     height: 100%;
     transition: opacity 0.8s ease;
+  }
+
+  /* Large faint word behind the bottles. */
+  .pb-hero-bottle__word {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    z-index: 0;
+    translate: 0 -40%;
+    overflow: hidden;
+    color: rgb(255 255 255 / 0.045);
+    font-size: clamp(4rem, 15.5vw, 22rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
   }
 
   .pb-hero-bottle__poster {
@@ -160,8 +184,7 @@
     .pb-hero-bottle {
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr auto;
-      min-height: max(560px, 85svh);
-      padding-block: 32px;
+      padding-block: calc(var(--pb-landing-header-height, 0px) + 16px) 32px;
     }
 
     .pb-hero-bottle__text--start {
@@ -273,6 +296,12 @@
     {
       "type": "header",
       "content": "Background"
+    },
+    {
+      "type": "text",
+      "id": "background_text",
+      "label": "Background word",
+      "default": "Protection"
     },
     {
       "type": "color",

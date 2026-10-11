@@ -37,7 +37,7 @@ const LAYOUTS = {
   1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0 }],
   2: [
     { position: [-1.35, 1.2, 0], tilt: [0.1, 0, 0.22], phase: 0 },
-    { position: [1.35, -1.7, 1.2], tilt: [0.06, 0, 0.14], phase: 1.9 },
+    { position: [1.35, -1.7, 0.6], tilt: [0.06, 0, 0.14], phase: 1.9 },
   ],
 };
 
@@ -179,8 +179,8 @@ class PBHeroBottle extends HTMLElement {
     // Fit the bottles: by height on wide screens, by width on narrow ones.
     const camera = this.#camera;
     const two = this.#bottles.length > 1;
-    const needHeight = two ? 14 : 10;
-    const needWidth = two ? 7.5 : 4.5;
+    const needHeight = two ? 17.5 : 13;
+    const needWidth = two ? 8 : 5;
     const tan = Math.tan(THREE_DEG(camera.fov / 2));
     camera.aspect = width / height;
     camera.position.set(0, 0, Math.max(needHeight / 2 / tan, needWidth / 2 / (tan * camera.aspect)));

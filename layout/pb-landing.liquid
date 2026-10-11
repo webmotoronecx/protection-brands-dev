@@ -1,0 +1,71 @@
+<!doctype html>
+{%- comment -%}
+  Protection Brands landing layout: a single dark screen with the minimal header
+  (sections/pb-landing-header.liquid) and no footer. Used by the homepage
+  (templates/index.json, "layout": "pb-landing"). <head> matches layout/theme.liquid.
+{%- endcomment -%}
+<html
+  {% if request.design_mode %}
+    class="shopify-design-mode"
+  {% endif %}
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ request.locale.direction | default: 'ltr' }}"
+>
+  <head>
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- render 'view-transition-opt-in' -%}
+
+    {%- render 'meta-tags' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'card-hover-effect-styles' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-palette' -%}
+    {%- render 'pb-head' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+
+    <style>
+      .pb-landing {
+        --pb-landing-header-height: 88px;
+
+        background: #141414;
+      }
+
+      @media screen and (max-width: 749px) {
+        .pb-landing {
+          --pb-landing-header-height: 72px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="pb-landing page-width-{{ settings.page_width }}">
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
+    <div class="page-wrapper">
+      {% section 'pb-landing-header' %}
+
+      <main
+        id="MainContent"
+        class="content-for-layout"
+        role="main"
+        data-template="{{ template }}"
+      >
+        {{ content_for_layout }}
+      </main>
+    </div>
+  </body>
+</html>

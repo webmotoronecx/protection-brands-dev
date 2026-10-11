@@ -1,0 +1,142 @@
+{%- comment -%}
+  Minimal header for the landing layout (layout/pb-landing.liquid): menu button on the left,
+  logo in the middle, cart on the right, floating over the page.
+  The menu button is a placeholder until the floating menu is built; it does nothing yet.
+{%- endcomment -%}
+
+<header class="pb-landing-header">
+  <button
+    type="button"
+    class="pb-landing-header__menu"
+    aria-label="Menu"
+    aria-expanded="false"
+    data-pb-menu-toggle
+  >
+    <span class="pb-landing-header__menu-line"></span>
+    <span class="pb-landing-header__menu-line"></span>
+  </button>
+
+  <a class="pb-landing-header__logo" href="{{ routes.root_url }}">
+    {%- if section.settings.logo != blank -%}
+      {{
+        section.settings.logo
+        | image_url: width: 600
+        | image_tag: alt: shop.name, loading: 'eager', widths: '300, 450, 600', sizes: '225px'
+      }}
+    {%- else -%}
+      <img
+        src="{{ 'logo-protectionbrands.svg' | asset_url }}"
+        alt="{{ shop.name | escape }}"
+        width="225"
+        height="46"
+      >
+    {%- endif -%}
+  </a>
+
+  <a
+    class="pb-landing-header__cart"
+    href="{{ routes.cart_url }}"
+    aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}"
+  >
+    {{- 'icon-cart.svg' | inline_asset_content -}}
+    {%- if cart.item_count > 0 -%}
+      <span class="pb-landing-header__count" aria-hidden="true">
+        {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
+      </span>
+    {%- endif -%}
+  </a>
+</header>
+
+{% stylesheet %}
+  .pb-landing-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: var(--pb-landing-header-height);
+    padding-inline: var(--page-margin, 24px);
+    color: #fff;
+  }
+
+  .pb-landing-header__menu {
+    justify-self: start;
+    display: grid;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-content: center;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pb-landing-header__menu-line {
+    display: block;
+    width: 26px;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  .pb-landing-header__logo {
+    display: block;
+    line-height: 0;
+  }
+
+  .pb-landing-header__logo img {
+    width: clamp(160px, 16vw, 225px);
+    height: auto;
+  }
+
+  .pb-landing-header__cart {
+    position: relative;
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: inherit;
+  }
+
+  .pb-landing-header__cart svg {
+    --icon-stroke-width: 1.5px;
+
+    width: 24px;
+    height: 24px;
+  }
+
+  .pb-landing-header__count {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-end: 4px;
+    min-width: 14px;
+    height: 14px;
+    padding-inline: 3px;
+    border-radius: 7px;
+    background: var(--pb-accent, #c62b23);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Landing header",
+  "tag": "div",
+  "class": "pb-landing-header-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Empty uses the Protection Brands logo. Shown on a dark background, so use a light version."
+    }
+  ]
+}
+{% endschema %}
