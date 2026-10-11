@@ -1,6 +1,7 @@
 # Store setup: categorisation, navigation and search
 
 Admin-side changes that go with the theme (brief §3, eCommerce Experience Enhancement).
+For the full launch-day list see [go-live-checklist.md](go-live-checklist.md).
 Do them in this order; each step depends on the one before.
 
 The theme expects these collection handles: `wash-shampoo`, `cleaners-sprays`, `microfibre-drying`,
