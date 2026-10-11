@@ -141,32 +141,77 @@
   color: var(--pb-accent, #ca0d0d);
 }
 
-/* Product results: image on the light card tile, like the product cards. */
-.search-modal .predictive-search-results__card--product .resource-card__media {
-  overflow: hidden;
+/* Product results, as the product cards (assets/pb-product-card.css): the whole card is a
+   light grey rounded tile with padding, a square contained image, a two-line title and a bold
+   price. Horizon's hover box around the result is replaced by a slightly darker tile. */
+.search-modal .predictive-search-results__card--product,
+.search-modal .predictive-search-results__card--product:is(:hover, :focus-visible, [aria-selected='true'].keyboard-focus, :has(.resource-card:focus-visible)) {
+  margin: 0;
+  padding: 0;
   border-radius: 12px;
-  background: var(--pb-card-bg, #f4f4f4);
+  background: none;
+  outline: none;
 }
 
-.search-modal .predictive-search-results__card--product .resource-card__media img {
+.search-modal .predictive-search-results__card--product .resource-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--pb-card-bg, #f4f4f4);
+  transition: background-color 0.2s ease;
+}
+
+.search-modal .predictive-search-results__card--product:hover .resource-card {
+  background: #ececec;
+}
+
+.search-modal .predictive-search-results__card--product:is([aria-selected='true'].keyboard-focus, :has(.resource-card:focus-visible)) .resource-card {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__media {
+  --resource-card-aspect-ratio: 1;
+
+  aspect-ratio: 1;
+  border-radius: 0;
+  background: transparent;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
   object-fit: contain;
   mix-blend-mode: multiply;
 }
 
+.search-modal .predictive-search-results__card--product .resource-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+}
+
 .search-modal .predictive-search-results__card--product .resource-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 2lh;
+  margin: 0;
   color: #111;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.3;
 }
 
 .search-modal .predictive-search-results__card--product .price {
   color: #111;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-}
-
-.search-modal .predictive-search-results__card--product:hover .resource-card__title {
-  color: var(--pb-accent, #ca0d0d);
 }
 
 .search-modal .predictive-search-results__no-results {
