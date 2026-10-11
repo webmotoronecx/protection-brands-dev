@@ -42,6 +42,11 @@ const LABEL = { bottom: 0.52, top: 4.98 };
    SLOSH: spring stiffness and damping, how strongly acceleration tips the surface, and the
    largest tilt (surface slope). */
 const LIQUID_LEVEL = 5.20;
+
+/* Sparkling liquid: small bubbles rising through each bottle (one instanced draw per bottle),
+   cut off at the moving surface, plus tiny glints twinkling in the liquid (shader). */
+const BUBBLES = { count: 90, radius: [0.025, 0.07], speed: [0.25, 0.6], spread: 0.8, bottom: 0.1 };
+const SPARKLE = 1.6; // glint brightness
 const SLOSH = { stiffness: 10, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
 
@@ -208,6 +213,7 @@ class PBHeroBottle extends HTMLElement {
     const geometries = bottleGeometries(THREE);
     const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
 
+    const sparkling = this.dataset.sparkle !== 'false';
     layout.forEach((spec, index) => {
       // The second (car care) bottle can have a gel finish: clearer, glossier, a faint shimmer.
       const finish = index === 1 ? this.dataset.finishSecond || 'gel' : 'liquid';
@@ -224,7 +230,17 @@ class PBHeroBottle extends HTMLElement {
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
+      const surface = materials.liquid.userData.surface;
+      surface.pbSparkle.value = sparkling ? SPARKLE : 0;
+      let fizz = null;
+      if (sparkling) {
+        fizz = makeBubbles(THREE, surface);
+        group.add(fizz.mesh);
+        updateBubbles(fizz, 0, 0);
+      }
+
       this.#bottles.push({
+        fizz,
         group,
         spec,
         surface: materials.liquid.userData.surface,
@@ -402,7 +418,9 @@ class PBHeroBottle extends HTMLElement {
     const wobble = this.dataset.wobble !== 'false' && !reducedMotion.matches;
     const point = this.#surfacePoint;
 
-    for (const { group, surface, slosh } of this.#bottles) {
+    for (const { group, surface, slosh, fizz } of this.#bottles) {
+      if (fizz) updateBubbles(fizz, reducedMotion.matches ? 0 : dt, this.#clock);
+      if (surface) surface.pbTime.value = this.#clock;
       if (!surface) continue;
       const { x, y, z } = group.position;
 
@@ -576,6 +594,68 @@ function bottleGeometries(THREE) {
   return { liquid, label, cap, shell };
 }
 
+/* Bubbles for one bottle: small spheres drawn in one go (InstancedMesh), cut off at the same
+   moving surface as the liquid (shares its uniforms). Positions are bottle-local. */
+function makeBubbles(THREE, surface) {
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.4,
+    roughness: 0.05,
+    transparent: true,
+    opacity: 0.7,
+    depthWrite: false,
+  });
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, surface);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPbWorld;')
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\n' +
+          '#ifdef USE_INSTANCING\nvPbWorld = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;\n' +
+          '#else\nvPbWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;\n#endif'
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPbWorld;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;')
+      .replace(
+        '#include <clipping_planes_fragment>',
+        '#include <clipping_planes_fragment>\nif (dot(vPbWorld - pbSurfacePoint, pbSurfaceNormal) > 0.0) discard;'
+      );
+  };
+
+  const mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), material, BUBBLES.count);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 1; // after the liquid (0), before the clear plastic (2)
+  const random = (min, max) => min + Math.random() * (max - min);
+  const bubbles = Array.from({ length: BUBBLES.count }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.sqrt(Math.random()) * BUBBLES.spread;
+    return {
+      x: Math.cos(angle) * distance,
+      z: Math.sin(angle) * distance,
+      y: random(BUBBLES.bottom, LIQUID_LEVEL),
+      radius: random(...BUBBLES.radius),
+      speed: random(...BUBBLES.speed),
+      phase: Math.random() * Math.PI * 2,
+    };
+  });
+  return { mesh, bubbles, matrix: new THREE.Matrix4() };
+}
+
+function updateBubbles(fizz, dt, time) {
+  const { mesh, bubbles, matrix } = fizz;
+  bubbles.forEach((bubble, index) => {
+    bubble.y += bubble.speed * dt;
+    if (bubble.y > LIQUID_LEVEL + 0.1) bubble.y = BUBBLES.bottom;
+    const sway = Math.sin(time * 3 + bubble.phase) * 0.035;
+    matrix.makeScale(bubble.radius, bubble.radius, bubble.radius);
+    matrix.setPosition(bubble.x + sway, bubble.y - HEIGHT / 2, bubble.z);
+    mesh.setMatrixAt(index, matrix);
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+}
+
 /* Cuts the liquid at a surface plane given in world space (point + normal, set every frame
    by #updateLiquids), and shades the inside faces that show through the cut as the surface. */
 function addLiquidSurface(THREE, material, colour, tint = 0.25, rim = 0) {
@@ -585,19 +665,21 @@ function addLiquidSurface(THREE, material, colour, tint = 0.25, rim = 0) {
     pbSurfaceColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), tint) },
     pbRim: { value: rim },
     pbRimColour: { value: colour.clone().lerp(new THREE.Color(0xffffff), 0.5) },
+    pbTime: { value: 0 },
+    pbSparkle: { value: 0 },
   };
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vPbWorld;')
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPbWorld;\nvarying vec3 vPbLocal;')
       .replace(
         '#include <project_vertex>',
-        '#include <project_vertex>\nvPbWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;'
+        '#include <project_vertex>\nvPbWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPbLocal = transformed;'
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec3 vPbWorld;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;\nuniform vec3 pbSurfaceColour;\nuniform float pbRim;\nuniform vec3 pbRimColour;'
+        '#include <common>\nvarying vec3 vPbWorld;\nvarying vec3 vPbLocal;\nuniform vec3 pbSurfacePoint;\nuniform vec3 pbSurfaceNormal;\nuniform vec3 pbSurfaceColour;\nuniform float pbRim;\nuniform vec3 pbRimColour;\nuniform float pbTime;\nuniform float pbSparkle;'
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -609,6 +691,13 @@ function addLiquidSurface(THREE, material, colour, tint = 0.25, rim = 0) {
           // Rim glow: brighter where the surface turns away from the viewer (gel finish).
           'float pbFacing = abs(dot(normalize(normal), normalize(vViewPosition)));\n' +
           'gl_FragColor.rgb += pbRimColour * pbRim * pow(1.0 - pbFacing, 2.5);\n' +
+          // Sparkle: a few cells of a 3D grid hold a tiny glint that twinkles on and off.
+          'vec3 pbCellPos = vPbLocal * 11.0;\n' +
+          'vec3 pbCell = floor(pbCellPos);\n' +
+          'float pbHash = fract(sin(dot(pbCell, vec3(12.9898, 78.233, 37.719))) * 43758.5453);\n' +
+          'float pbTwinkle = pow(max(0.0, sin(pbTime * 2.6 + pbHash * 60.0)), 18.0);\n' +
+          'float pbDot = smoothstep(0.2, 0.0, length(fract(pbCellPos) - 0.5));\n' +
+          'gl_FragColor.rgb += vec3(pbSparkle * pbDot * pbTwinkle * step(0.7, pbHash));\n' +
           'if (!gl_FrontFacing) gl_FragColor.rgb = mix(gl_FragColor.rgb, pbSurfaceColour, 0.55);'
       );
   };
@@ -650,6 +739,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
     clearcoat: gloss,
     transparent: true,
     side: THREE.DoubleSide,
+    depthWrite: false, // so the bubbles inside show through the liquid's front face
     ...look,
   });
   liquidMaterial.userData.surface = addLiquidSurface(THREE, liquidMaterial, liquid, surfaceTint, rim);

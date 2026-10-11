@@ -26,6 +26,7 @@
         "liquid_color_2": "#0077bb",
         "liquid_finish_2": "gel",
         "bottle_size": 100,
+        "liquid_sparkle": true,
         "liquid_wobble": true,
         "mouse_strength": 60,
         "highlights": 100,

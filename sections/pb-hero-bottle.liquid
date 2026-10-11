@@ -42,6 +42,7 @@
   data-shadow="{{ section.settings.shadow | divided_by: 100.0 }}"
   data-shadow-blur="{{ section.settings.shadow_blur | times: 0.48 }}"
   data-wobble="{{ section.settings.liquid_wobble }}"
+  data-sparkle="{{ section.settings.liquid_sparkle }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
   style="--pb-hero-bg: {{ section.settings.background }}; --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
 >
@@ -514,6 +515,13 @@
       "step": 5,
       "unit": "%",
       "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "liquid_sparkle",
+      "label": "Sparkling liquid",
+      "info": "Small bubbles rising and tiny glints in the liquid.",
+      "default": true
     },
     {
       "type": "checkbox",
