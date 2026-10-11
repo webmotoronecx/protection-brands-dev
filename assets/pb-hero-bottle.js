@@ -1,8 +1,9 @@
 /*
   Protection Brands 3D hero bottle: <pb-hero-bottle>, rendered by sections/pb-hero-bottle.liquid.
 
-  One or two bottles float with their labels facing out. They turn and tilt a little towards
-  the mouse, and lift as the hero scrolls away; they don't spin on their own. The bottle is
+  One or two bottles float with their labels facing out. They drift, turn and tilt towards
+  the mouse, and lift as the hero scrolls away; they don't spin on their own. The headings
+  follow the mouse slightly and the scrolling wordmark drifts the other way. The bottle is
   built in code from a profile measured from the 500 ml product photo; the label artwork
   wraps all the way round, front facing out.
 
@@ -117,6 +118,7 @@ class PBHeroBottle extends HTMLElement {
   #bottles = [];
   #pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
   #marquee;
+  #texts = [];
   #last = 0;
 
   async #init() {
@@ -149,6 +151,7 @@ class PBHeroBottle extends HTMLElement {
 
     const look = readLook(this.dataset);
     this.#marquee = this.querySelector('.pb-hero-bottle__marquee');
+    this.#texts = [...this.querySelectorAll('.pb-hero-bottle__text')];
 
     this.#scene = new THREE.Scene();
     this.#environment = studioEnvironment(THREE, renderer);
@@ -347,6 +350,15 @@ class PBHeroBottle extends HTMLElement {
       const x = -pointer.x * 40 * strength;
       const y = -pointer.y * 14 * strength;
       this.#marquee.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    }
+
+    // Headings and buttons, the front layer, follow the mouse a little (kept small so the
+    // text stays easy to read and the buttons easy to hit).
+    if (this.#texts.length) {
+      const x = pointer.x * 26 * strength;
+      const y = pointer.y * 16 * strength;
+      const transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+      for (const text of this.#texts) text.style.transform = transform;
     }
 
     this.#renderer.render(this.#scene, this.#camera);
