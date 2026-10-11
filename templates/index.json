@@ -9,6 +9,21 @@
  */
 {
   "sections": {
+    "pb_hero_bottle": {
+      "type": "pb-hero-bottle",
+      "settings": {
+        "start_line_1": "Professional",
+        "start_line_2": "Products",
+        "start_link": "/collections/all",
+        "end_line_1": "Car care",
+        "end_line_2": "Products",
+        "end_link": "/collections/all",
+        "bottles": "2",
+        "liquid_color": "#b5650e",
+        "mouse_strength": 60,
+        "background": "#141414"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -370,6 +385,7 @@
     }
   },
   "order": [
+    "pb_hero_bottle",
     "hero_jVaWmY",
     "shop_by_category",
     "shop_by_brand",

@@ -1,0 +1,296 @@
+{%- comment -%}
+  Protection Brands homepage hero: one or two 3D product bottles that spin, float and
+  follow the mouse, between two linked headings. The 3D is drawn by assets/pb-hero-bottle.js
+  with Three.js, which loads after the page has shown. The still image (if set) shows
+  first and stays for visitors who turn off motion or whose device can't draw 3D.
+{%- endcomment -%}
+
+{%- liquid
+  assign label_url = 'pb-label-detailing-spray.jpg' | asset_url
+  if section.settings.label != blank
+    assign label_url = section.settings.label | image_url: width: 4096
+  endif
+
+  assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
+-%}
+
+<pb-hero-bottle
+  class="pb-hero-bottle{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
+  data-three="{{ 'three.module.min.js' | asset_url }}"
+  data-label="{{ label_url }}"
+  data-bottles="{{ section.settings.bottles }}"
+  data-liquid="{{ section.settings.liquid_color }}"
+  data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
+  style="--pb-hero-bg: {{ section.settings.background }};"
+>
+  {%- if section.settings.poster != blank -%}
+    {{
+      section.settings.poster
+      | image_url: width: 2400
+      | image_tag:
+        class: 'pb-hero-bottle__poster',
+        loading: 'eager',
+        fetchpriority: 'high',
+        sizes: '100vw',
+        widths: '800, 1200, 1600, 2400',
+        alt: poster_alt
+    }}
+  {%- endif -%}
+
+  <canvas class="pb-hero-bottle__canvas" aria-hidden="true"></canvas>
+
+  {%- for side in (1..2) -%}
+    {%- liquid
+      if side == 1
+        assign line_1 = section.settings.start_line_1
+        assign line_2 = section.settings.start_line_2
+        assign link = section.settings.start_link
+        assign modifier = 'start'
+      else
+        assign line_1 = section.settings.end_line_1
+        assign line_2 = section.settings.end_line_2
+        assign link = section.settings.end_link
+        assign modifier = 'end'
+      endif
+    -%}
+    {%- if line_1 != blank or line_2 != blank -%}
+      <p class="pb-hero-bottle__text pb-hero-bottle__text--{{ modifier }}">
+        {%- if link != blank -%}<a href="{{ link }}">{%- endif -%}
+        <span class="pb-hero-bottle__line">{{ line_1 }}</span>
+        <span class="pb-hero-bottle__line pb-hero-bottle__line--muted">{{ line_2 }}</span>
+        {%- if link != blank -%}</a>{%- endif -%}
+      </p>
+    {%- endif -%}
+  {%- endfor -%}
+</pb-hero-bottle>
+
+<script type="module" src="{{ 'pb-hero-bottle.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  .pb-hero-bottle {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 1.1fr) 1fr;
+    align-items: center;
+    min-height: max(560px, 90svh);
+    padding: 48px var(--page-margin, 24px);
+    overflow: hidden;
+    color: #fff;
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      color-mix(in srgb, var(--pb-hero-bg) 88%, #fff) 0%,
+      var(--pb-hero-bg) 70%
+    );
+  }
+
+  .pb-hero-bottle__poster,
+  .pb-hero-bottle__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.8s ease;
+  }
+
+  .pb-hero-bottle__poster {
+    z-index: 0;
+    object-fit: contain;
+  }
+
+  /* The canvas starts empty and fades in over the still image once its first frame is drawn. */
+  .pb-hero-bottle__canvas {
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .pb-hero-bottle.is-ready .pb-hero-bottle__canvas {
+    opacity: 1;
+  }
+
+  .pb-hero-bottle.is-ready .pb-hero-bottle__poster {
+    opacity: 0;
+  }
+
+  .pb-hero-bottle__text {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .pb-hero-bottle__text a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pb-hero-bottle__line {
+    display: block;
+  }
+
+  .pb-hero-bottle__line--muted {
+    color: #8a8a8a;
+    transition: color 0.2s ease;
+  }
+
+  .pb-hero-bottle__text a:is(:hover, :focus-visible) .pb-hero-bottle__line--muted {
+    color: #fff;
+  }
+
+  .pb-hero-bottle__text--start {
+    grid-column: 1;
+    justify-self: end;
+    margin-block-end: 8rem;
+    text-align: end;
+  }
+
+  .pb-hero-bottle__text--end {
+    grid-column: 3;
+    justify-self: start;
+    margin-block-start: 8rem;
+    text-align: start;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-hero-bottle {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      min-height: max(560px, 85svh);
+      padding-block: 32px;
+    }
+
+    .pb-hero-bottle__text--start {
+      grid-row: 1;
+      grid-column: 1;
+      justify-self: start;
+      align-self: start;
+      margin: 0;
+      text-align: start;
+    }
+
+    .pb-hero-bottle__text--end {
+      grid-row: 3;
+      grid-column: 1;
+      justify-self: end;
+      align-self: end;
+      margin: 0;
+      text-align: end;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero bottle (3D)",
+  "tag": "section",
+  "class": "pb-hero-bottle-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Headings"
+    },
+    {
+      "type": "text",
+      "id": "start_line_1",
+      "label": "Left heading, line 1",
+      "default": "Professional"
+    },
+    {
+      "type": "text",
+      "id": "start_line_2",
+      "label": "Left heading, line 2",
+      "default": "Products"
+    },
+    {
+      "type": "url",
+      "id": "start_link",
+      "label": "Left link"
+    },
+    {
+      "type": "text",
+      "id": "end_line_1",
+      "label": "Right heading, line 1",
+      "default": "Car care"
+    },
+    {
+      "type": "text",
+      "id": "end_line_2",
+      "label": "Right heading, line 2",
+      "default": "Products"
+    },
+    {
+      "type": "url",
+      "id": "end_link",
+      "label": "Right link"
+    },
+    {
+      "type": "header",
+      "content": "Bottle"
+    },
+    {
+      "type": "select",
+      "id": "bottles",
+      "label": "Bottles",
+      "options": [
+        {
+          "value": "1",
+          "label": "One"
+        },
+        {
+          "value": "2",
+          "label": "Two"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "image_picker",
+      "id": "label",
+      "label": "Label artwork",
+      "info": "The flat wrap-around label, front panel in the middle. Empty uses the Detailing Spray label."
+    },
+    {
+      "type": "color",
+      "id": "liquid_color",
+      "label": "Liquid",
+      "default": "#b5650e"
+    },
+    {
+      "type": "range",
+      "id": "mouse_strength",
+      "label": "Mouse follow",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#141414"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Still image",
+      "info": "Shown while the 3D loads, and instead of it for visitors who turn off motion."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero bottle (3D)"
+    }
+  ]
+}
+{% endschema %}
