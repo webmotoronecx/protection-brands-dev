@@ -49,6 +49,10 @@ const LAYOUTS = {
 
 const FLOAT = 0.18; // float height
 
+/* Mouse parallax, at Mouse follow 100%: bottles move towards the mouse (scene units, scaled
+   by each bottle's depth), the wordmark behind moves the other way (px). */
+const PARALLAX = { bottleX: 1.6, bottleY: 1, wordmarkX: 110, wordmarkY: 36 };
+
 /* Intro: when the 3D first appears, the bottles drop in from above, the second (blue) a
    moment after the first (amber). Distances in scene units. */
 const INTRO = { duration: 1.4, distance: 11, stagger: 0.18 };
@@ -357,13 +361,13 @@ class PBHeroBottle extends HTMLElement {
 
     this.#bottles.forEach(({ group, spec }, index) => {
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
-      group.rotation.y = spec.tilt[1] + pointer.x * 0.6 * strength;
+      group.rotation.y = spec.tilt[1] + pointer.x * 0.8 * strength;
       group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
       // Drift towards the mouse; the front bottle moves further than the one behind.
-      group.position.x = spec.position[0] + pointer.x * 0.9 * spec.depth * strength;
+      group.position.x = spec.position[0] + pointer.x * PARALLAX.bottleX * spec.depth * strength;
       group.position.y =
         spec.position[1] -
-        pointer.y * 0.6 * spec.depth * strength +
+        pointer.y * PARALLAX.bottleY * spec.depth * strength +
         Math.sin(this.#clock * 1.1 + spec.phase) * FLOAT +
         scrolled * 3 +
         introOffset(index);
@@ -375,8 +379,8 @@ class PBHeroBottle extends HTMLElement {
 
     // The scrolling wordmark drifts the other way, so it reads as a layer further back.
     if (this.#marquee) {
-      const x = -pointer.x * 40 * strength;
-      const y = -pointer.y * 14 * strength;
+      const x = -pointer.x * PARALLAX.wordmarkX * strength;
+      const y = -pointer.y * PARALLAX.wordmarkY * strength;
       this.#marquee.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
     }
 
