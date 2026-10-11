@@ -54,6 +54,8 @@ and switch the header to it in the theme editor.
       SDS, About Us, Contact.
 - [ ] Footer menu (`footer`): policies, Delivery, Terms & Conditions, Privacy Policy,
       Contact.
+- [ ] Collection pages: pick the category row (Theme editor → Collection page → Collection
+      header (PB) → Categories). Also pick the menu categories on inner pages (Header (PB)).
 - [ ] Homepage floating menu: uses `main-menu` by default (Theme editor → Home page →
       Landing header → Floating menu). Top-level links only for now.
 - [ ] Homepage footer row: uses the `footer` menu by default (Theme editor → Home page →

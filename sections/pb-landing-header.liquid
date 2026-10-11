@@ -24,6 +24,9 @@
 -%}
 
 <header class="pb-landing-header{% if light %} pb-landing-header--light{% endif %}">
+  {%- if light -%}
+    <pb-header-watch hidden></pb-header-watch>
+  {%- endif -%}
   <button
     type="button"
     class="pb-landing-header__menu"
@@ -162,6 +165,9 @@
 </pb-menu>
 
 <script type="module" src="{{ 'pb-menu.js' | asset_url }}"></script>
+{%- if light -%}
+  <script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
+{%- endif -%}
 
 {% stylesheet %}
   .pb-landing-header {
@@ -182,6 +188,17 @@
     height: 104px;
     background: #fff;
     color: #111;
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  /* Once the page scrolls (assets/pb-header.js): see-through white over a blur. */
+  .pb-landing-header--light.is-scrolled {
+    background: rgb(255 255 255 / 0.7);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.06);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
   }
 
   /* Light header sticks to the top while the page scrolls. Like Horizon's own sticky header,
@@ -192,7 +209,9 @@
 
   .pb-landing-header-section:has(> .pb-landing-header--light) {
     position: sticky;
-    top: 0;
+
+    /* -1px, as in Horizon, so assets/pb-header.js can tell when the page has scrolled. */
+    top: -1px;
     z-index: var(--layer-menu-drawer, 40);
   }
 

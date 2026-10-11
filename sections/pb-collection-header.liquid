@@ -1,0 +1,177 @@
+{%- comment -%}
+  Protection Brands collection header: the collection title, large, light and uppercase,
+  with a row of category links under it (current collection in red). On phones the row
+  scrolls sideways. Categories are picked in the theme editor.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
+  if heading_font == blank
+    assign heading_font = settings.type_body_font
+  endif
+
+  assign current = collection
+  if current == blank
+    assign current = closest.collection
+  endif
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="pb-collection-header"
+  style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
+>
+  <h1 class="pb-collection-header__title">{{ current.title | default: section.settings.fallback_title }}</h1>
+
+  {%- if section.settings.show_description and current.description != blank -%}
+    <div class="pb-collection-header__description rte">{{ current.description }}</div>
+  {%- endif -%}
+
+  {%- if section.settings.categories != blank -%}
+    <nav class="pb-collection-header__nav" aria-label="{{ section.settings.nav_label | escape }}">
+      <ul class="pb-collection-header__categories">
+        {%- for category in section.settings.categories -%}
+          <li>
+            <a
+              href="{{ category.url }}"
+              {% if category.handle == current.handle %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- category.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- elsif request.design_mode -%}
+    <p class="pb-collection-header__hint">Pick the categories for this row in the section settings.</p>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .pb-collection-header {
+    padding: 32px var(--page-margin, 24px) 40px;
+  }
+
+  .pb-collection-header__title {
+    max-width: 12ch;
+    margin: 0;
+    color: #111;
+    font-family: var(--pb-collection-heading-font, inherit);
+    font-size: clamp(2.25rem, 3.4vw, 3.5rem);
+    font-weight: var(--pb-collection-heading-weight, 300);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  .pb-collection-header__description {
+    max-width: 60ch;
+    margin-block-start: 16px;
+    color: #555;
+  }
+
+  .pb-collection-header__nav {
+    margin-block-start: clamp(32px, 4vw, 56px);
+  }
+
+  .pb-collection-header__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 45px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-collection-header__categories a {
+    color: #111;
+    font-size: 17px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .pb-collection-header__categories a:is(:hover, :focus-visible) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .pb-collection-header__categories a[aria-current='page'] {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-collection-header__hint {
+    margin: 24px 0 0;
+    color: #888;
+    font-size: 14px;
+  }
+
+  /* Phones: one row that scrolls sideways, edge to edge. */
+  @media screen and (max-width: 749px) {
+    .pb-collection-header__nav {
+      margin-inline: calc(var(--page-margin, 16px) * -1);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .pb-collection-header__nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pb-collection-header__categories {
+      flex-wrap: nowrap;
+      gap: 28px;
+      width: max-content;
+      padding-inline: var(--page-margin, 16px);
+    }
+
+    .pb-collection-header__categories a {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection header (PB)",
+  "tag": "section",
+  "class": "pb-collection-header-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": false
+    },
+    {
+      "type": "collection_list",
+      "id": "categories",
+      "label": "Categories",
+      "limit": 16
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "Category row label",
+      "info": "Read out by screen readers.",
+      "default": "Categories"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Title when there is no collection",
+      "default": "Products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection header (PB)"
+    }
+  ]
+}
+{% endschema %}

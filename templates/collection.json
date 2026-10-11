@@ -9,6 +9,14 @@
  */
 {
   "sections": {
+    "pb_collection_header": {
+      "type": "pb-collection-header",
+      "settings": {
+        "show_description": false,
+        "nav_label": "Categories",
+        "fallback_title": "Products"
+      }
+    },
     "section": {
       "type": "section",
       "blocks": {
@@ -93,7 +101,8 @@
         "border_radius": 0,
         "padding-block-start": 48,
         "padding-block-end": 48
-      }
+      },
+      "disabled": true
     },
     "main": {
       "type": "main-collection",
@@ -230,6 +239,7 @@
     }
   },
   "order": [
+    "pb_collection_header",
     "section",
     "main"
   ]
