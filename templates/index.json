@@ -25,6 +25,8 @@
         "bottle_size": 100,
         "mouse_strength": 60,
         "background": "#0b0b0b",
+        "background_style": "scroll",
+        "scroll_duration": 60,
         "background_text": "Protection"
       }
     }

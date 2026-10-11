@@ -39,9 +39,25 @@
     }}
   {%- endif -%}
 
-  {%- if section.settings.background_text != blank -%}
-    <span class="pb-hero-bottle__word" aria-hidden="true">{{ section.settings.background_text }}</span>
-  {%- endif -%}
+  {%- case section.settings.background_style -%}
+    {%- when 'scroll' -%}
+      {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
+      <div
+        class="pb-hero-bottle__marquee"
+        aria-hidden="true"
+        style="--pb-marquee-duration: {{ section.settings.scroll_duration }}s;"
+      >
+        <div class="pb-hero-bottle__marquee-track">
+          {%- for i in (1..4) -%}
+            <img src="{{ 'label-scroling.svg' | asset_url }}" alt="" width="319" height="27">
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- when 'text' -%}
+      {%- if section.settings.background_text != blank -%}
+        <span class="pb-hero-bottle__word" aria-hidden="true">{{ section.settings.background_text }}</span>
+      {%- endif -%}
+  {%- endcase -%}
 
   <canvas class="pb-hero-bottle__canvas" aria-hidden="true"></canvas>
 
@@ -97,6 +113,42 @@
     width: 100%;
     height: 100%;
     transition: opacity 0.8s ease;
+  }
+
+  /* Scrolling wordmark behind the bottles. Only transform animates, so it runs on the compositor. */
+  .pb-hero-bottle__marquee {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    z-index: 0;
+    translate: 0 -40%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .pb-hero-bottle__marquee-track {
+    display: flex;
+    width: max-content;
+    animation: pb-hero-marquee var(--pb-marquee-duration, 60s) linear infinite;
+  }
+
+  .pb-hero-bottle__marquee-track img {
+    flex: none;
+    width: auto;
+    height: clamp(4rem, 15.5vw, 22rem);
+    margin-inline-end: 6vw;
+  }
+
+  @keyframes pb-hero-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle__marquee-track {
+      animation: none;
+    }
   }
 
   /* Large faint word behind the bottles. */
@@ -318,10 +370,43 @@
       "content": "Background"
     },
     {
+      "type": "select",
+      "id": "background_style",
+      "label": "Behind the bottles",
+      "options": [
+        {
+          "value": "scroll",
+          "label": "Scrolling wordmark"
+        },
+        {
+          "value": "text",
+          "label": "Word"
+        },
+        {
+          "value": "none",
+          "label": "Nothing"
+        }
+      ],
+      "default": "scroll"
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "label": "Scroll speed",
+      "info": "Seconds for one loop. Higher is slower.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 60,
+      "visible_if": "{{ section.settings.background_style == 'scroll' }}"
+    },
+    {
       "type": "text",
       "id": "background_text",
       "label": "Background word",
-      "default": "Protection"
+      "default": "Protection",
+      "visible_if": "{{ section.settings.background_style == 'text' }}"
     },
     {
       "type": "color",
