@@ -42,15 +42,12 @@
   mix-blend-mode: multiply;
 }
 
-.product-grid__card .product-media-container {
+.product-grid__card :is(slideshow-container, .product-media-container) {
   background: transparent;
 }
 
-/* Text: keep clear of the button, title always takes exactly two lines. */
-.product-grid__card > :not(.card-gallery, .product-grid-view-zoom-out--details) {
-  padding-inline-end: calc(var(--pb-quick-add-size) + var(--padding-sm, 12px));
-}
-
+/* Text: title always takes exactly two lines and stops short of the button.
+   (The title's wrappers use display: contents, so the padding goes on the heading.) */
 .product-grid__card [role='heading'] {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -58,6 +55,7 @@
   overflow: hidden;
   min-height: calc(var(--pb-title-lines) * 1lh);
   margin: 0;
+  padding-inline-end: calc(var(--pb-quick-add-size) + var(--padding-sm, 12px));
 }
 
 /* Quick add: fixed square, always shown. Whether it renders at all on desktop/mobile is
@@ -102,6 +100,33 @@
     --pb-card-radius: 8px;
     --pb-quick-add-size: 36px;
   }
+}
+
+/* Icon: a plain plus instead of Horizon's bag-plus. Drawn with two bars so it follows
+   the button's text colour; the original SVG is hidden, not removed. */
+.product-grid__card .quick-add__button .add-to-cart-icon {
+  position: relative;
+}
+
+.product-grid__card .quick-add__button .add-to-cart-icon > svg {
+  display: none;
+}
+
+.product-grid__card .quick-add__button .add-to-cart-icon::before,
+.product-grid__card .quick-add__button .add-to-cart-icon::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 40%;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  translate: -50% -50%;
+}
+
+.product-grid__card .quick-add__button .add-to-cart-icon::after {
+  rotate: 90deg;
 }
 
 /* Price: bold, current price only weight change. */
