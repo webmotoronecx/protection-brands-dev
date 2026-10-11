@@ -68,6 +68,13 @@
     }
   }
 
+  /* Built-in stills, one per bottle: each drops in from above the hero. */
+  @keyframes pb-intro-bottle-drop {
+    from {
+      transform: translateY(-100%);
+    }
+  }
+
   @keyframes pb-intro-drop {
     from {
       opacity: 0;
@@ -81,6 +88,14 @@
 
   .pb-landing .pb-hero-bottle__poster {
     animation: pb-intro-bottles 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__poster--1 {
+    animation: pb-intro-bottle-drop 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__poster--2 {
+    animation: pb-intro-bottle-drop 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.28s backwards;
   }
 
   .pb-landing .pb-hero-bottle__text--start {

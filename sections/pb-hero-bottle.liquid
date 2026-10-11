@@ -13,7 +13,7 @@
 
   assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
 
-  # Built-in still: assets/pb-hero-poster-*.webp are renders of the 3D scene at rest (two
+  # Built-in still: assets/pb-hero-poster-*-1/2.webp are renders of each bottle at rest (two
   # bottles, default size, colours and label), so they line up with it exactly. Used when no
   # still image is uploaded and the bottles still match what was rendered.
   assign builtin_poster = false
@@ -68,26 +68,31 @@
     }}
   {%- elsif builtin_poster -%}
     {%- comment -%}
-      Wide render fills the hero by height at any landscape size (as the 3D does); the phone
-      render matches the 3D's fit-by-width framing on phones.
+      One still per bottle (amber first, blue on top), so each can drop in on its own. Wide
+      renders fill the hero by height at any landscape size (as the 3D does); the phone
+      renders match the 3D's fit-by-width framing on phones.
     {%- endcomment -%}
-    <picture>
-      <source
-        media="(max-width: 749px)"
-        srcset="{{ 'pb-hero-poster-mobile.webp' | asset_url }}"
-        width="780"
-        height="1688"
-      >
-      <img
-        class="pb-hero-bottle__poster pb-hero-bottle__poster--render"
-        src="{{ 'pb-hero-poster-wide.webp' | asset_url }}"
-        alt="{{ poster_alt | escape }}"
-        width="4320"
-        height="1800"
-        loading="eager"
-        fetchpriority="high"
-      >
-    </picture>
+    {%- for i in (1..2) -%}
+      {%- capture wide_file %}pb-hero-poster-wide-{{ i }}.webp{% endcapture -%}
+      {%- capture mobile_file %}pb-hero-poster-mobile-{{ i }}.webp{% endcapture -%}
+      <picture>
+        <source
+          media="(max-width: 749px)"
+          srcset="{{ mobile_file | asset_url }}"
+          width="780"
+          height="1688"
+        >
+        <img
+          class="pb-hero-bottle__poster pb-hero-bottle__poster--render pb-hero-bottle__poster--{{ i }}"
+          src="{{ wide_file | asset_url }}"
+          alt="{% if i == 1 %}{{ poster_alt | escape }}{% endif %}"
+          width="4320"
+          height="1800"
+          loading="eager"
+          fetchpriority="high"
+        >
+      </picture>
+    {%- endfor -%}
   {%- endif -%}
 
   {%- case section.settings.background_style -%}

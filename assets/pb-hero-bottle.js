@@ -215,8 +215,9 @@ class PBHeroBottle extends HTMLElement {
       // The still did the entrance. Swap to the 3D only once its drop-in has finished, and in
       // a single frame (no crossfade): the 3D is drawn in the still's exact pose, so the two
       // never show together. Float and mouse-follow start after the swap.
-      const poster = this.querySelector('.pb-hero-bottle__poster');
-      await Promise.all((poster?.getAnimations() ?? []).map((animation) => animation.finished.catch(() => {})));
+      const posters = [...this.querySelectorAll('.pb-hero-bottle__poster')];
+      const animations = posters.flatMap((poster) => poster.getAnimations());
+      await Promise.all(animations.map((animation) => animation.finished.catch(() => {})));
       if (this.#disposed) return;
       this.#render(0);
     }
