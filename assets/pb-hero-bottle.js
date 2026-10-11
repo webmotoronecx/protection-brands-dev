@@ -577,7 +577,7 @@ const LIQUID_FINISHES = {
   },
   gel: {
     opacity: 0.8,
-    emissiveIntensity: 0.24,
+    emissiveIntensity: 0.34,
     roughness: 0.02,
     clearcoatRoughness: 0.01,
     specularIntensity: 1,
