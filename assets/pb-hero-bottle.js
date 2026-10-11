@@ -49,8 +49,8 @@ const LAYOUTS = {
 
 const FLOAT = 0.18; // float height
 
-/* Intro: when the 3D first appears, the first (amber) bottle drops in from above and the
-   second (blue) rises from below, a moment later. Distances in scene units. */
+/* Intro: when the 3D first appears, the bottles drop in from above, the second (blue) a
+   moment after the first (amber). Distances in scene units. */
 const INTRO = { duration: 1.4, distance: 11, stagger: 0.18 };
 
 /* Reflections & lighting. These defaults are the designed look; each one can be changed in
@@ -349,7 +349,7 @@ class PBHeroBottle extends HTMLElement {
       if (!this.#introStart) return 0;
       const t = Math.min(Math.max((now - this.#introStart - index * INTRO.stagger) / INTRO.duration, 0), 1);
       const remaining = (1 - t) ** 3;
-      return remaining * INTRO.distance * (index % 2 === 0 ? 1 : -1);
+      return remaining * INTRO.distance;
     };
 
     this.#bottles.forEach(({ group, spec }, index) => {
