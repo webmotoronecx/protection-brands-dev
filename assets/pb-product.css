@@ -20,21 +20,28 @@
   mix-blend-mode: multiply;
 }
 
-.product-information .slideshow-controls__thumbnail {
-  overflow: hidden;
-  border: 1.5px solid transparent;
-  border-radius: 8px;
-  background: var(--pb-card-bg, #f4f4f4);
-  transition: border-color 0.2s ease;
+.product-information slideshow-controls {
+  --thumbnail-radius: 8px;
 }
 
-.product-information .slideshow-controls__thumbnail img {
+.product-information .slideshow-controls__thumbnails .slideshow-control {
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information .slideshow-controls__thumbnails .slideshow-control img {
+  border-radius: 8px;
   object-fit: contain;
   mix-blend-mode: multiply;
 }
 
-.product-information .slideshow-controls__thumbnail[aria-selected='true'] {
-  border-color: #111;
+/* One thin outline on the current thumbnail (replaces Horizon's thick double outline). */
+.product-information .slideshow-controls__thumbnails .slideshow-control[aria-selected='true'] {
+  border: 0;
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
 }
 
 /* Price */
