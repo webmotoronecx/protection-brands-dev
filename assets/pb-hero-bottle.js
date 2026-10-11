@@ -46,6 +46,7 @@ const LAYOUTS = {
 };
 
 const FLOAT = 0.18; // float height
+const SHADOW_OPACITY = 0.55; // darkness of the shadow behind the bottles
 const DPR_CAP = coarsePointer.matches ? 1.5 : 1.75;
 
 class PBHeroBottle extends HTMLElement {
@@ -114,6 +115,10 @@ class PBHeroBottle extends HTMLElement {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
+    // Soft shadows: the front bottle shades the one behind, and both cast onto a
+    // see-through backdrop for a layered look.
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.VSMShadowMap;
 
     this.#scene = new THREE.Scene();
     this.#environment = studioEnvironment(THREE, renderer);
@@ -137,6 +142,8 @@ class PBHeroBottle extends HTMLElement {
       for (const [name, geometry] of Object.entries(geometries)) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
         mesh.renderOrder = name === 'shell' ? 2 : name === 'label' ? 1 : 0;
+        mesh.castShadow = true;
+        mesh.receiveShadow = name !== 'shell';
         mesh.position.y = -HEIGHT / 2;
         group.add(mesh);
       }
@@ -165,11 +172,32 @@ class PBHeroBottle extends HTMLElement {
     const key = new THREE.DirectionalLight(0xffffff, 1.4);
     key.position.set(4, 6, 8);
     // Brand-red rim from behind, picks out the edges against the dark background.
-    const rim = new THREE.DirectionalLight(0xc62b23, 2.2);
+    const rim = new THREE.DirectionalLight(0xc62b23, 0.25);
     rim.position.set(-6, 3, -6);
     const fill = new THREE.DirectionalLight(0xffffff, 0.5);
     fill.position.set(-5, -2, 6);
     this.#scene.add(key, rim, fill);
+
+    // Shadow light: from the upper right, in front, so shadows fall down and to the left.
+    const shadowLight = new THREE.DirectionalLight(0xffffff, 0.01);
+    shadowLight.position.set(3, 3, 10);
+    shadowLight.castShadow = true;
+    const shadow = shadowLight.shadow;
+    shadow.mapSize.set(1024, 1024);
+    shadow.radius = 14;
+    shadow.blurSamples = 16;
+    shadow.bias = -0.0005;
+    Object.assign(shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 30 });
+    this.#scene.add(shadowLight);
+
+    // Backdrop: invisible except for the shadow that falls on it.
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 60),
+      new THREE.ShadowMaterial({ color: 0x000000, opacity: SHADOW_OPACITY })
+    );
+    backdrop.position.z = -2.5;
+    backdrop.receiveShadow = true;
+    this.#scene.add(backdrop);
   }
 
   #resize() {
@@ -344,7 +372,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour) {
       color: labelTexture ? 0xffffff : 0x111111,
       map: labelTexture,
       roughness: 0.42,
-      clearcoat: 0.4,
+      clearcoat: 0.2,
       clearcoatRoughness: 0.3,
     }),
     cap: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55 }),
@@ -374,9 +402,9 @@ function studioEnvironment(THREE, renderer) {
     mesh.lookAt(0, 0, 0);
     room.add(mesh);
   };
-  softbox(3, 14, 6, -6, 1, 3);
-  softbox(2.5, 14, 4, 6, 1, 2);
-  softbox(10, 3, 2, 0, 8, 2);
+  softbox(3, 14, 2.5, -6, 1, 3);
+  softbox(2.5, 14, 2, 6, 1, 2);
+  softbox(10, 3, 1, 0, 8, 2);
 
   const generator = new THREE.PMREMGenerator(renderer);
   const texture = generator.fromScene(room, 0.02).texture;
