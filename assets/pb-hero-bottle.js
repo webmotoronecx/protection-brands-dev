@@ -49,6 +49,10 @@ const LAYOUTS = {
 
 const FLOAT = 0.18; // float height
 
+/* Intro: when the 3D first appears, the first (amber) bottle drops in from above and the
+   second (blue) rises from below, a moment later. Distances in scene units. */
+const INTRO = { duration: 1.4, distance: 11, stagger: 0.18 };
+
 /* Reflections & lighting. These defaults are the designed look; each one can be changed in
    the theme editor (Hero bottle (3D) → Reflections & lighting), which passes it in as a
    data attribute on <pb-hero-bottle>. */
@@ -120,6 +124,7 @@ class PBHeroBottle extends HTMLElement {
   #marquee;
   #texts = [];
   #last = 0;
+  #introStart = 0; // seconds (performance.now), 0 once the intro has finished
 
   async #init() {
     if (this.#disposed) return;
@@ -198,6 +203,7 @@ class PBHeroBottle extends HTMLElement {
     }
 
     this.#listen();
+    this.#introStart = performance.now() / 1000;
     this.#render(0);
     this.classList.add('is-ready');
   }
@@ -337,7 +343,16 @@ class PBHeroBottle extends HTMLElement {
     const rect = this.getBoundingClientRect();
     const scrolled = Math.min(Math.max(-rect.top / rect.height, 0), 1);
 
-    for (const { group, spec } of this.#bottles) {
+    // Intro offset per bottle: eases out from INTRO.distance to 0.
+    const now = performance.now() / 1000;
+    const introOffset = (index) => {
+      if (!this.#introStart) return 0;
+      const t = Math.min(Math.max((now - this.#introStart - index * INTRO.stagger) / INTRO.duration, 0), 1);
+      const remaining = (1 - t) ** 3;
+      return remaining * INTRO.distance * (index % 2 === 0 ? 1 : -1);
+    };
+
+    this.#bottles.forEach(({ group, spec }, index) => {
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
       group.rotation.y = spec.tilt[1] + pointer.x * 0.6 * strength;
       group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
@@ -347,7 +362,12 @@ class PBHeroBottle extends HTMLElement {
         spec.position[1] -
         pointer.y * 0.6 * spec.depth * strength +
         Math.sin(time * 1.1 + spec.phase) * FLOAT +
-        scrolled * 3;
+        scrolled * 3 +
+        introOffset(index);
+    });
+
+    if (this.#introStart && now - this.#introStart > INTRO.duration + INTRO.stagger * this.#bottles.length) {
+      this.#introStart = 0;
     }
 
     // The scrolling wordmark drifts the other way, so it reads as a layer further back.

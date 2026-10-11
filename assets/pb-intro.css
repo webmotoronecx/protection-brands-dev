@@ -33,6 +33,46 @@
     }
   }
 
+  /* Homepage (layout/pb-landing.liquid): the header rises in, the two headings slide in
+     from the left and right, and the footer links slide down last. The bottles' own
+     entrance is in the 3D scene (assets/pb-hero-bottle.js). */
+  @keyframes pb-intro-from-left {
+    from {
+      opacity: 0.4;
+      transform: translateX(-56px);
+    }
+  }
+
+  @keyframes pb-intro-from-right {
+    from {
+      opacity: 0.4;
+      transform: translateX(56px);
+    }
+  }
+
+  @keyframes pb-intro-drop {
+    from {
+      opacity: 0.4;
+      transform: translateY(-14px);
+    }
+  }
+
+  .pb-landing .pb-landing-header {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__text--start {
+    animation: pb-intro-from-left 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__text--end {
+    animation: pb-intro-from-right 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s backwards;
+  }
+
+  .pb-landing .pb-landing-footer {
+    animation: pb-intro-drop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards;
+  }
+
   /* Collection title bar: the card, then its title and category row, while the wordmark
      slides in behind them. */
   .pb-collection-header {
