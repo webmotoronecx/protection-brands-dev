@@ -8,6 +8,7 @@
 {{ 'pb-search.css' | asset_url | stylesheet_tag }}
 {%- if template.name == 'product' -%}
   {{ 'pb-product.css' | asset_url | stylesheet_tag }}
+  <script type="module" src="{{ 'pb-lightbox.js' | asset_url }}"></script>
   {{ 'pb-sticky-cart.css' | asset_url | stylesheet_tag }}
 {%- endif -%}
 {%- if settings.pb_reveal -%}
