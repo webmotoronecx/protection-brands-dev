@@ -22,6 +22,7 @@
         "bottles": "2",
         "liquid_color": "#b5650e",
         "liquid_color_2": "#2f8fc0",
+        "bottle_size": 100,
         "mouse_strength": 60,
         "background": "#141414",
         "background_text": "Protection"

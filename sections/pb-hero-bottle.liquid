@@ -21,6 +21,7 @@
   data-bottles="{{ section.settings.bottles }}"
   data-liquid="{{ section.settings.liquid_color }}"
   data-liquid-second="{{ section.settings.liquid_color_2 }}"
+  data-size="{{ section.settings.bottle_size | divided_by: 100.0 }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
   style="--pb-hero-bg: {{ section.settings.background }};"
 >
@@ -290,6 +291,17 @@
       "label": "Liquid, second bottle",
       "info": "The lower, right-hand bottle when showing two.",
       "default": "#2f8fc0"
+    },
+    {
+      "type": "range",
+      "id": "bottle_size",
+      "label": "Bottle size",
+      "info": "100% fits the bottles to the screen.",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
     },
     {
       "type": "range",

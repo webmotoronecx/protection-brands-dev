@@ -185,7 +185,10 @@ class PBHeroBottle extends HTMLElement {
     const needWidth = two ? 8 : 5;
     const tan = Math.tan(THREE_DEG(camera.fov / 2));
     camera.aspect = width / height;
-    camera.position.set(0, 0, Math.max(needHeight / 2 / tan, needWidth / 2 / (tan * camera.aspect)));
+    // Bottle size setting: 1 = fit, larger moves the camera closer.
+    const size = Number(this.dataset.size || 1);
+    const distance = Math.max(needHeight / 2 / tan, needWidth / 2 / (tan * camera.aspect));
+    camera.position.set(0, 0, distance / size);
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
     if (reducedMotion.matches) this.#render(0);
