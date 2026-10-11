@@ -1,10 +1,10 @@
 /*
   Protection Brands 3D hero bottle: <pb-hero-bottle>, rendered by sections/pb-hero-bottle.liquid.
 
-  One or two bottles spin slowly and float, tilt towards the mouse (moving the mouse spins
-  them faster for a moment), and turn further as the hero scrolls away. The bottle is built
-  in code from a profile traced from the 500 ml product photo; the label artwork wraps all
-  the way round, front panel facing out.
+  One or two bottles float with their labels facing out. They turn and tilt a little towards
+  the mouse, and lift as the hero scrolls away; they don't spin on their own. The bottle is
+  built in code from a profile measured from the 500 ml product photo; the label artwork
+  wraps all the way round, front facing out.
 
   Performance (see .claude/skills/animation-perf):
   - Three.js (~170 KB gzip) is imported only after the page has loaded and gone idle.
@@ -35,16 +35,16 @@ const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
 const LABEL = { bottom: 0.52, top: 4.98 };
 const HEIGHT = 6.27;
 
-/* Layout of the bottles: position, resting tilt, and float phase. */
+/* Layout of the bottles: position, resting tilt [x, y, z] and float phase.
+   Positive z tilt leans the top to the left, negative to the right. */
 const LAYOUTS = {
   1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0 }],
   2: [
     { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 0 },
-    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, 0.15], phase: 1.9 },
+    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, -0.15], phase: 1.9 },
   ],
 };
 
-const SPIN_SPEED = 0.35; // radians per second at rest
 const FLOAT = 0.18; // float height
 const DPR_CAP = coarsePointer.matches ? 1.5 : 1.75;
 
@@ -88,7 +88,7 @@ class PBHeroBottle extends HTMLElement {
   #resizer;
   #stop;
   #bottles = [];
-  #pointer = { x: 0, y: 0, targetX: 0, targetY: 0, boost: 0 };
+  #pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
   #last = 0;
 
   async #init() {
@@ -133,20 +133,17 @@ class PBHeroBottle extends HTMLElement {
 
     layout.forEach((spec, index) => {
       const materials = bottleMaterials(THREE, label, liquids[index]);
-      // group: position and tilt. spinner: turns around the bottle's own axis.
       const group = new THREE.Group();
-      const spinner = new THREE.Group();
       for (const [name, geometry] of Object.entries(geometries)) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
         mesh.renderOrder = name === 'shell' ? 2 : name === 'label' ? 1 : 0;
         mesh.position.y = -HEIGHT / 2;
-        spinner.add(mesh);
+        group.add(mesh);
       }
-      group.add(spinner);
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
-      this.#bottles.push({ group, spinner, spec, spin: spec.phase });
+      this.#bottles.push({ group, spec });
     });
 
     this.#resize();
@@ -208,7 +205,6 @@ class PBHeroBottle extends HTMLElement {
         (event) => {
           pointer.targetX = (event.clientX / window.innerWidth) * 2 - 1;
           pointer.targetY = (event.clientY / window.innerHeight) * 2 - 1;
-          pointer.boost = Math.min(pointer.boost + Math.abs(event.movementX) * 0.004 * strength, 3);
         },
         { passive: true, signal }
       );
@@ -269,17 +265,12 @@ class PBHeroBottle extends HTMLElement {
     const ease = 1 - Math.exp(-dt * 4);
     pointer.x += (pointer.targetX - pointer.x) * ease;
     pointer.y += (pointer.targetY - pointer.y) * ease;
-    pointer.boost *= Math.exp(-dt * 1.5);
 
     // 0 when the hero's top is at the top of the screen, 1 when it has scrolled fully away.
     const rect = this.getBoundingClientRect();
     const scrolled = Math.min(Math.max(-rect.top / rect.height, 0), 1);
 
-    for (const bottle of this.#bottles) {
-      const { group, spinner, spec } = bottle;
-      bottle.spin += dt * (SPIN_SPEED + pointer.boost);
-      spinner.rotation.y = bottle.spin + scrolled * Math.PI;
-
+    for (const { group, spec } of this.#bottles) {
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
       group.rotation.y = spec.tilt[1] + pointer.x * 0.6 * strength;
       group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
