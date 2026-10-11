@@ -54,7 +54,8 @@
   endif
   assign current_tag_handles = ''
   for tag in current_tags
-    assign current_tag_handles = current_tag_handles | append: ',' | append: tag | handle | append: ','
+    assign tag_handle = tag | handle
+    assign current_tag_handles = current_tag_handles | append: ',' | append: tag_handle | append: ','
   endfor
 -%}
 
@@ -331,6 +332,16 @@
   .pb-collection-header__categories a:is(:hover, :focus-visible) {
     text-decoration-line: underline;
     text-decoration-color: rgb(255 255 255 / 0.5);
+  }
+
+  /* With one category selected, the others step back to 50%. */
+  .pb-collection-header__categories:has([aria-current='page']) a:not([aria-current='page']) {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-collection-header__categories:has([aria-current='page']) a:not([aria-current='page']):is(:hover, :focus-visible) {
+    opacity: 1;
   }
 
   .pb-collection-header__categories a[aria-current='page'] {
