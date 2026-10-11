@@ -8,6 +8,26 @@
   --height-buy-buttons: 52px;
 }
 
+/* Same outer edge as the breadcrumb bar, title bar and footer: 10px from the screen edge
+   (8px on phones). Horizon lays the section out from --page-margin / --page-width. */
+.shopify-section:has(> .product-information),
+.product-information {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .shopify-section:has(> .product-information),
+  .product-information {
+    --page-margin: 8px;
+  }
+
+  /* Horizon runs the phone gallery edge to edge; keep it inside the 8px edge too. */
+  .product-information .product-information__media {
+    padding-inline: 8px;
+  }
+}
+
 /* Gallery: each photo on the light grey rounded tile, whole product visible. */
 /* Higher specificity than the gallery's own inline style, which paints the slides
    (.product-media-container.constrain-height) and the slider white. */
