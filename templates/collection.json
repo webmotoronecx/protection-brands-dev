@@ -219,13 +219,31 @@
                 "product_swatches_padding_left": 0,
                 "product_swatches_padding_right": 0
               }
+            },
+            "pb_review": {
+              "type": "review",
+              "settings": {
+                "stars_style": "shaded",
+                "show_number": true,
+                "type_preset": "paragraph",
+                "width": "100%",
+                "alignment": "left"
+              },
+              "blocks": {}
+            },
+            "pb_card_buy": {
+              "type": "pb-card-buy",
+              "settings": {},
+              "blocks": {}
             }
           },
           "block_order": [
             "card-gallery",
             "product_title_4nY4eT",
+            "pb_review",
             "price_EzJzMm",
-            "swatches"
+            "swatches",
+            "pb_card_buy"
           ]
         }
       },

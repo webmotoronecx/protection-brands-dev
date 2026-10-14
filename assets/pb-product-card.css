@@ -1,8 +1,8 @@
 /*
   Protection Brands product cards.
-  Grey card, square contained image, two-line title, bold price, and an always-visible
-  square quick-add button in the card's bottom-right corner. Every card in a row is the
-  same height.
+  Grey card, square contained image, two-line title, review stars, bold price with the
+  compare-at price struck through underneath, and a black quantity + Add To Cart bar
+  pinned to the bottom (blocks/pb-card-buy.liquid). Every card in a row is the same height.
 
   Scoped to grid cards (.product-grid__card): collection, search, product lists,
   recommendations.
@@ -16,13 +16,16 @@
   --pb-accent-hover: #a30a0a;
   --pb-on-accent: #ffffff;
   --pb-card-radius: 12px;
-  --pb-card-padding: 16px;
-  --pb-quick-add-size: 26px;
+  --pb-card-padding: 20px;
+  --pb-buy-bg: #000000;
+  --pb-buy-bg-hover: #262626;
+  --pb-buy-text: #ffffff;
+  --pb-buy-height: 40px;
+  --pb-buy-radius: 8px;
+  --pb-star-color: #c8291f;
   --pb-title-lines: 2;
 }
 
-/* Card: positioning context for the quick-add button, which now sits at the card's
-   corner instead of the image's. */
 .product-card .product-grid__card.product-grid__card {
   position: relative;
   height: 100%;
@@ -46,8 +49,13 @@
   background: transparent;
 }
 
-/* Text: title always takes exactly two lines and stops short of the button.
-   (The title's wrappers use display: contents, so the padding goes on the heading.) */
+/* The buy bar replaces Horizon's quick-add button. */
+.product-grid__card .card-gallery quick-add-component {
+  display: none;
+}
+
+/* Text: title always takes exactly two lines.
+   (The title's wrappers use display: contents, so this goes on the heading.) */
 .product-grid__card [role='heading'] {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -55,43 +63,155 @@
   overflow: hidden;
   min-height: calc(var(--pb-title-lines) * 1lh);
   margin: 0;
-  padding-inline-end: calc(var(--pb-quick-add-size) + var(--padding-sm, 12px));
 }
 
-/* Quick add: fixed square, always shown. Whether it renders at all on desktop/mobile is
-   still controlled by the theme's quick add settings (--quick-add-display). */
-.product-grid__card .quick-add {
-  --quick-add-inset-inline-end: var(--pb-card-padding);
-  --quick-add-inset-block-end: var(--pb-card-padding);
+/* Reviews: red stars, "2 Reviews" in the text colour, tucked under the title. Only shows
+   when a reviews app fills the product's rating metafields. */
+.product-grid__card .rating-wrapper {
+  --star-fill-color: var(--pb-star-color);
+  --star-fill-color-rgb: 200 41 31;
+
+  margin-block-start: calc(var(--product-card-gap, 16px) * -0.5);
+  gap: var(--gap-sm, 12px);
 }
 
-.product-grid__card button.quick-add__button,
-.product-grid__card button.quick-add__button:is(:hover, :focus-visible) {
-  --quick-add-collapsed-width: var(--pb-quick-add-size);
-  --quick-add-icon-width: var(--pb-quick-add-size);
+.product-grid__card .rating-wrapper .rating-count {
+  color: var(--color-foreground);
+  text-transform: capitalize;
+}
 
-  opacity: 1;
-  width: var(--pb-quick-add-size);
-  height: var(--pb-quick-add-size);
-  padding: 0;
+.product-grid__card .rating-wrapper .stars {
+  --empty-star-fill-color: #c4c4c4 !important;
+}
+
+/* Price: bold sale price, compare-at price struck through underneath. */
+.product-grid__card [ref='priceContainer'] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.product-grid__card .price {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.product-grid__card .compare-at-price {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(var(--color-foreground-rgb) / 0.35);
+  text-decoration: line-through;
+}
+
+/* Buy bar: quantity dropdown | Add To Cart, one black bar pinned to the card's bottom. */
+.pb-card-buy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-block-start: auto;
+  padding-block-start: 8px;
+}
+
+.pb-card-buy__form {
+  display: flex;
+  height: var(--pb-buy-height);
+  border-radius: var(--pb-buy-radius);
+  background: var(--pb-buy-bg);
+  color: var(--pb-buy-text);
+  overflow: hidden;
+}
+
+.pb-card-buy__qty {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30%;
+  min-width: 64px;
+  max-width: 96px;
+  border-inline-end: 1px solid rgb(255 255 255 / 0.3);
+}
+
+.pb-card-buy__qty select {
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  padding-inline: 0 18px;
   border: 0;
-  border-radius: 6px;
-  background: var(--pb-accent);
-  color: var(--pb-on-accent);
-  backdrop-filter: none;
-  scale: 1;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
 }
 
-.product-grid__card button.quick-add__button:is(:hover, :focus-visible) {
-  background: var(--pb-accent-hover);
+.pb-card-buy__qty select option {
+  color: #000000;
 }
 
-.product-grid__card button.quick-add__button:disabled {
-  opacity: 0.5;
+.pb-card-buy__qty select:focus-visible {
+  outline: 2px solid var(--pb-buy-text);
+  outline-offset: -4px;
 }
 
-.product-grid__card .quick-add__button[data-added='true'] .add-to-cart__added {
-  color: var(--pb-on-accent);
+.pb-card-buy__chevron {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 14px;
+  width: 10px;
+  height: 10px;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+.pb-card-buy add-to-cart-component {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pb-card-buy .pb-card-buy__button,
+.pb-card-buy .pb-card-buy__button:is(:hover, :focus-visible) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--pb-buy-bg);
+  color: var(--pb-buy-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pb-card-buy .pb-card-buy__button:is(:hover, :focus-visible) {
+  background: var(--pb-buy-bg-hover);
+}
+
+.pb-card-buy .pb-card-buy__button:disabled {
+  opacity: 1;
+  color: rgb(255 255 255 / 0.5);
+  cursor: not-allowed;
+}
+
+.pb-card-buy .pb-card-buy__button .add-to-cart__added {
+  color: var(--pb-buy-text);
+}
+
+/* Products with options: the whole bar is a Choose Options link. */
+.pb-card-buy .pb-card-buy__button--choose {
+  height: var(--pb-buy-height);
+  border-radius: var(--pb-buy-radius);
 }
 
 /* Collection and search results: the grid's outer edges line up with the title bar and
@@ -133,40 +253,16 @@
   :root {
     --pb-card-padding: 12px;
     --pb-card-radius: 8px;
+    --pb-buy-height: 44px;
   }
-}
 
-/* Icon: a plain plus instead of Horizon's bag-plus. Drawn with two bars so it follows
-   the button's text colour; the original SVG is hidden, not removed. */
-.product-grid__card .quick-add__button .add-to-cart-icon {
-  position: relative;
-}
+  .pb-card-buy__qty {
+    min-width: 52px;
+  }
 
-.product-grid__card .quick-add__button .add-to-cart-icon > svg {
-  display: none;
-}
-
-.product-grid__card .quick-add__button .add-to-cart-icon::before,
-.product-grid__card .quick-add__button .add-to-cart-icon::after {
-  content: '';
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 50%;
-  width: 40%;
-  height: 2px;
-  border-radius: 1px;
-  background: currentColor;
-  translate: -50% -50%;
-}
-
-.product-grid__card .quick-add__button .add-to-cart-icon::after {
-  rotate: 90deg;
-}
-
-/* Price: bold, current price only weight change. */
-.product-grid__card .price {
-  font-size: 16px;
-  font-weight: 700;
+  .pb-card-buy__chevron {
+    inset-inline-end: 9px;
+  }
 }
 
 /* Product rows ("You may also like", product list sections on pages): the cards' outer edges

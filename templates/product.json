@@ -416,12 +416,30 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "pb_review": {
+              "type": "review",
+              "settings": {
+                "stars_style": "shaded",
+                "show_number": true,
+                "type_preset": "paragraph",
+                "width": "100%",
+                "alignment": "left"
+              },
+              "blocks": {}
+            },
+            "pb_card_buy": {
+              "type": "pb-card-buy",
+              "settings": {},
+              "blocks": {}
             }
           },
           "block_order": [
             "product_card_gallery_DNizbJ",
             "product_title_M7MJkb",
-            "price_gLWgA6"
+            "pb_review",
+            "price_gLWgA6",
+            "pb_card_buy"
           ]
         }
       },
