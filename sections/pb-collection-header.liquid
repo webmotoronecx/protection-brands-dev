@@ -12,6 +12,10 @@
   (collection, page, blog; an article shows its blog's name) or, for pages without one
   (cart, collections list, 404), from the "Title" setting. On the cart it also shows the
   item count and hides the cart's own small heading.
+
+  The wordmark can be swapped for a word ("Watermark" setting): the page's own name (used by
+  templates/collection.brand.json for brand pages; a collection's custom.watermark metafield,
+  e.g. "Honda", overrides it) or fixed text.
 {%- endcomment -%}
 
 {%- liquid
@@ -73,10 +77,19 @@
       if section.settings.marquee_motion == 'scroll'
         assign marquee_static = false
       endif
+
+      assign marquee_word = blank
+      case section.settings.marquee_source
+        when 'title'
+          assign marquee_word = current.metafields.custom.watermark.value | default: title
+        when 'custom'
+          assign marquee_word = section.settings.marquee_text
+      endcase
     -%}
     {%- render 'pb-marquee',
       class: 'pb-collection-header__marquee',
       file: 'label-scroling-invert.svg',
+      text: marquee_word,
       duration: section.settings.marquee_duration,
       static: marquee_static,
       follow_mouse: marquee_static,
@@ -540,6 +553,34 @@
       "id": "marquee",
       "label": "Show scrolling wordmark",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "marquee_source",
+      "label": "Watermark",
+      "options": [
+        {
+          "value": "wordmark",
+          "label": "Protection Brands wordmark"
+        },
+        {
+          "value": "title",
+          "label": "Page name"
+        },
+        {
+          "value": "custom",
+          "label": "Custom text"
+        }
+      ],
+      "default": "wordmark",
+      "info": "With Page name, a collection's custom.watermark metafield (e.g. \"Honda\") is used if set.",
+      "visible_if": "{{ section.settings.marquee }}"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Watermark text",
+      "visible_if": "{{ section.settings.marquee and section.settings.marquee_source == 'custom' }}"
     },
     {
       "type": "select",

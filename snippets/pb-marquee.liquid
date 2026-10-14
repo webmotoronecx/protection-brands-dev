@@ -15,6 +15,8 @@
   @param {string} [file] - SVG asset name. Defaults to 'label-scroling.svg'.
   @param {boolean} [static] - Don't scroll; the wordmark stands still.
   @param {boolean} [follow_mouse] - Drift slightly against the mouse (pb-marquee.js).
+  @param {string} [text] - A word to show instead of the SVG (e.g. a brand name), drawn in
+    the inverted file's look: faint, fading upwards.
 {%- enddoc -%}
 
 <pb-marquee
@@ -28,13 +30,17 @@
   {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
   <span class="pb-marquee__track">
     {%- for i in (1..4) -%}
-      <img
-        src="{{ file | default: 'label-scroling.svg' | asset_url }}"
-        alt=""
-        width="319"
-        height="27"
-        loading="{{ loading | default: 'lazy' }}"
-      >
+      {%- if text != blank -%}
+        <span class="pb-marquee__word">{{ text | escape }}</span>
+      {%- else -%}
+        <img
+          src="{{ file | default: 'label-scroling.svg' | asset_url }}"
+          alt=""
+          width="319"
+          height="27"
+          loading="{{ loading | default: 'lazy' }}"
+        >
+      {%- endif -%}
     {%- endfor -%}
   </span>
 </pb-marquee>
@@ -69,6 +75,25 @@
     width: auto;
     height: var(--pb-marquee-height, clamp(4rem, 15.5vw, 22rem));
     margin-inline-end: 6vw;
+  }
+
+  /* Text instead of the SVG, matching label-scroling-invert.svg: white fading up to grey,
+     at 9% opacity. Cap height is about 0.72em, so the font is sized up to fill the strip. */
+  .pb-marquee__word {
+    flex: none;
+    margin-inline-end: 6vw;
+    font-family: var(--font-body--family, inherit);
+    font-size: calc(var(--pb-marquee-height, clamp(4rem, 15.5vw, 22rem)) * 1.35);
+    font-weight: var(--font-body--weight, 400);
+    /* Box as tall as the strip, so it sits where the SVG did. */
+    line-height: 0.74;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: transparent;
+    background: linear-gradient(to top, #fff 15%, rgb(97 97 97 / 0.02) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    opacity: 0.09;
   }
 
   @keyframes pb-marquee {

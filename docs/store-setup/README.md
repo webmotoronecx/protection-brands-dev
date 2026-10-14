@@ -52,7 +52,12 @@ type and vendor too.
 Existing collections keep their handles, so old links and search rankings survive:
 
 - **Permagard Car Care / CERFACE Ceramic / OptiVAN Caravan Maintenance**: leave as they are.
-  They act as the brand landing pages.
+  They act as the brand landing pages. Set each one's **Theme template** to `brand`
+  (`templates/collection.brand.json`): the same title bar, with the brand name as the faint
+  watermark instead of the Protection Brands wordmark.
+- **Honda Genuine Car Care** (from 4 Nov): new automated collection, handle
+  `honda-genuine-car-care`, condition *Product vendor is equal to* `Honda Genuine Car Care`,
+  theme template `brand`.
 - **Car Care**: leave as it is (all car care products).
 - **Accessories**: currently almost the same list as Car Care. Either change it to
   *any condition*: type = `Microfibre & Drying` OR type = `Power & Emergency`, or hide it
@@ -60,6 +65,11 @@ Existing collections keep their handles, so old links and search rankings surviv
 - **Professional**: leave on the `Professional` tag (it marks trade/bulk items).
 - **Reapplication / Warranty Transfer**: no products are visible publicly. Publish their
   products to the Online Store sales channel, or point the menu at a page instead.
+
+For a shorter watermark than the collection name, add a collection metafield definition
+(**Settings → Custom data → Collections**): *Watermark*, `custom.watermark`, single line text.
+Fill it in on the collection, e.g. `Honda`. Without it the collection title is used.
+If Honda products should show a *Suitable for* line, add `Honda` to the §1 preset choices.
 
 Give each new collection an image and a one-line description; the home page cards show both.
 
