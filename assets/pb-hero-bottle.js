@@ -602,10 +602,10 @@ function makeBubbles(THREE, surface) {
   const material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0xffffff,
-    emissiveIntensity: 0.4,
-    roughness: 0.05,
+    emissiveIntensity: 0.01,
+    roughness: 1,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.2,
     depthWrite: false,
   });
   material.onBeforeCompile = (shader) => {
