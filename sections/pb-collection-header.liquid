@@ -16,6 +16,10 @@
   The wordmark can be swapped for a word ("Watermark" setting): the page's own name (used by
   templates/collection.brand.json for brand pages; a collection's custom.watermark metafield,
   e.g. "Honda", overrides it) or fixed text.
+
+  Hero image: a photo covering the whole card behind a dark gradient, in place of the
+  wordmark. From the collection's custom.hero_image metafield when "Use the collection's hero
+  image" is on (brand pages), otherwise the "Hero image" setting.
 {%- endcomment -%}
 
 {%- liquid
@@ -56,6 +60,14 @@
   if tag_collection == blank
     assign tag_collection = collections.all
   endif
+  assign hero_image = blank
+  if section.settings.hero_from_collection
+    assign hero_image = current.metafields.custom.hero_image.value
+  endif
+  if hero_image == blank
+    assign hero_image = section.settings.hero_image
+  endif
+
   assign current_tag_handles = ''
   for tag in current_tags
     assign tag_handle = tag | handle
@@ -68,10 +80,23 @@
 </style>
 
 <div
-  class="pb-collection-header"
+  class="pb-collection-header{% if hero_image != blank %} pb-collection-header--hero{% endif %}"
   style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
 >
-  {%- if section.settings.marquee -%}
+  {%- if hero_image != blank -%}
+    <div class="pb-collection-header__hero">
+      {{-
+        hero_image
+        | image_url: width: 2400
+        | image_tag:
+          alt: '',
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: 'calc(100vw - 20px)',
+          widths: '750, 1100, 1500, 2000, 2400'
+      -}}
+    </div>
+  {%- elsif section.settings.marquee -%}
     {%- liquid
       assign marquee_static = true
       if section.settings.marquee_motion == 'scroll'
@@ -254,6 +279,35 @@
     inset-inline: -80px;
     inset-block-start: calc(var(--pb-marquee-height) * -0.2);
     z-index: -1;
+  }
+
+  /* Hero image: covers the card, darkened on the left and bottom where the text sits. */
+  .pb-collection-header--hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: clamp(360px, 34vw, 560px);
+  }
+
+  .pb-collection-header__hero {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .pb-collection-header__hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pb-collection-header__hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(0deg, rgb(0 0 0 / 0.8) 0%, rgb(0 0 0 / 0.2) 55%, transparent 80%),
+      linear-gradient(90deg, rgb(0 0 0 / 0.6) 0%, transparent 65%);
   }
 
   /* Title with the count and sort on the right (stacked on phones). */
@@ -512,7 +566,7 @@
           "label": "None"
         }
       ],
-      "default": "tags"
+      "default": "none"
     },
     {
       "type": "text",
@@ -547,6 +601,27 @@
       "label": "Title",
       "info": "Used on pages without a title of their own: cart, collections list, 404, all products.",
       "default": "Products"
+    },
+    {
+      "type": "header",
+      "content": "Hero image"
+    },
+    {
+      "type": "checkbox",
+      "id": "hero_from_collection",
+      "label": "Use the collection's hero image",
+      "info": "From the collection's custom.hero_image metafield (Settings > Custom data > Collections). Falls back to the image below.",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image",
+      "info": "Covers the card behind a dark gradient, in place of the watermark. Wide, at least 2400px."
+    },
+    {
+      "type": "header",
+      "content": "Watermark"
     },
     {
       "type": "checkbox",

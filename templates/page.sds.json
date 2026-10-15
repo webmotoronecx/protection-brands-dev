@@ -19,7 +19,7 @@
         "marquee": true,
         "marquee_motion": "mouse",
         "marquee_duration": 60,
-        "category_source": "tags",
+        "category_source": "none",
         "all_label": "All"
       }
     },

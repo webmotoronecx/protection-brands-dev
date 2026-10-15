@@ -17,11 +17,13 @@
         "fallback_title": "Products",
         "marquee": true,
         "marquee_source": "title",
+        "hero_from_collection": true,
+        "hero_image": "shopify://shop_images/AtHomeDetailersKit.png",
         "marquee_duration": 60,
         "marquee_motion": "mouse",
-        "category_source": "tags",
+        "category_source": "none",
         "all_label": "All",
-        "show_sort": true
+        "show_sort": false
       }
     },
     "section": {
@@ -118,13 +120,13 @@
           "type": "filters",
           "static": true,
           "settings": {
-            "enable_filtering": false,
+            "enable_filtering": true,
             "filter_style": "vertical",
             "filter_width": "centered",
             "text_label_case": "default",
             "show_swatch_label": false,
             "show_filter_label": false,
-            "enable_sorting": false,
+            "enable_sorting": true,
             "enable_grid_density": false,
             "padding-block-start": 8,
             "padding-block-end": 8,
