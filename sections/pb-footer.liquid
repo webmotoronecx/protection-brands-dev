@@ -1,6 +1,6 @@
 {%- comment -%}
   Protection Brands footer for inner pages (footer group in layout/theme.liquid): a full-width
-  dark panel with rounded top corners, with the newsletter signup on the left, up to four link columns on the right,
+  dark panel that the page above curves down into, with the newsletter signup on the left, up to four link columns on the right,
   a copyright line and social icons, and the scrolling wordmark (snippets/pb-marquee.liquid)
   along the bottom.
 
@@ -8,146 +8,170 @@
   here, e.g. the OptiVAN and Permagard sites and Instagram).
 {%- endcomment -%}
 
-{%- comment -%} data-reveal: its children rise in one after another as it scrolls in (assets/pb-motion.js). {%- endcomment -%}
-<footer class="pb-footer" data-reveal style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};">
-  <div class="pb-footer__top">
-    {%- if section.settings.newsletter -%}
-      <div class="pb-footer__newsletter">
-        {%- if section.settings.newsletter_heading != blank -%}
-          <h2 class="pb-footer__title">{{ section.settings.newsletter_heading }}</h2>
-        {%- endif -%}
+{%- comment -%}
+  data-pb-footer: as it scrolls in, the panel slides down from under the page's curved edge
+  and its contents fade in (assets/pb-motion.js).
+{%- endcomment -%}
+<footer class="pb-footer" data-pb-footer style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};">
+  <div class="pb-footer__panel">
+    <div class="pb-footer__top">
+      {%- if section.settings.newsletter -%}
+        <div class="pb-footer__newsletter">
+          {%- if section.settings.newsletter_heading != blank -%}
+            <h2 class="pb-footer__title">{{ section.settings.newsletter_heading }}</h2>
+          {%- endif -%}
 
-        {%- form 'customer', id: 'PBFooterNewsletter', class: 'pb-footer__form' -%}
-          <input type="hidden" name="contact[tags]" value="newsletter">
-          {%- if form.posted_successfully? -%}
-            <p class="pb-footer__message" role="status">Thanks for subscribing.</p>
-          {%- else -%}
-            <div class="pb-footer__field">
-              <label class="visually-hidden" for="PBFooterEmail">Email address</label>
-              <input
-                id="PBFooterEmail"
-                type="email"
-                name="contact[email]"
-                value="{{ form.email }}"
-                placeholder="Enter your email"
-                autocomplete="email"
-                autocorrect="off"
-                autocapitalize="off"
-                required
-                {% if form.errors %}
-                  aria-invalid="true"
-                  aria-describedby="PBFooterEmailError"
-                {% endif %}
-              >
-              <button type="submit" class="pb-footer__submit" aria-label="Subscribe">
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </div>
-            {%- if form.errors -%}
-              <div id="PBFooterEmailError" class="pb-footer__message pb-footer__message--error">
-                {{ form.errors | default_errors }}
+          {%- form 'customer', id: 'PBFooterNewsletter', class: 'pb-footer__form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            {%- if form.posted_successfully? -%}
+              <p class="pb-footer__message" role="status">Thanks for subscribing.</p>
+            {%- else -%}
+              <div class="pb-footer__field">
+                <label class="visually-hidden" for="PBFooterEmail">Email address</label>
+                <input
+                  id="PBFooterEmail"
+                  type="email"
+                  name="contact[email]"
+                  value="{{ form.email }}"
+                  placeholder="Enter your email"
+                  autocomplete="email"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  required
+                  {% if form.errors %}
+                    aria-invalid="true"
+                    aria-describedby="PBFooterEmailError"
+                  {% endif %}
+                >
+                <button type="submit" class="pb-footer__submit" aria-label="Subscribe">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
               </div>
+              {%- if form.errors -%}
+                <div id="PBFooterEmailError" class="pb-footer__message pb-footer__message--error">
+                  {{ form.errors | default_errors }}
+                </div>
+              {%- endif -%}
             {%- endif -%}
-          {%- endif -%}
-        {%- endform -%}
-      </div>
-    {%- endif -%}
-
-    {%- if section.blocks.size > 0 -%}
-      <div class="pb-footer__columns">
-        {%- for block in section.blocks -%}
-          <nav class="pb-footer__column" {{ block.shopify_attributes }} aria-labelledby="PBFooterHeading-{{ block.id }}">
-            <h2 id="PBFooterHeading-{{ block.id }}" class="pb-footer__heading">{{ block.settings.heading }}</h2>
-            <ul class="pb-footer__links">
-              {%- case block.type -%}
-                {%- when 'menu' -%}
-                  {%- for link in block.settings.menu.links -%}
-                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                  {%- endfor -%}
-                {%- when 'links' -%}
-                  {%- for i in (1..4) -%}
-                    {%- liquid
-                      assign label_key = 'label_' | append: i
-                      assign url_key = 'url_' | append: i
-                      assign label = block.settings[label_key]
-                      assign url = block.settings[url_key]
-                    -%}
-                    {%- if label != blank and url != blank -%}
-                      <li>
-                        <a
-                          href="{{ url }}"
-                          {% if block.settings.new_tab %}
-                            target="_blank" rel="noopener"
-                          {% endif %}
-                        >
-                          {{- label -}}
-                        </a>
-                      </li>
-                    {%- endif -%}
-                  {%- endfor -%}
-              {%- endcase -%}
-            </ul>
-          </nav>
-        {%- endfor -%}
-      </div>
-    {%- endif -%}
-  </div>
-
-  <div class="pb-footer__bottom">
-    <p class="pb-footer__copyright">
-      {%- if section.settings.copyright != blank -%}
-        {{ section.settings.copyright }}
-      {%- else -%}
-        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+          {%- endform -%}
+        </div>
       {%- endif -%}
-    </p>
 
-    {%- liquid
-      assign socials = 'instagram,facebook,youtube,tiktok,linkedin' | split: ','
-      assign has_social = false
-      for platform in socials
-        assign key = platform | append: '_url'
-        if section.settings[key] != blank
-          assign has_social = true
-        endif
-      endfor
-    -%}
-    {%- if has_social -%}
-      <ul class="pb-footer__social">
-        {%- for platform in socials -%}
-          {%- assign key = platform | append: '_url' -%}
-          {%- assign url = section.settings[key] -%}
-          {%- if url != blank -%}
-            <li>
-              <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ platform | capitalize }}">
-                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  {%- render 'icon', icon: platform -%}
-                </svg>
-              </a>
-            </li>
-          {%- endif -%}
-        {%- endfor -%}
-      </ul>
+      {%- if section.blocks.size > 0 -%}
+        <div class="pb-footer__columns">
+          {%- for block in section.blocks -%}
+            <nav class="pb-footer__column" {{ block.shopify_attributes }} aria-labelledby="PBFooterHeading-{{ block.id }}">
+              <h2 id="PBFooterHeading-{{ block.id }}" class="pb-footer__heading">{{ block.settings.heading }}</h2>
+              <ul class="pb-footer__links">
+                {%- case block.type -%}
+                  {%- when 'menu' -%}
+                    {%- for link in block.settings.menu.links -%}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {%- endfor -%}
+                  {%- when 'links' -%}
+                    {%- for i in (1..4) -%}
+                      {%- liquid
+                        assign label_key = 'label_' | append: i
+                        assign url_key = 'url_' | append: i
+                        assign label = block.settings[label_key]
+                        assign url = block.settings[url_key]
+                      -%}
+                      {%- if label != blank and url != blank -%}
+                        <li>
+                          <a
+                            href="{{ url }}"
+                            {% if block.settings.new_tab %}
+                              target="_blank" rel="noopener"
+                            {% endif %}
+                          >
+                            {{- label -}}
+                          </a>
+                        </li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                {%- endcase -%}
+              </ul>
+            </nav>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="pb-footer__bottom">
+      <p class="pb-footer__copyright">
+        {%- if section.settings.copyright != blank -%}
+          {{ section.settings.copyright }}
+        {%- else -%}
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+        {%- endif -%}
+      </p>
+
+      {%- liquid
+        assign socials = 'instagram,facebook,youtube,tiktok,linkedin' | split: ','
+        assign has_social = false
+        for platform in socials
+          assign key = platform | append: '_url'
+          if section.settings[key] != blank
+            assign has_social = true
+          endif
+        endfor
+      -%}
+      {%- if has_social -%}
+        <ul class="pb-footer__social">
+          {%- for platform in socials -%}
+            {%- assign key = platform | append: '_url' -%}
+            {%- assign url = section.settings[key] -%}
+            {%- if url != blank -%}
+              <li>
+                <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ platform | capitalize }}">
+                  <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    {%- render 'icon', icon: platform -%}
+                  </svg>
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.marquee -%}
+      {%- render 'pb-marquee', class: 'pb-footer__marquee', duration: section.settings.marquee_duration -%}
     {%- endif -%}
   </div>
-
-  {%- if section.settings.marquee -%}
-    {%- render 'pb-marquee', class: 'pb-footer__marquee', duration: section.settings.marquee_duration -%}
-  {%- endif -%}
 </footer>
 
 {% stylesheet %}
+  /* The footer clips the panel, so the panel can start hidden above it, under the curve. */
   .pb-footer {
+    --pb-footer-curve: clamp(10px, 1.25vw, 18px);
+
     position: relative;
     overflow: hidden;
-    padding: clamp(48px, 7vw, 120px) clamp(24px, 5vw, 84px) 0;
-    border-radius: clamp(20px, 2.5vw, 36px) clamp(20px, 2.5vw, 36px) 0 0;
+  }
+
+  .pb-footer__panel {
+    position: relative;
+    overflow: hidden;
+    padding: calc(clamp(48px, 7vw, 120px) + var(--pb-footer-curve)) clamp(24px, 5vw, 84px) 0;
     background:
       radial-gradient(ellipse 60% 70% at 20% 40%, #1c1c1c 0%, transparent 70%),
       linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
     color: #fff;
+  }
+
+  /* The page above curves down into the footer: a strip of page background along the top
+     with rounded bottom corners, so the dark footer shows in the corners. */
+  .pb-footer::before {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset: 0 0 auto;
+    height: var(--pb-footer-curve);
+    border-radius: 0 0 var(--pb-footer-curve) var(--pb-footer-curve);
+    background: var(--color-background, #fff);
   }
 
   .pb-footer__top {

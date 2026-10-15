@@ -7,6 +7,7 @@
   Reveals:
   - Every section in #MainContent that starts below the first screen fades and slides in once.
   - Any element with [data-reveal] reveals its children with a stagger instead.
+  - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
@@ -122,6 +123,35 @@
         once: true,
         onEnter: () => gsap.to(children, { ...to, stagger: 0.06 }),
       });
+    });
+
+    // Footer: scrubbed to the scroll. As the footer comes up from the bottom of the screen,
+    // the panel slides down from under the page's curved edge (the footer clips it) and its
+    // contents fade in; it's fully in place when the page reaches its end, and runs backwards
+    // on the way up. Tabbing into it drops the scrub and shows it at once.
+    document.querySelectorAll('[data-pb-footer]').forEach((footer) => {
+      const panel = footer.querySelector('.pb-footer__panel');
+      if (!panel || !belowFold(footer)) return;
+      const items = [...panel.children];
+      revealed.push(panel, ...items);
+
+      const timeline = gsap
+        .timeline({
+          scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
+        })
+        .fromTo(panel, { yPercent: -100 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
+        .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.4);
+
+      footer.addEventListener(
+        'focusin',
+        () => {
+          timeline.scrollTrigger.kill();
+          timeline.kill();
+          gsap.to(panel, { yPercent: 0, duration: 0.3, clearProps: 'transform' });
+          gsap.to(items, { opacity: 1, duration: 0.3, clearProps: 'opacity' });
+        },
+        { once: true }
+      );
     });
 
     // Tabbing into content that hasn't revealed yet shows it straight away.
