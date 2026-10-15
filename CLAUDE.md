@@ -13,7 +13,7 @@ The new Protection Brands storefront theme for the 2026 revamp, built on **Shopi
 ```bash
 shopify theme check                                   # lint (stock Horizon baseline: 6 warnings)
 shopify theme dev -e dev                              # local preview on the dev store (hidden development theme)
-shopify theme push -e dev-theme                       # update "PB Horizon (dev)", the dev store's published theme
+shopify theme push -e dev-theme --allow-live          # update "PB Horizon (dev)", the dev store's published theme
 shopify theme push -e live-preview                    # update "PB Horizon (preview)", unpublished on the live store
 ```
 

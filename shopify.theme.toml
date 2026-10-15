@@ -6,7 +6,8 @@
 [environments.dev]
 store = "protection-brands-dev"
 
-# Dev store's published theme "PB Horizon (dev)": `shopify theme push -e dev-theme`.
+# Dev store's published theme "PB Horizon (dev)": `shopify theme push -e dev-theme --allow-live`
+# (--allow-live because it is the dev store's published theme; this is not the real live store).
 [environments.dev-theme]
 store = "protection-brands-dev"
 theme = "167151435879"

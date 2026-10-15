@@ -7,7 +7,8 @@
   Reveals:
   - Every section in #MainContent that starts below the first screen fades and slides in once.
   - Any element with [data-reveal] reveals its children with a stagger instead.
-  - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll.
+  - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll,
+    with parallax on its content.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
@@ -128,19 +129,28 @@
     // Footer: scrubbed to the scroll. As the footer comes up from the bottom of the screen,
     // the panel slides down from under the page's curved edge (the footer clips it) and its
     // contents fade in; it's fully in place when the page reaches its end, and runs backwards
-    // on the way up. Tabbing into it drops the scrub and shows it at once.
+    // on the way up. Parallax: the content lags behind the panel, and the wordmark rises from
+    // below, each by a different amount. Tabbing into it drops the scrub and shows it at once.
     document.querySelectorAll('[data-pb-footer]').forEach((footer) => {
       const panel = footer.querySelector('.pb-footer__panel');
       if (!panel || !belowFold(footer)) return;
       const items = [...panel.children];
+      const layers = [
+        [panel.querySelector('.pb-footer__top'), { y: 90 }],
+        [panel.querySelector('.pb-footer__bottom'), { y: 50 }],
+        [panel.querySelector('.pb-footer__marquee'), { yPercent: 45 }],
+      ].filter(([el]) => el);
       revealed.push(panel, ...items);
 
       const timeline = gsap
         .timeline({
           scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
         })
-        .fromTo(panel, { yPercent: -100 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
-        .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.4);
+        .fromTo(panel, { yPercent: -55 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
+        .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.1);
+      layers.forEach(([el, from]) => {
+        timeline.fromTo(el, from, { y: 0, yPercent: 0, ease: 'none', duration: 1 }, 0);
+      });
 
       footer.addEventListener(
         'focusin',
@@ -148,7 +158,7 @@
           timeline.scrollTrigger.kill();
           timeline.kill();
           gsap.to(panel, { yPercent: 0, duration: 0.3, clearProps: 'transform' });
-          gsap.to(items, { opacity: 1, duration: 0.3, clearProps: 'opacity' });
+          gsap.to(items, { opacity: 1, y: 0, yPercent: 0, duration: 0.3, clearProps: 'transform,opacity' });
         },
         { once: true }
       );
