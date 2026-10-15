@@ -27,6 +27,13 @@
     }
   }
 
+  /* Product cards: fade only, no movement. */
+  @keyframes pb-intro-fade {
+    from {
+      opacity: 0.4;
+    }
+  }
+
   @keyframes pb-intro-drift {
     from {
       transform: translateX(72px);
@@ -161,10 +168,10 @@
     animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
   }
 
-  /* Product grid (collection and search pages): the first eight cards, one after another.
-     nth-of-type, because the grid's first child is a script. */
+  /* Product grid (collection and search pages): the first eight cards fade in, one after
+     another, without moving. nth-of-type, because the grid's first child is a script. */
   .product-grid > .product-grid__item:nth-of-type(-n + 8) {
-    animation: pb-intro-card 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation: pb-intro-fade 0.7s ease-out backwards;
     animation-delay: calc(0.25s + var(--pb-intro-index, 0) * 0.06s);
   }
 
