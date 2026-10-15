@@ -59,7 +59,6 @@ Section settings:
 | Heading | Title above the grid (default "Shop by category"). Leave it blank for no title. |
 | Columns on desktop | 3 or 4. Tablets always show 3 and phones 2. |
 | Tile shape | Square, Landscape (4:3) or Portrait (3:4). |
-| Color scheme | Background and text colour of the section. |
 
 Each **Tile** block:
 
@@ -70,7 +69,8 @@ Each **Tile** block:
 | Label | Optional. Use different words on this tile, e.g. "Wash & Dry" instead of "Wash & Shampoo". |
 
 - **Add tile** adds a block, up to 12. Drag tiles to reorder them.
-- A tile with no collection only shows in the editor, never on the live store.
+- A tile with no collection only shows in the editor, never on the live store. If no tile has a
+  collection, the whole section is hidden on the live store, including its heading.
 
 ## 5. Set up the brand logos
 
@@ -85,7 +85,6 @@ Section settings:
 | Heading | Optional title above the logos, e.g. "Our brands". Blank for none. |
 | Logo height | 24–96 px (default 48). All logos are scaled to this height. |
 | Grey until hover | On: logos are grey and turn full colour on hover. Off: always full colour. |
-| Color scheme | Background of the section. |
 
 Each **Logo** block:
 
@@ -95,7 +94,8 @@ Each **Logo** block:
 | Link | Optional. Usually the brand's collection. Without it the logo isn't clickable. |
 | Alt text | Optional. Read out by screen readers. Defaults to the image's alt text, otherwise use the brand name. |
 
-- **Add logo** adds a block, up to 16. Drag logos to reorder them.
+- **Add logo** adds a block, up to 16. Drag logos to reorder them. Until at least one logo has an
+  image, the section is hidden on the live store.
 - **Honda (4 Nov):** add a logo block with the Honda logo, linked to `/collections/honda-genuine-car-care`.
 
 ## 6. Check

@@ -41,9 +41,94 @@
         "scroll_duration": 60,
         "background_text": "Protection"
       }
+    },
+    "pb_category_tiles": {
+      "type": "pb-category-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "wash-shampoo"
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "cleaners-sprays"
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "microfibre-drying"
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "kits-packs"
+          }
+        },
+        "tile_5": {
+          "type": "tile",
+          "settings": {
+            "collection": "power-emergency"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4",
+        "tile_5"
+      ],
+      "settings": {
+        "heading": "Shop by category",
+        "columns": "4",
+        "ratio": "square"
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        }
+      },
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan"
+      ],
+      "settings": {
+        "heading": "",
+        "logo_height": 48,
+        "greyscale": true
+      }
     }
   },
   "order": [
-    "pb_hero_bottle"
+    "pb_hero_bottle",
+    "pb_category_tiles",
+    "pb_brand_logos"
   ]
 }

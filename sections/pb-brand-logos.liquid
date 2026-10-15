@@ -1,0 +1,219 @@
+{%- comment -%}
+  Brand logos (Protection Brands): a centred row of logos that wraps on phones, each linking to
+  its brand page. Logos are scaled to one height and shown in grey until hovered (setting).
+  Setup: docs/store-setup/category-tiles-and-brand-logos.md.
+{%- endcomment -%}
+
+{%- liquid
+  # Nothing to show (no logo uploaded yet): render nothing.
+  for block in section.blocks
+    if block.settings.image != blank
+      assign has_logos = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if has_logos or request.design_mode -%}
+<div
+  class="pb-brand-logos{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
+  style="--pb-logo-height: {{ section.settings.logo_height }}px;"
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="pb-brand-logos__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+
+  <ul class="pb-brand-logos__list" role="list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign logo = block.settings.image
+        if logo == blank and request.design_mode == false
+          continue
+        endif
+        assign logo_alt = block.settings.alt | default: logo.alt
+        assign logo_width = logo.aspect_ratio | times: section.settings.logo_height | round
+      -%}
+      <li {{ block.shopify_attributes }}>
+        {%- if block.settings.link != blank -%}
+          <a class="pb-brand-logos__logo" href="{{ block.settings.link }}">
+        {%- else -%}
+          <span class="pb-brand-logos__logo">
+        {%- endif -%}
+
+        {%- if logo != blank -%}
+          {{-
+            logo
+            | image_url: width: 480
+            | image_tag:
+              alt: logo_alt,
+              loading: 'lazy',
+              widths: '160, 320, 480',
+              sizes: '180px',
+              width: logo_width,
+              height: section.settings.logo_height
+          -}}
+        {%- else -%}
+          <span class="pb-brand-logos__empty">Pick a logo</span>
+        {%- endif -%}
+
+        {%- if block.settings.link != blank -%}
+          </a>
+        {%- else -%}
+          </span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  .pb-brand-logos {
+    margin: 0 10px;
+    padding-block: 32px;
+  }
+
+  .pb-brand-logos__heading {
+    margin: 0 0 24px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .pb-brand-logos__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 24px 48px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-brand-logos__logo {
+    display: block;
+  }
+
+  .pb-brand-logos__logo img {
+    display: block;
+    width: auto;
+    max-width: 180px;
+    height: var(--pb-logo-height, 48px);
+    object-fit: contain;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+  }
+
+  .pb-brand-logos--greyscale .pb-brand-logos__logo img {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
+
+  .pb-brand-logos--greyscale .pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    filter: none;
+    opacity: 1;
+  }
+
+  a.pb-brand-logos__logo:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 6px;
+  }
+
+  .pb-brand-logos__empty {
+    display: grid;
+    place-items: center;
+    width: 140px;
+    height: var(--pb-logo-height, 48px);
+    border: 1px dashed currentColor;
+    font-size: 13px;
+    opacity: 0.5;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-brand-logos {
+      margin-inline: 8px;
+      padding-block: 24px;
+    }
+
+    .pb-brand-logos__list {
+      gap: 20px 32px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand logos (PB)",
+  "tag": "section",
+  "class": "pb-brand-logos-section",
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Optional, e.g. \"Our brands\"."
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 24,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "checkbox",
+      "id": "greyscale",
+      "label": "Grey until hover",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "SVG or transparent PNG, trimmed. Logos without an image are skipped."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Usually the brand's collection."
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Read by screen readers. Defaults to the image's alt text."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand logos (PB)",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,6 +1,6 @@
 # Shop by category tiles and brand logo row: design
 
-Date: 14 Oct 2026. Status: approved in chat, awaiting spec review.
+Date: 14 Oct 2026. Status: built 14 Oct 2026. Changes from the reviewed version: no colour-scheme setting (Horizon 4.2 sections don't use one), and each section hides itself on the storefront when it has nothing to show.
 
 ## Goal
 
@@ -31,7 +31,6 @@ They can go on any page. The first use is the home page, under the bottle hero. 
 | `heading` | text | `Shop by category` | Hidden if blank |
 | `columns` | select `3` / `4` | `4` | Desktop column count |
 | `ratio` | select `square` / `landscape` (4:3) / `portrait` (3:4) | `square` | |
-| `color_scheme` | color_scheme | `scheme-1` | |
 
 **Blocks:** `tile`, up to 12.
 
@@ -73,7 +72,6 @@ They can go on any page. The first use is the home page, under the bottle hero. 
 | `heading` | text | blank (hidden) |
 | `logo_height` | range 24–96px, step 4 | `48` |
 | `greyscale` | checkbox: greyscale until hover | `true` |
-| `color_scheme` | color_scheme | `scheme-1` |
 
 **Blocks:** `logo`, up to 16.
 
