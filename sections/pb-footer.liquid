@@ -1,6 +1,6 @@
 {%- comment -%}
-  Protection Brands footer for inner pages (footer group in layout/theme.liquid): a rounded
-  dark card with the newsletter signup on the left, up to four link columns on the right,
+  Protection Brands footer for inner pages (footer group in layout/theme.liquid): a full-width
+  dark panel with rounded top corners, with the newsletter signup on the left, up to four link columns on the right,
   a copyright line and social icons, and the scrolling wordmark (snippets/pb-marquee.liquid)
   along the bottom.
 
@@ -142,9 +142,8 @@
   .pb-footer {
     position: relative;
     overflow: hidden;
-    margin: 10px;
     padding: clamp(48px, 7vw, 120px) clamp(24px, 5vw, 84px) 0;
-    border-radius: 12px;
+    border-radius: clamp(20px, 2.5vw, 36px) clamp(20px, 2.5vw, 36px) 0 0;
     background:
       radial-gradient(ellipse 60% 70% at 20% 40%, #1c1c1c 0%, transparent 70%),
       linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
@@ -317,7 +316,7 @@
     fill: currentColor;
   }
 
-  /* Scrolling wordmark, full card width, cut off by the bottom of the card. */
+  /* Scrolling wordmark, full footer width, cut off by the bottom of the footer. */
   .pb-footer__marquee {
     --pb-marquee-height: clamp(4rem, 15vw, 20rem);
 
