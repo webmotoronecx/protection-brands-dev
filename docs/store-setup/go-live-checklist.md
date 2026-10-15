@@ -16,6 +16,9 @@ Detail for the bigger steps: [README.md](README.md) (catalogue, filters, menu) a
 
 ## 2. Catalogue data (README §1–3)
 
+Create the categories from [categories-dev-to-live.md](categories-dev-to-live.md), the record
+of what was finalised on the dev store.
+
 These changes show on the live Debut site straight away. They're safe there, because Debut
 doesn't use them, but do them close to launch day.
 

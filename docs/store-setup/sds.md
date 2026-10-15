@@ -9,7 +9,7 @@ Theme files: `templates/page.sds.json`, `blocks/sds-list.liquid`, `snippets/sds-
 
 ## 1. Metaobject definition
 
-**Settings → Custom data → Metaobjects → Add definition**
+**Settings → Metafields and metaobjects → Metaobjects → Add definition**
 
 Name **SDS document**. Type (handle) must be `sds_document`. Turn on **Storefront access**.
 
@@ -24,7 +24,7 @@ Keys must match exactly; the theme reads them by name.
 
 ## 2. Product metafield
 
-**Settings → Custom data → Products → Add definition**
+**Settings → Metafields and metaobjects → Products → Add definition**
 
 | Field | Value |
 |---|---|

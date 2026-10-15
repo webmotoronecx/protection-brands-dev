@@ -1,7 +1,9 @@
 # Store setup: categorisation, navigation and search
 
 Admin-side changes that go with the theme (brief §3, eCommerce Experience Enhancement).
-For the full launch-day list see [go-live-checklist.md](go-live-checklist.md).
+For the full launch-day list see [go-live-checklist.md](go-live-checklist.md). Categories are
+built on the dev store first; record them in [categories-dev-to-live.md](categories-dev-to-live.md)
+so they can be rebuilt on live.
 Do them in this order; each step depends on the one before.
 
 The theme expects these collection handles: `wash-shampoo`, `cleaners-sprays`, `microfibre-drying`,
@@ -10,7 +12,10 @@ The theme expects these collection handles: `wash-shampoo`, `cleaners-sprays`, `
 
 ## 1. Metafield definition
 
-**Settings → Custom data → Products → Add definition**
+**Settings → Metafields and metaobjects → Products → Add definition**
+
+Or create this and the two collection definitions in §3 in one go with
+[`metafield-definitions.graphql`](metafield-definitions.graphql) (instructions at the top of the file).
 
 | Field | Value |
 |---|---|
@@ -66,9 +71,15 @@ Existing collections keep their handles, so old links and search rankings surviv
 - **Reapplication / Warranty Transfer**: no products are visible publicly. Publish their
   products to the Online Store sales channel, or point the menu at a page instead.
 
-For a shorter watermark than the collection name, add a collection metafield definition
-(**Settings → Custom data → Collections**): *Watermark*, `custom.watermark`, single line text.
-Fill it in on the collection, e.g. `Honda`. Without it the collection title is used.
+Brand page banners use two collection metafield definitions
+(**Settings → Metafields and metaobjects → Collections → Add definition**, storefront access on):
+
+| Name | Namespace and key | Type | Use |
+|---|---|---|---|
+| Hero image | `custom.hero_image` | File (images only) | Photo across the whole banner, behind a dark gradient. Wide, at least 2400px. |
+| Watermark | `custom.watermark` | Single line text | Short faint watermark when there's no hero image, e.g. `Honda`. Without it the collection title is used. |
+
+Fill them in at the bottom of each brand collection's page in admin.
 If Honda products should show a *Suitable for* line, add `Honda` to the §1 preset choices.
 
 Give each new collection an image and a one-line description; the home page cards show both.

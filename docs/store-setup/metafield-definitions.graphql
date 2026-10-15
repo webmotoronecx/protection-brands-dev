@@ -1,0 +1,51 @@
+# Metafield definitions the theme uses (README §1 and §3), as one Admin API mutation.
+# Run it in the Shopify GraphiQL App (https://shopify-graphiql-app.shopifycloud.com):
+# install it on the store with write access to products, paste this in and press Run.
+# Do it once on the dev store and once on live. If a definition already exists, its
+# userErrors says "Key is in use" and the others are still created.
+
+mutation CreatePBMetafieldDefinitions {
+  suitableFor: metafieldDefinitionCreate(
+    definition: {
+      name: "Suitable for"
+      namespace: "custom"
+      key: "suitable_for"
+      ownerType: PRODUCT
+      type: "list.single_line_text_field"
+      validations: [{ name: "choices", value: "[\"Permagard\",\"CERFACE\",\"OptiVAN\"]" }]
+      access: { storefront: PUBLIC_READ }
+    }
+  ) {
+    createdDefinition { id namespace key }
+    userErrors { field message code }
+  }
+
+  heroImage: metafieldDefinitionCreate(
+    definition: {
+      name: "Hero image"
+      namespace: "custom"
+      key: "hero_image"
+      ownerType: COLLECTION
+      type: "file_reference"
+      validations: [{ name: "file_type_options", value: "[\"Image\"]" }]
+      access: { storefront: PUBLIC_READ }
+    }
+  ) {
+    createdDefinition { id namespace key }
+    userErrors { field message code }
+  }
+
+  watermark: metafieldDefinitionCreate(
+    definition: {
+      name: "Watermark"
+      namespace: "custom"
+      key: "watermark"
+      ownerType: COLLECTION
+      type: "single_line_text_field"
+      access: { storefront: PUBLIC_READ }
+    }
+  ) {
+    createdDefinition { id namespace key }
+    userErrors { field message code }
+  }
+}
