@@ -5,6 +5,8 @@ so the same import can be repeated on the live store (`protection-brands`) at la
 updates every product in one CSV import:
 
 - **Images**: the cut-out product shots (transparent, 2048 px square) replace the matching photos.
+  A product's cut-outs come first, so its first image (the one on product cards) is a cut-out
+  whenever it has one; the remaining live photos follow.
 - **Type**: the category (`Wash & Shampoo`, `Cleaners & Sprays`, `Microfibre & Drying`,
   `Kits & Packs`, `Power & Emergency`).
 - **Vendor**: the brand.
@@ -67,7 +69,8 @@ python3 make-import-csv.py '<the copied link>' ../../CSV/products_import_live.cs
 ```
 
 It prints how many cut-outs it used (39), which images it kept from the live photos (the ones
-with no cut-out), and how many products it categorised (19). Products not in the taxonomy keep
+with no cut-out), which products now start with a cut-out (6), which have none (6, so their
+card still shows a live photo), and how many products it categorised (19). Products not in the taxonomy keep
 their type and vendor. The market price columns (`Price / Australia` etc.) are left out, so
 market prices on live are unchanged.
 
