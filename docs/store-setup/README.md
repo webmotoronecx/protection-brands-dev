@@ -21,23 +21,27 @@ Or create this and the two collection definitions in §3 in one go with
 |---|---|
 | Name | Suitable for |
 | Namespace and key | `custom.suitable_for` |
-| Type | Single line text → **List of values** |
-| Validation | Limit to preset choices: `Permagard`, `CERFACE`, `OptiVAN` |
-| Storefront access | On |
-| Filtering | On (lets Search & Discovery use it) |
+| Type | **List** → **Choice list (Single line text)** (plain *Single line text* has no choices) |
+| Choices | `Permagard`, `CERFACE`, `OptiVAN`, `Honda Genuine Car Care` (spelled exactly; item count left empty) |
+| Options | **Use as a condition in collections**: on (the "By treatment" collections need it). **Storefront API access**: on. **Filter on the product list and in the Admin API**: on (optional, admin only). Analytics: off. |
 
 ## 2. Import product data
 
-File: [`product-taxonomy.csv`](product-taxonomy.csv). It sets **Vendor** (brand), **Type**
-(category) and **Suitable for** for the 19 products currently on the storefront.
+Step by step, as done on dev and to repeat on live: [product-import.md](product-import.md).
+
+Source: [`product-taxonomy.csv`](product-taxonomy.csv), the **Vendor** (brand), **Type**
+(category) and **Suitable for** of the 19 products currently on the storefront. Don't import it
+directly: run `product-images/make-import-csv.py`, which merges it into the full product export
+with the cut-out images, alt text and the `Bulk` tag, and writes *Suitable for* in
+the format the import needs. A list metafield takes **one value per line inside the cell**
+(as Shopify exports it); `Permagard; CERFACE; OptiVAN` or commas are read as one value, and the
+choice list rejects the whole product.
 
 1. **Products → Export** a full backup first.
 2. Test one product: delete all rows but one, then **Products → Import**, tick
    **Overwrite products with matching handles**, and check that product's vendor, type and
    *Suitable for* values. Columns not in the CSV are left unchanged.
-3. If the list metafield didn't take, export that product and copy the format Shopify
-   uses for the *Suitable for* column (this CSV uses `Permagard; CERFACE; OptiVAN`).
-4. Import the full file.
+3. Import the full file.
 
 Products hidden from the Online Store aren't in the CSV. Give any that should go live a
 type and vendor too.
@@ -54,6 +58,27 @@ type and vendor too.
 | Kits & Packs | `kits-packs` | Product type is equal to `Kits & Packs` |
 | Power & Emergency | `power-emergency` | Product type is equal to `Power & Emergency` |
 
+"By treatment" and bulk, for the Shop menu (also automated, *all conditions*). Treatments use
+the *Suitable for* metafield (Add condition → Suitable for → is equal to), which only appears once
+the definition's **Use as a condition in collections** option is on (§1). A product suitable for
+several treatments is in each of those collections. Don't use the old `OptiVAN` /
+`CERFACE Ceramic` / `Permagard Products` tags: they're on almost every product.
+
+| Collection | Handle | Condition |
+|---|---|---|
+| Permagard Car Care | `permagard-car-care` | Suitable for is equal to `Permagard` |
+| CERFACE Ceramic | `cerface-ceramic` | Suitable for is equal to `CERFACE` |
+| OptiVAN Caravan Maintenance | `optivan-caravan-maintenance` | Suitable for is equal to `OptiVAN` |
+| Honda Genuine Car Care (from 4 Nov) | `honda-genuine-car-care` | Suitable for is equal to `Honda Genuine Car Care` |
+| Bulk & Professional | `bulk-professional` | Product tag is equal to `Bulk` |
+
+These are the brand collections listed below, so the menu and the brand logos share one
+URL per treatment. On the dev store, create them with these conditions; on live, decide whether
+to switch the existing ones to the same condition.
+
+Only true bulk items carry the `Bulk` tag (now just the 20L drum). Don't use the old
+`Professional` tag for this: most retail products have it.
+
 Existing collections keep their handles, so old links and search rankings survive:
 
 - **Permagard Car Care / CERFACE Ceramic / OptiVAN Caravan Maintenance**: leave as they are.
@@ -61,7 +86,7 @@ Existing collections keep their handles, so old links and search rankings surviv
   (`templates/collection.brand.json`): the same title bar, with the brand name as the faint
   watermark instead of the Protection Brands wordmark.
 - **Honda Genuine Car Care** (from 4 Nov): new automated collection, handle
-  `honda-genuine-car-care`, condition *Product vendor is equal to* `Honda Genuine Car Care`,
+  `honda-genuine-car-care`, condition *Suitable for is equal to* `Honda Genuine Car Care`,
   theme template `brand`.
 - **Car Care**: leave as it is (all car care products).
 - **Accessories**: currently almost the same list as Car Care. Either change it to
@@ -80,7 +105,6 @@ Brand page banners use two collection metafield definitions
 | Watermark | `custom.watermark` | Single line text | Short faint watermark when there's no hero image, e.g. `Honda`. Without it the collection title is used. |
 
 Fill them in at the bottom of each brand collection's page in admin.
-If Honda products should show a *Suitable for* line, add `Honda` to the §1 preset choices.
 
 Give each new collection an image and a one-line description; the home page cards show both.
 

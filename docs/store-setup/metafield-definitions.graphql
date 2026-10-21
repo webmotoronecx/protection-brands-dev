@@ -12,8 +12,10 @@ mutation CreatePBMetafieldDefinitions {
       key: "suitable_for"
       ownerType: PRODUCT
       type: "list.single_line_text_field"
-      validations: [{ name: "choices", value: "[\"Permagard\",\"CERFACE\",\"OptiVAN\"]" }]
+      validations: [{ name: "choices", value: "[\"Permagard\",\"CERFACE\",\"OptiVAN\",\"Honda Genuine Car Care\"]" }]
       access: { storefront: PUBLIC_READ }
+      # Lets the "By treatment" collections use it as a condition.
+      capabilities: { smartCollectionCondition: { enabled: true } }
     }
   ) {
     createdDefinition { id namespace key }

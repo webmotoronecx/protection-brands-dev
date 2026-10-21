@@ -22,12 +22,12 @@ of what was finalised on the dev store.
 These changes show on the live Debut site straight away. They're safe there, because Debut
 doesn't use them, but do them close to launch day.
 
-- [ ] Create the product metafield **Suitable for** (`custom.suitable_for`).
-- [ ] Import `product-taxonomy.csv`, one product first, then the rest.
+- [ ] Import the products with their cut-out images, categories and *Suitable for*: follow
+      [product-import.md](product-import.md) (metafield, fresh export, Files upload, CSV,
+      import, collections).
 - [ ] Set type and vendor on any hidden products that should go live, and publish them to
       the Online Store sales channel.
-- [ ] Create the 5 category collections (`wash-shampoo`, `cleaners-sprays`,
-      `microfibre-drying`, `kits-packs`, `power-emergency`), each with an image and description.
+- [ ] Give each collection from product-import.md §6 an image and description.
 - [ ] Decide on **Accessories** (narrow it or hide it).
 - [ ] Fix **Reapplication** and **Warranty Transfer**: publish their products or point the
       links at pages.
