@@ -9,6 +9,7 @@
   - Any element with [data-reveal] reveals its children with a stagger instead.
   - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll,
     with parallax on its content.
+  - The homepage hero (.pb-hero-bottle) has scroll parallax as it scrolls away; see below.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
@@ -28,6 +29,8 @@
   if (!gsap || reducedMotion.matches || window.Shopify?.designMode) return;
 
   const squeeze = window.matchMedia('(min-width: 990px)');
+  const FOOTER_SCRUB = 1;
+  const HERO_SCRUB = 0.4;
   const pageWrapper = document.querySelector('.page-wrapper');
   const scroller = () => (squeeze.matches && pageWrapper ? pageWrapper : window);
 
@@ -74,6 +77,7 @@
     ScrollTrigger?.getAll().forEach((trigger) => trigger.kill());
     gsap.killTweensOf(revealed);
     gsap.set(revealed, { clearProps: 'transform,opacity' });
+    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => hero.style.removeProperty('--pb-hero-shift'));
   };
 
   if (config.reveal && ScrollTrigger) {
@@ -127,10 +131,13 @@
     });
 
     // Footer: scrubbed to the scroll. As the footer comes up from the bottom of the screen,
-    // the panel slides down from under the page's curved edge (the footer clips it) and its
-    // contents fade in; it's fully in place when the page reaches its end, and runs backwards
-    // on the way up. Parallax: the content lags behind the panel, and the wordmark rises from
-    // below, each by a different amount. Tabbing into it drops the scrub and shows it at once.
+    // the panel (content only; the background stays on the footer) slides down from under the
+    // page's curved edge (the footer clips it) and its contents fade in; it's fully in place when the page reaches its end, and runs backwards
+    // on the way up. Parallax: the content lags behind the panel, each part by a different
+    // amount. The wordmark only fades: it sits on the footer's clipped bottom edge, so any
+    // movement down there would show it cut off. Tabbing into it drops the scrub and shows it at once.
+    // FOOTER_SCRUB: seconds the footer takes to catch up with the scroll, so it trails behind
+    // and eases to a stop rather than being locked to the scrollbar (true = locked).
     document.querySelectorAll('[data-pb-footer]').forEach((footer) => {
       const panel = footer.querySelector('.pb-footer__panel');
       if (!panel || !belowFold(footer)) return;
@@ -138,13 +145,12 @@
       const layers = [
         [panel.querySelector('.pb-footer__top'), { y: 90 }],
         [panel.querySelector('.pb-footer__bottom'), { y: 50 }],
-        [panel.querySelector('.pb-footer__marquee'), { yPercent: 45 }],
       ].filter(([el]) => el);
       revealed.push(panel, ...items);
 
       const timeline = gsap
         .timeline({
-          scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
+          scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: FOOTER_SCRUB },
         })
         .fromTo(panel, { yPercent: -55 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
         .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.1);
@@ -162,6 +168,23 @@
         },
         { once: true }
       );
+    });
+
+    // Hero parallax, scrubbed to the scroll as the hero scrolls away: its layers move at
+    // different speeds, so the scene has depth. The wordmark drifts down most (furthest back),
+    // then the bottles; the heading and note rise a little faster than the page and fade.
+    // The wordmark and split-layout headings already follow the mouse with inline transforms
+    // (assets/pb-hero-bottle.js), so this sets one variable, --pb-hero-shift (px scrolled
+    // past), and the hero's CSS moves each layer with `translate`, which adds to them.
+    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => {
+      const fading = hero.querySelectorAll('.pb-hero-bottle__intro, .pb-hero-bottle__note, .pb-hero-bottle__text');
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: HERO_SCRUB, invalidateOnRefresh: true },
+        })
+        .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0)
+        .fromTo(fading, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.6 }, 0);
+      revealed.push(...fading);
     });
 
     // Tabbing into content that hasn't revealed yet shows it straight away.

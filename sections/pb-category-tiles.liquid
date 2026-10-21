@@ -6,12 +6,11 @@
 {%- endcomment -%}
 
 {%- liquid
-  assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
-  if heading_font == blank
-    assign heading_font = settings.type_body_font
-  endif
+  assign heading_font = settings.type_heading_font
 
   case section.settings.columns
+    when '5'
+      assign sizes = '(min-width: 990px) calc((100vw - 84px) / 5), (min-width: 750px) calc((100vw - 52px) / 3), calc((100vw - 24px) / 2)'
     when '3'
       assign sizes = '(min-width: 990px) calc((100vw - 52px) / 3), (min-width: 750px) calc((100vw - 52px) / 3), calc((100vw - 24px) / 2)'
     else
@@ -34,11 +33,29 @@
 </style>
 
 <div
-  class="pb-category-tiles pb-category-tiles--{{ section.settings.ratio }}"
-  style="--pb-tiles-columns: {{ section.settings.columns }}; --pb-tiles-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-tiles-weight: {{ heading_font.weight }};"
+  class="pb-category-tiles pb-category-tiles--{{ section.settings.ratio }} pb-category-tiles--heading-{{ section.settings.heading_alignment }} pb-category-tiles--label-{{ section.settings.label_alignment }}"
+  style="--pb-tiles-columns: {{ section.settings.columns }}; --pb-tiles-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-tiles-weight: {{ heading_font.weight }};{% if section.settings.background != blank %} --pb-tiles-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-tiles-text: {{ section.settings.text_color }};{% endif %}"
 >
-  {%- if section.settings.heading != blank -%}
-    <h2 class="pb-category-tiles__heading">{{ section.settings.heading }}</h2>
+  {%- liquid
+    assign show_link = false
+    if section.settings.link_label != blank and section.settings.link != blank
+      assign show_link = true
+    endif
+  -%}
+  {%- if section.settings.heading != blank or show_link -%}
+    <div class="pb-category-tiles__header">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="pb-category-tiles__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if show_link -%}
+        <a class="pb-category-tiles__link" href="{{ section.settings.link }}">
+          {{- section.settings.link_label -}}
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M8 7h9v9"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
   {%- endif -%}
 
   <ul class="pb-category-tiles__grid" role="list">
@@ -95,16 +112,55 @@
 
 {% stylesheet %}
   .pb-category-tiles {
-    margin: clamp(40px, 5vw, 72px) 10px;
+    padding: clamp(40px, 5vw, 72px) clamp(16px, 2.5vw, 40px);
+    background: var(--pb-tiles-bg, transparent);
+    color: var(--pb-tiles-text, inherit);
+  }
+
+  .pb-category-tiles__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px 16px;
+    margin-bottom: clamp(20px, 2.5vw, 32px);
+  }
+
+  .pb-category-tiles--heading-left .pb-category-tiles__header {
+    justify-content: space-between;
+  }
+
+  .pb-category-tiles__link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    color: var(--pb-accent, #ca0d0d);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .pb-category-tiles__link svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .pb-category-tiles__link:is(:hover, :focus-visible) svg {
+    transform: translate(2px, -2px);
   }
 
   .pb-category-tiles__heading {
-    margin: 0 0 clamp(20px, 2.5vw, 32px);
+    margin: 0;
+    color: inherit;
     font-family: var(--pb-tiles-font, inherit);
-    font-size: clamp(2rem, 3vw, 3rem);
-    font-weight: var(--pb-tiles-weight, 300);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: var(--pb-tiles-weight, 400);
     line-height: 1.05;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     text-align: center;
     text-transform: uppercase;
   }
@@ -140,7 +196,7 @@
     aspect-ratio: 1;
     padding: clamp(14px, 1.6vw, 24px);
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 8px;
     background: #111;
     color: #fff;
     text-decoration: none;
@@ -152,6 +208,19 @@
 
   .pb-category-tiles--portrait .pb-category-tiles__tile {
     aspect-ratio: 3 / 4;
+  }
+
+  .pb-category-tiles--tall .pb-category-tiles__tile {
+    aspect-ratio: 7 / 8;
+  }
+
+  /* Centred labels: no arrow, the label sits centred along the bottom. */
+  .pb-category-tiles--label-center .pb-category-tiles__label {
+    text-align: center;
+  }
+
+  .pb-category-tiles--label-center .pb-category-tiles__arrow {
+    display: none;
   }
 
   /* Dark fade from the bottom so the label reads on any photo. */
@@ -179,7 +248,7 @@
     overflow: hidden;
     font-family: var(--pb-tiles-font, inherit);
     font-size: clamp(1.25rem, 2vw, 2rem);
-    font-weight: 500;
+    font-weight: var(--pb-tiles-weight, 400);
     line-height: 1.05;
     text-transform: uppercase;
     -webkit-box-orient: vertical;
@@ -215,7 +284,7 @@
 
   @media screen and (max-width: 749px) {
     .pb-category-tiles {
-      margin-inline: 8px;
+      padding-inline: 16px;
     }
   }
 {% endstylesheet %}
@@ -246,6 +315,10 @@
         {
           "value": "4",
           "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
         }
       ],
       "default": "4"
@@ -264,11 +337,69 @@
           "label": "Landscape (4:3)"
         },
         {
+          "value": "tall",
+          "label": "Slightly tall (7:8)"
+        },
+        {
           "value": "portrait",
           "label": "Portrait (3:4)"
         }
       ],
       "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "left",
+          "label": "Left, link on the right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "label_alignment",
+      "label": "Tile labels",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left, with arrow"
+        },
+        {
+          "value": "center",
+          "label": "Centred"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "info": "Optional, e.g. \"All categories\". Shown beside the heading."
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Optional. Defaults to the page background."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading colour"
     }
   ],
   "blocks": [

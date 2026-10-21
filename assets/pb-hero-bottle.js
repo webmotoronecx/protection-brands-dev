@@ -3,9 +3,11 @@
 
   One or two bottles float with their labels facing out. They drift, turn and tilt towards
   the mouse, and lift as the hero scrolls away; they don't spin on their own. The headings
-  follow the mouse slightly and the scrolling wordmark drifts the other way. The bottle is
-  built in code from a profile measured from the 500 ml product photo; the label artwork
-  wraps all the way round, front facing out.
+  follow the mouse slightly and the scrolling wordmark drifts the other way. Each bottle is
+  built in code from a profile measured from its product photo (MODELS); the label artwork
+  wraps all the way round, front facing out. The first is the clear Detailing Spray bottle
+  with liquid inside; the second is the same, or the white Permagard Car Wash Shampoo bottle
+  (data-model-second).
 
   Performance (see .claude/skills/animation-perf):
   - Three.js (~170 KB gzip) is imported only after the page has loaded and gone idle.
@@ -35,6 +37,23 @@ const CAP = [[0, 5.62], [0.455, 5.62], [0.455, 6.18], [0.42, 6.24], [0.28, 6.27]
 const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
 const LABEL = { bottom: 0.52, top: 4.98 };
 
+/* Permagard Car Wash Shampoo (236 ml), measured from its product photo the same way (body
+   483 px wide, 1,612 px from base to cap top): opaque white plastic, a glossy black label
+   from just above the base to the shoulder, and a ribbed black flat-top cap. Scaled to the
+   Detailing Spray's height so the two balance in the hero. */
+const PERMAGARD = {
+  shell: [
+    [0, 0], [0.53, 0.02], [0.67, 0.05], [0.77, 0.07], [0.87, 0.12], [0.92, 0.17], [0.96, 0.22],
+    [0.98, 0.27], [0.995, 0.35], [1, 0.45], [1, 5.55], [0.994, 5.64], [0.983, 5.72],
+    [0.961, 5.76], [0.882, 5.81], [0.716, 5.85], [0.542, 5.89], [0.53, 5.95],
+  ],
+  cap: [[0, 5.93], [0.522, 5.93], [0.522, 6.6], [0.49, 6.64], [0.4, 6.665], [0, 6.675]],
+  capRibs: { bottom: 6.02, top: 6.58, radius: 0.5, count: 90 },
+  // turn: radians the artwork is turned round the bottle, to centre it in the hero's pose.
+  label: { bottom: 0.36, top: 5.54, radius: 1.004, turn: -0.1 },
+  height: 6.675,
+};
+
 /* Liquid wobble: the liquid is cut by a surface that stays level in the world and sloshes
    against each bottle's acceleration (a damped spring per axis). LIQUID_LEVEL is the fill
    height from the base, up into the shoulder like the real bottle, so the surface shows
@@ -51,6 +70,19 @@ const BUBBLES = { count: 90, radius: [0.025, 0.07], drift: 0.07, speed: [0.25, 0
 const SPARKLE = 1.6; // glint brightness
 const SLOSH = { stiffness: 10, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
+
+const MODELS = {
+  detailing: {
+    shell: SHELL,
+    liquid: LIQUID,
+    cap: CAP,
+    capRibs: { ...CAP_RIBS, count: 45 },
+    label: { ...LABEL, radius: 1.006 },
+    height: HEIGHT,
+    clear: true,
+  },
+  permagard: { ...PERMAGARD, clear: false },
+};
 
 /* Layout of the bottles: position, resting tilt [x, y, z], float phase, and depth (how far
    the bottle moves with the mouse; the front bottle moves most, for parallax).
@@ -206,36 +238,48 @@ class PBHeroBottle extends HTMLElement {
     this.#camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
     this.#addLights(THREE, look);
 
-    const label = await loadTexture(THREE, this.dataset.label).catch(() => null);
+    // The first bottle is always the Detailing Spray; the second can be the Permagard bottle,
+    // with its own label.
+    const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
+    const models = layout.map((spec, index) =>
+      index === 1 && MODELS[this.dataset.modelSecond] ? this.dataset.modelSecond : 'detailing'
+    );
+    const labelUrls = models.map((model, index) => (index === 1 ? this.dataset.labelSecond || this.dataset.label : this.dataset.label));
+    const labels = await Promise.all(
+      [...new Set(labelUrls)].map((url) => loadTexture(THREE, url).then((texture) => [url, texture]).catch(() => [url, null]))
+    ).then((entries) => new Map(entries));
     if (this.#disposed) return;
-    if (label) label.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    for (const texture of labels.values()) if (texture) texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
     // Each bottle can have its own liquid colour (the second is the car care bottle).
     const liquids = [this.dataset.liquid || '#b5650e', this.dataset.liquidSecond || this.dataset.liquid || '#b5650e'];
-    const geometries = bottleGeometries(THREE);
-    const layout = LAYOUTS[this.dataset.bottles] || LAYOUTS[2];
+    const geometries = new Map([...new Set(models)].map((name) => [name, bottleGeometries(THREE, MODELS[name])]));
 
     const sparkling = this.dataset.sparkle !== 'false';
     layout.forEach((spec, index) => {
+      const model = MODELS[models[index]];
       // The second (car care) bottle can have a gel finish: clearer, glossier, a faint shimmer.
       const finish = index === 1 ? this.dataset.finishSecond || 'gel' : 'liquid';
-      const materials = bottleMaterials(THREE, label, liquids[index], look.gloss, finish);
+      const materials = model.clear
+        ? bottleMaterials(THREE, labels.get(labelUrls[index]), liquids[index], look.gloss, finish)
+        : opaqueBottleMaterials(THREE, labels.get(labelUrls[index]), look.gloss);
       const group = new THREE.Group();
-      for (const [name, geometry] of Object.entries(geometries)) {
+      for (const [name, geometry] of Object.entries(geometries.get(models[index]))) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
-        mesh.renderOrder = name === 'shell' ? 2 : name === 'label' ? 1 : 0;
+        mesh.renderOrder = model.clear && name === 'shell' ? 2 : name === 'label' ? 1 : 0;
         mesh.castShadow = true;
-        mesh.receiveShadow = name !== 'shell';
+        mesh.receiveShadow = !model.clear || name !== 'shell';
         mesh.position.y = -HEIGHT / 2;
         group.add(mesh);
       }
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
-      const surface = materials.liquid.userData.surface;
-      surface.pbSparkle.value = sparkling ? SPARKLE : 0;
+      // Liquid (and its sparkle) only in the clear bottle.
+      const surface = materials.liquid?.userData.surface || null;
+      if (surface) surface.pbSparkle.value = sparkling ? SPARKLE : 0;
       let fizz = null;
-      if (sparkling) {
+      if (surface && sparkling) {
         fizz = makeBubbles(THREE, surface);
         group.add(fizz.mesh);
         updateBubbles(fizz, 0, 0);
@@ -245,7 +289,7 @@ class PBHeroBottle extends HTMLElement {
         fizz,
         group,
         spec,
-        surface: materials.liquid.userData.surface,
+        surface,
         slosh: { x: 0, vx: 0, z: 0, vz: 0, px: null, py: 0, pz: 0, ry: 0, speedX: 0, speedY: 0, speedZ: 0 },
       });
     });
@@ -569,31 +613,37 @@ function lathe(THREE, points, segments) {
   );
 }
 
-function bottleGeometries(THREE) {
-  const shell = lathe(THREE, SHELL, 96);
-  const liquid = lathe(THREE, LIQUID, 96);
+/* Shell, cap and label (and liquid, for a clear bottle) for one model, scaled to HEIGHT. */
+function bottleGeometries(THREE, model) {
+  const parts = { shell: lathe(THREE, model.shell, 96) };
+  if (model.liquid) parts.liquid = lathe(THREE, model.liquid, 96);
 
   // Cap with vertical grip ribs: push the side wall in and out around the circumference.
-  const cap = lathe(THREE, CAP, 180);
+  const ribs = model.capRibs;
+  const cap = lathe(THREE, model.cap, ribs.count * 4);
   const position = cap.attributes.position;
   for (let i = 0; i < position.count; i++) {
     const x = position.getX(i);
     const y = position.getY(i);
     const z = position.getZ(i);
-    if (y > CAP_RIBS.bottom && y < CAP_RIBS.top && Math.hypot(x, z) > CAP_RIBS.radius) {
-      const scale = 1 + 0.025 * Math.sign(Math.cos(Math.atan2(x, z) * 45));
+    if (y > ribs.bottom && y < ribs.top && Math.hypot(x, z) > ribs.radius) {
+      const scale = 1 + 0.025 * Math.sign(Math.cos(Math.atan2(x, z) * ribs.count));
       position.setXYZ(i, x * scale, y, z * scale);
     }
   }
   cap.computeVertexNormals();
+  parts.cap = cap;
 
   // Label: open cylinder just outside the shell, the artwork wrapped once around it.
   // thetaStart = PI puts the middle of the artwork (the front) facing the camera.
-  const labelHeight = LABEL.top - LABEL.bottom;
-  const label = new THREE.CylinderGeometry(1.006, 1.006, labelHeight, 128, 1, true, Math.PI);
-  label.translate(0, LABEL.bottom + labelHeight / 2, 0);
+  const { bottom, top, radius, turn = 0 } = model.label;
+  const label = new THREE.CylinderGeometry(radius, radius, top - bottom, 128, 1, true, Math.PI + turn);
+  label.translate(0, bottom + (top - bottom) / 2, 0);
+  parts.label = label;
 
-  return { liquid, label, cap, shell };
+  const scale = HEIGHT / model.height;
+  if (scale !== 1) for (const geometry of Object.values(parts)) geometry.scale(scale, scale, scale);
+  return parts;
 }
 
 /* Bubbles for one bottle: small spheres drawn in one go (InstancedMesh), cut off at the same
@@ -769,6 +819,27 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
       clearcoatRoughness: 0.05,
       depthWrite: false,
     }),
+  };
+}
+
+/* An opaque bottle (Permagard): glossy white plastic, a high-gloss black label wrap and a
+   matt black cap. No liquid. */
+function opaqueBottleMaterials(THREE, labelTexture, gloss) {
+  return {
+    shell: new THREE.MeshPhysicalMaterial({
+      color: 0xe6e8eb,
+      roughness: 0.32,
+      clearcoat: 0.6 * gloss,
+      clearcoatRoughness: 0.12,
+    }),
+    label: new THREE.MeshPhysicalMaterial({
+      color: labelTexture ? 0xffffff : 0x0d0d0f,
+      map: labelTexture,
+      roughness: 0.3,
+      clearcoat: gloss,
+      clearcoatRoughness: 0.06,
+    }),
+    cap: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.6 }),
   };
 }
 

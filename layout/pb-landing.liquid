@@ -1,8 +1,9 @@
 <!doctype html>
 {%- comment -%}
-  Protection Brands landing layout: a single dark screen with the minimal header
-  (sections/pb-landing-header.liquid) and a one-row footer (sections/pb-landing-footer.liquid). Used by the homepage
-  (templates/index.json, "layout": "pb-landing"). <head> matches layout/theme.liquid.
+  Protection Brands landing layout: the dark header (sections/pb-landing-header.liquid) floats
+  over the first section, then the page scrolls into the footer group (sections/pb-footer.liquid)
+  as on inner pages. Used by the homepage (templates/index.json, "layout": "pb-landing").
+  <head> matches layout/theme.liquid.
 {%- endcomment -%}
 <html
   {% if request.design_mode %}
@@ -58,6 +59,12 @@
         background: #0b0b0b;
       }
 
+      /* Behind the sections: white, so a section fading and sliding in (assets/pb-motion.js)
+         shows white around it, not the dark page. The hero paints its own background over it. */
+      .pb-landing .content-for-layout {
+        background: var(--color-background, #fff);
+      }
+
       @media screen and (max-width: 749px) {
         .pb-landing {
           --pb-landing-header-height: 72px;
@@ -82,9 +89,12 @@
         {{ content_for_layout }}
       </main>
 
-      {% section 'pb-landing-footer' %}
+      <footer>
+        {% sections 'footer-group' %}
+      </footer>
     </div>
 
+    {% render 'cart-drawer', render_wrapper: true %}
     {% render 'search-modal' %}
   </body>
 </html>

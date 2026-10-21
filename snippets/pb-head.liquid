@@ -16,11 +16,7 @@
 {%- endif -%}
 
 {%- liquid
-  # Smooth scrolling on inner pages only: the homepage is a single screen.
   assign pb_smooth = settings.pb_smooth_scroll
-  if template.name == 'index'
-    assign pb_smooth = false
-  endif
 
   assign pb_motion = false
   if pb_smooth or settings.pb_reveal

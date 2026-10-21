@@ -1,6 +1,7 @@
 {%- comment -%}
   Protection Brands homepage hero: one or two 3D product bottles that spin, float and
-  follow the mouse, between two linked headings. The 3D is drawn by assets/pb-hero-bottle.js
+  follow the mouse. Layout "Welcome": a heading and Shop now button on the left and a short
+  note in a card bottom right. Layout "Split": two linked headings either side of the bottles. The 3D is drawn by assets/pb-hero-bottle.js
   with Three.js, which loads after the page has shown. The still image (if set) shows
   first and stays for visitors who turn off motion or whose device can't draw 3D.
 {%- endcomment -%}
@@ -10,27 +11,47 @@
   if section.settings.label != blank
     assign label_url = section.settings.label | image_url: width: 4096
   endif
+  # Second bottle: another Detailing Spray (its own liquid colour), or the Permagard Car Wash
+  # Shampoo bottle (white, its label made from the product photo by
+  # product-images/make-label-permagard.py).
+  assign label_second_url = label_url
+  if section.settings.bottle_2 == 'permagard'
+    assign label_second_url = 'pb-label-permagard-shampoo.jpg' | asset_url
+  endif
+
+  # Background texture: the section's image, or the theme's dark texture (assets/bg-black.jpg).
+  assign texture_url = 'bg-black.jpg' | asset_url
+  if section.settings.background_image != blank
+    assign texture_url = section.settings.background_image | image_url: width: 2400
+  endif
 
   assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
 
 
-  # Headings use a light weight of the body font (Manrope 300), loaded only here.
-  assign heading_font = settings.type_body_font | font_modify: 'weight', '300'
-  if heading_font == blank
-    assign heading_font = settings.type_body_font
-  endif
+  # Headings use the theme's heading font (Oswald).
+  assign heading_font = settings.type_heading_font
 -%}
 
 <style>
   {{ heading_font | font_face: font_display: 'swap' }}
 </style>
 
+{%- comment -%}
+  The texture is a CSS background, which the browser would only find after the stylesheet.
+  Preloading it means it's there at first paint instead of painting in after the hero.
+{%- endcomment -%}
+{%- if section.settings.background_texture -%}
+  {{ texture_url | preload_tag: as: 'image', fetchpriority: 'high' }}
+{%- endif -%}
+
 <pb-hero-bottle
-  class="pb-hero-bottle{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
+  class="pb-hero-bottle pb-hero-bottle--{{ section.settings.layout }}{% if section.settings.bottom_curve %} pb-hero-bottle--curve{% endif %}{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
   data-three="{{ 'three.module.min.js' | asset_url }}"
   data-label="{{ label_url }}"
   data-bottles="{{ section.settings.bottles }}"
   data-liquid="{{ section.settings.liquid_color }}"
+  data-model-second="{{ section.settings.bottle_2 }}"
+  data-label-second="{{ label_second_url }}"
   data-liquid-second="{{ section.settings.liquid_color_2 }}"
   data-finish-second="{{ section.settings.liquid_finish_2 }}"
   data-size="{{ section.settings.bottle_size | divided_by: 100.0 }}"
@@ -44,7 +65,7 @@
   data-wobble="{{ section.settings.liquid_wobble }}"
   data-sparkle="{{ section.settings.liquid_sparkle }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
-  style="--pb-hero-bg: {{ section.settings.background }}; --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
+  style="--pb-hero-bg: {{ section.settings.background }};{% if section.settings.background_texture %} --pb-hero-texture: url('{{ texture_url }}');{% endif %} --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
 >
   {%- if section.settings.poster != blank -%}
     {{
@@ -75,6 +96,29 @@
 
   <canvas class="pb-hero-bottle__canvas" aria-hidden="true"></canvas>
 
+  {%- if section.settings.layout == 'intro' -%}
+    {%- comment -%}
+      Not .pb-hero-bottle__text: pb-hero-bottle.js pairs those with the bottles for the hover
+      effect, which only applies to the split layout.
+    {%- endcomment -%}
+    <div class="pb-hero-bottle__intro">
+      {%- if section.settings.intro_heading != blank -%}
+        <h1 class="pb-hero-bottle__heading">{{ section.settings.intro_heading | escape | newline_to_br }}</h1>
+      {%- endif -%}
+      {%- if section.settings.intro_link != blank and section.settings.intro_button != blank -%}
+        <a class="pb-hero-bottle__button pb-hero-bottle__button--solid" href="{{ section.settings.intro_link }}">
+          <span class="pb-hero-bottle__button-label">{{ section.settings.intro_button }}</span>
+          <svg class="pb-hero-bottle__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.intro_note != blank -%}
+      <p class="pb-hero-bottle__note">{{ section.settings.intro_note | escape | newline_to_br }}</p>
+    {%- endif -%}
+  {%- else -%}
   {%- for side in (1..2) -%}
     {%- liquid
       if side == 1
@@ -108,6 +152,7 @@
       </div>
     {%- endif -%}
   {%- endfor -%}
+  {%- endif -%}
 </pb-hero-bottle>
 
 <script type="module" src="{{ 'pb-hero-bottle.js' | asset_url }}"></script>
@@ -124,11 +169,47 @@
       max(48px, var(--pb-landing-footer-height, 0px));
     overflow: hidden;
     color: #fff;
-    background: radial-gradient(
-      ellipse at 50% 45%,
-      color-mix(in srgb, var(--pb-hero-bg) 92%, #fff) 0%,
-      var(--pb-hero-bg) 70%
-    );
+    background:
+      var(--pb-hero-texture, none) center / cover no-repeat,
+      radial-gradient(
+        ellipse at 50% 45%,
+        color-mix(in srgb, var(--pb-hero-bg) 92%, #fff) 0%,
+        var(--pb-hero-bg) 70%
+      );
+  }
+
+  /* The first section below the hero that shows anything (a section with nothing set up yet
+     renders empty, so it's skipped) curves up over it: it's pulled up by the curve's height and
+     has rounded top corners, so the dark hero shows in the corners (the footer's curve, upside
+     down; sections/pb-footer.liquid). The curve belongs to that section, so it moves and
+     fades with it when assets/pb-motion.js reveals it.
+     The hero is taller than the screen by the same amount, with that much extra padding at
+     the bottom, so the overlap starts at the fold and the hero's content stays where it was. */
+  .pb-hero-bottle--curve,
+  .pb-hero-bottle-section:has(> .pb-hero-bottle--curve)
+    ~ .shopify-section:has(> *):not(.pb-hero-bottle-section ~ .shopify-section:has(> *) ~ .shopify-section) {
+    --pb-hero-curve: clamp(10px, 1.25vw, 18px);
+  }
+
+  .pb-hero-bottle--curve {
+    min-height: calc(max(560px, 100svh) + var(--pb-hero-curve));
+    padding-block-end: calc(max(48px, var(--pb-landing-footer-height, 0px)) + var(--pb-hero-curve));
+  }
+
+  .pb-hero-bottle-section:has(> .pb-hero-bottle--curve)
+    ~ .shopify-section:has(> *):not(.pb-hero-bottle-section ~ .shopify-section:has(> *) ~ .shopify-section) {
+    position: relative;
+    z-index: 1;
+    margin-block-start: calc(var(--pb-hero-curve) * -1);
+    overflow: clip;
+    border-radius: var(--pb-hero-curve) var(--pb-hero-curve) 0 0;
+    background: var(--color-background, #fff);
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-hero-bottle--curve .pb-hero-bottle__note {
+      bottom: calc(max(48px, 15svh) + var(--pb-hero-curve));
+    }
   }
 
   .pb-hero-bottle__poster,
@@ -147,7 +228,25 @@
     inset-inline: -160px;
     inset-block-start: 50%;
     z-index: 0;
-    translate: 0 -40%;
+    translate: 0 calc(-40% + var(--pb-hero-shift, 0px) * 0.35);
+  }
+
+  /* Scroll parallax (assets/pb-motion.js sets --pb-hero-shift as the hero scrolls away):
+     each layer moves by a share of it. Positive drifts down (slower than the page, further
+     back); negative rises faster than the page. `translate`, so it adds to the mouse
+     parallax transforms from pb-hero-bottle.js. */
+  .pb-hero-bottle__canvas,
+  .pb-hero-bottle__poster {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * 0.18);
+  }
+
+  .pb-hero-bottle__intro,
+  .pb-hero-bottle__text {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * -0.15);
+  }
+
+  .pb-hero-bottle__note {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * -0.08);
   }
 
   /* Large faint word behind the bottles. */
@@ -156,7 +255,7 @@
     inset-inline: 0;
     inset-block-start: 50%;
     z-index: 0;
-    translate: 0 -40%;
+    translate: 0 calc(-40% + var(--pb-hero-shift, 0px) * 0.35);
     overflow: hidden;
     color: rgb(255 255 255 / 0.045);
     font-size: clamp(4rem, 15.5vw, 22rem);
@@ -215,9 +314,9 @@
     color: #fff;
     font-family: var(--pb-hero-heading-font, inherit);
     font-size: clamp(2rem, 3.4vw, 3.75rem);
-    font-weight: var(--pb-hero-heading-weight, 300);
+    font-weight: var(--pb-hero-heading-weight, 400);
     line-height: 1.05;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
@@ -365,6 +464,86 @@
     text-align: start;
   }
 
+  /* Welcome layout: heading and button on the left, clear of the bottles in the middle; the
+     note sits in a frosted card bottom right.
+     Sizes come from --pb-hero-zone, the content box: the full width, but never wider than
+     2.16 x the hero's height (the mock's proportions). The 3D bottles scale with the height,
+     so on wide screens the text and note scale and move in with them instead of drifting
+     off to the edges. */
+  .pb-hero-bottle--intro {
+    --pb-hero-zone: min(100vw, 216svh);
+    --pb-hero-side: calc((100vw - var(--pb-hero-zone)) / 2);
+
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding-inline: max(24px, calc(var(--pb-hero-side) + var(--pb-hero-zone) * 0.042));
+  }
+
+  .pb-hero-bottle__intro {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: max(24px, calc(var(--pb-hero-zone) * 0.028));
+    grid-column: 1;
+  }
+
+  .pb-hero-bottle--intro .pb-hero-bottle__heading {
+    font-size: max(2.5rem, calc(var(--pb-hero-zone) * 0.046));
+    line-height: 1.12;
+  }
+
+  .pb-hero-bottle__note {
+    position: absolute;
+    inset: auto calc(var(--pb-hero-side) + var(--pb-hero-zone) * 0.067) max(48px, 15svh) auto;
+    z-index: 2;
+    /* The mock's size (1440px artboard): 20px text in a 370px card. Width and padding are in
+       em, so on smaller screens the card shrinks with its text and keeps its shape. It doesn't
+       grow past the mock's size on large screens. */
+    width: 18.5em;
+    margin: 0;
+    padding: 1.3em;
+    border-radius: 0.55em;
+    background: rgb(255 255 255 / 0.05);
+    backdrop-filter: blur(6px);
+    color: rgb(255 255 255 / 0.7);
+    font-size: clamp(1rem, 1.4vw, 1.25rem);
+    font-weight: 300;
+    line-height: 1.15;
+  }
+
+  /* Solid red button: hover sweeps a darker red in. */
+  .pb-hero-bottle__button--solid {
+    padding: max(13px, calc(var(--pb-hero-zone) * 0.0095)) max(28px, calc(var(--pb-hero-zone) * 0.025));
+    border-radius: 4px;
+    background: var(--pb-accent, #ca0d0d);
+    font-size: max(13px, calc(var(--pb-hero-zone) * 0.0095));
+    font-weight: 500;
+  }
+
+  .pb-hero-bottle__button--solid::before {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-hero-bottle--intro {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      padding-inline: var(--page-margin, 24px);
+    }
+
+    .pb-hero-bottle__intro {
+      grid-row: 1;
+    }
+
+    .pb-hero-bottle__note {
+      position: relative;
+      inset: auto;
+      grid-row: 3;
+      width: auto;
+    }
+  }
+
   @media screen and (max-width: 749px) {
     .pb-hero-bottle {
       grid-template-columns: 1fr;
@@ -401,54 +580,108 @@
   "class": "pb-hero-bottle-section",
   "settings": [
     {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "intro",
+          "label": "Welcome: heading left, note bottom right"
+        },
+        {
+          "value": "split",
+          "label": "Split: a heading either side"
+        }
+      ],
+      "default": "intro"
+    },
+    {
+      "type": "textarea",
+      "id": "intro_heading",
+      "label": "Heading",
+      "info": "Each new line starts a new line on desktop.",
+      "default": "Welcome to the\nProtection Brands\nonline shop",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "text",
+      "id": "intro_button",
+      "label": "Button label",
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "url",
+      "id": "intro_link",
+      "label": "Button link",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "textarea",
+      "id": "intro_note",
+      "label": "Note",
+      "info": "Shown in a card bottom right. Leave empty to hide.",
+      "default": "The home of Permagard, CERFACE & OptiVAN at home maintenance products & information",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
       "type": "header",
-      "content": "Headings"
+      "content": "Split headings",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "start_line_1",
       "label": "Left heading, line 1",
-      "default": "Professional"
+      "default": "Professional",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "start_line_2",
       "label": "Left heading, line 2",
-      "default": "Products"
+      "default": "Products",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "url",
       "id": "start_link",
-      "label": "Left button link"
+      "label": "Left button link",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "start_button",
       "label": "Left button label",
-      "default": "Shop now"
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "end_line_1",
       "label": "Right heading, line 1",
-      "default": "Car care"
+      "default": "Car care",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "end_line_2",
       "label": "Right heading, line 2",
-      "default": "Products"
+      "default": "Products",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "url",
       "id": "end_link",
-      "label": "Right button link"
+      "label": "Right button link",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "text",
       "id": "end_button",
       "label": "Right button label",
-      "default": "Shop now"
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
     },
     {
       "type": "header",
@@ -483,16 +716,35 @@
       "default": "#b5650e"
     },
     {
+      "type": "select",
+      "id": "bottle_2",
+      "label": "Second bottle",
+      "info": "The lower, right-hand bottle when showing two.",
+      "options": [
+        {
+          "value": "permagard",
+          "label": "Permagard Car Wash Shampoo"
+        },
+        {
+          "value": "detailing",
+          "label": "Detailing Spray"
+        }
+      ],
+      "default": "permagard",
+      "visible_if": "{{ section.settings.bottles == '2' }}"
+    },
+    {
       "type": "color",
       "id": "liquid_color_2",
       "label": "Liquid, second bottle",
-      "info": "The lower, right-hand bottle when showing two.",
-      "default": "#01FBFF"
+      "default": "#01FBFF",
+      "visible_if": "{{ section.settings.bottles == '2' and section.settings.bottle_2 == 'detailing' }}"
     },
     {
       "type": "select",
       "id": "liquid_finish_2",
       "label": "Second bottle finish",
+      "visible_if": "{{ section.settings.bottles == '2' and section.settings.bottle_2 == 'detailing' }}",
       "options": [
         {
           "value": "gel",
@@ -660,6 +912,26 @@
       "id": "background",
       "label": "Background",
       "default": "#0b0b0b"
+    },
+    {
+      "type": "checkbox",
+      "id": "bottom_curve",
+      "label": "Curve into the next section",
+      "info": "The section below overlaps the hero a little, with rounded top corners, as on the footer.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "background_texture",
+      "label": "Background texture",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Texture image",
+      "info": "Defaults to the dark Protection Brands texture.",
+      "visible_if": "{{ section.settings.background_texture }}"
     },
     {
       "type": "image_picker",

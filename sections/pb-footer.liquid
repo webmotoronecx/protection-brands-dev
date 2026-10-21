@@ -9,10 +9,22 @@
 {%- endcomment -%}
 
 {%- comment -%}
-  data-pb-footer: as it scrolls in, the panel slides down from under the page's curved edge
-  and its contents fade in (assets/pb-motion.js).
+  data-pb-footer: as it scrolls in, the panel (the content, over the footer's background, which
+  stays put) slides down from under the page's curved edge and its contents fade in
+  (assets/pb-motion.js).
 {%- endcomment -%}
-<footer class="pb-footer" data-pb-footer style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};">
+{%- liquid
+  # Background texture: the section's image, or the theme's dark texture (assets/bg-black.jpg).
+  assign texture_url = 'bg-black.jpg' | asset_url
+  if section.settings.background_image != blank
+    assign texture_url = section.settings.background_image | image_url: width: 2400
+  endif
+-%}
+<footer
+  class="pb-footer"
+  data-pb-footer
+  style="--pb-footer-columns: {{ section.blocks.size | at_least: 1 }};{% if section.settings.background_texture %} --pb-footer-texture: url('{{ texture_url }}');{% endif %}"
+>
   <div class="pb-footer__panel">
     <div class="pb-footer__top">
       {%- if section.settings.newsletter -%}
@@ -144,22 +156,25 @@
 </footer>
 
 {% stylesheet %}
-  /* The footer clips the panel, so the panel can start hidden above it, under the curve. */
+  /* The footer clips the panel, so the panel can start hidden above it, under the curve.
+     The background is on the footer, not the panel, so it stays whole while the panel's
+     contents slide in over it. */
   .pb-footer {
     --pb-footer-curve: clamp(10px, 1.25vw, 18px);
 
     position: relative;
     overflow: hidden;
+    background:
+      var(--pb-footer-texture, none) center / cover no-repeat,
+      radial-gradient(ellipse 60% 70% at 20% 40%, #1c1c1c 0%, transparent 70%),
+      linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
+    color: #fff;
   }
 
   .pb-footer__panel {
     position: relative;
     overflow: hidden;
     padding: calc(clamp(48px, 7vw, 120px) + var(--pb-footer-curve)) clamp(24px, 5vw, 84px) 0;
-    background:
-      radial-gradient(ellipse 60% 70% at 20% 40%, #1c1c1c 0%, transparent 70%),
-      linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
-    color: #fff;
   }
 
   /* The page above curves down into the footer: a strip of page background along the top
@@ -185,10 +200,12 @@
   .pb-footer__title {
     max-width: 16ch;
     margin: 0 0 28px;
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.1;
+    letter-spacing: 0;
+    text-transform: uppercase;
   }
 
   .pb-footer__field {
@@ -267,9 +284,11 @@
 
   .pb-footer__heading {
     margin: 0 0 22px;
+    font-family: var(--font-heading--family, inherit);
     font-size: 19px;
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+    text-transform: uppercase;
   }
 
   .pb-footer__links {
@@ -341,10 +360,11 @@
   }
 
   /* Scrolling wordmark, full footer width, cut off by the bottom of the footer. */
+  /* The whole word shows, with a little room under it (the footer clips anything lower). */
   .pb-footer__marquee {
     --pb-marquee-height: clamp(4rem, 15vw, 20rem);
 
-    margin-block: clamp(24px, 3vw, 48px) calc(var(--pb-marquee-height) * -0.2);
+    margin-block: clamp(24px, 3vw, 48px) clamp(12px, 1.5vw, 24px);
     margin-inline: calc(clamp(24px, 5vw, 84px) * -1);
   }
 
@@ -372,6 +392,19 @@
   "class": "pb-footer-section",
   "max_blocks": 4,
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "background_texture",
+      "label": "Background texture",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Texture image",
+      "info": "Defaults to the dark Protection Brands texture.",
+      "visible_if": "{{ section.settings.background_texture }}"
+    },
     {
       "type": "checkbox",
       "id": "newsletter",

@@ -16,8 +16,8 @@
 
 {%- if has_logos or request.design_mode -%}
 <div
-  class="pb-brand-logos{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
-  style="--pb-logo-height: {{ section.settings.logo_height }}px;"
+  class="pb-brand-logos pb-brand-logos--heading-{{ section.settings.heading_position }}{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
+  style="--pb-logo-height: {{ section.settings.logo_height }}px;{% if section.settings.background != blank %} --pb-logos-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-logos-text: {{ section.settings.text_color }};{% endif %}"
 >
   {%- if section.settings.heading != blank -%}
     <h2 class="pb-brand-logos__heading">{{ section.settings.heading }}</h2>
@@ -69,12 +69,14 @@
 
 {% stylesheet %}
   .pb-brand-logos {
-    margin: 0 10px;
-    padding-block: 32px;
+    padding: 32px 10px;
+    background: var(--pb-logos-bg, transparent);
+    color: var(--pb-logos-text, inherit);
   }
 
   .pb-brand-logos__heading {
     margin: 0 0 24px;
+    color: inherit;
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -131,10 +133,31 @@
     opacity: 0.5;
   }
 
+  /* Heading beside the logos: on the left, then a thin divider, then the logos spread out. */
+  @media screen and (min-width: 750px) {
+    .pb-brand-logos--heading-beside {
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 2.5vw, 40px);
+      padding-inline: clamp(24px, 4.5vw, 72px);
+    }
+
+    .pb-brand-logos--heading-beside .pb-brand-logos__heading {
+      flex: none;
+      margin: 0;
+      padding-right: clamp(24px, 2.5vw, 40px);
+      border-right: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+      line-height: 2.5;
+    }
+
+    .pb-brand-logos--heading-beside .pb-brand-logos__list {
+      flex: 1;
+    }
+  }
+
   @media screen and (max-width: 749px) {
     .pb-brand-logos {
-      margin-inline: 8px;
-      padding-block: 24px;
+      padding: 24px 8px;
     }
 
     .pb-brand-logos__list {
@@ -157,6 +180,23 @@
       "info": "Optional, e.g. \"Our brands\"."
     },
     {
+      "type": "select",
+      "id": "heading_position",
+      "label": "Heading position",
+      "info": "Phones always show it above.",
+      "options": [
+        {
+          "value": "above",
+          "label": "Above the logos"
+        },
+        {
+          "value": "beside",
+          "label": "Beside the logos"
+        }
+      ],
+      "default": "above"
+    },
+    {
       "type": "range",
       "id": "logo_height",
       "label": "Logo height",
@@ -171,6 +211,17 @@
       "id": "greyscale",
       "label": "Grey until hover",
       "default": true
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Optional. Defaults to the page background."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading colour"
     }
   ],
   "blocks": [
