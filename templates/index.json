@@ -124,16 +124,24 @@
             "link": "shopify://collections/optivan-caravan-maintenance",
             "alt": "OptiVAN"
           }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
         }
       },
       "block_order": [
         "logo_permagard",
         "logo_cerface",
-        "logo_optivan"
+        "logo_optivan",
+        "logo_oridon"
       ],
       "settings": {
         "heading": "Our brands",
-        "logo_height": 40,
+        "logo_height": 50,
         "greyscale": false,
         "heading_position": "beside",
         "background": "#ffffff",

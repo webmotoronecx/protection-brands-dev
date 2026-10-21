@@ -22,6 +22,8 @@
 <header class="pb-landing-header{% if light %} pb-landing-header--light{% endif %}">
   {%- if light -%}
     <pb-header-watch hidden></pb-header-watch>
+  {%- else -%}
+    <pb-hero-watch hidden></pb-hero-watch>
   {%- endif -%}
   <button
     type="button"
@@ -185,9 +187,7 @@
 </pb-menu>
 
 <script type="module" src="{{ 'pb-menu.js' | asset_url }}"></script>
-{%- if light -%}
-  <script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
-{%- endif -%}
+<script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
 
 {% stylesheet %}
   .pb-landing-header {
@@ -200,6 +200,68 @@
     height: var(--pb-landing-header-height);
     padding-inline: var(--page-margin, 24px);
     color: #fff;
+  }
+
+  /* Dark header over the homepage: once the light page sections slide up under it (from the
+     first section below the hero until the dark footer; <pb-hero-watch>, assets/pb-header.js)
+     it becomes the inner pages' compact frosted bar: a see-through white bar over a blur
+     (::before, faded in), dark logo and icons, contents moved up into the bar and the logo a
+     little smaller. Only opacity, colour and transforms change. */
+  .pb-landing-header:not(.pb-landing-header--light) {
+    --pb-header-compact: 68px;
+    --pb-header-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    transition: color 0.4s ease;
+  }
+
+  .pb-landing-header:not(.pb-landing-header--light)::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: var(--pb-header-compact);
+    background: rgb(255 255 255 / 0.72);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .pb-landing-header:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+    transition:
+      translate 0.4s var(--pb-header-ease),
+      scale 0.4s var(--pb-header-ease);
+  }
+
+  .pb-landing-header.is-past-hero {
+    color: #111;
+  }
+
+  .pb-landing-header.is-past-hero::before {
+    opacity: 1;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+  }
+
+  .pb-landing-header.is-past-hero > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+    translate: 0 calc((var(--pb-header-compact) - var(--pb-landing-header-height)) / 2);
+  }
+
+  .pb-landing-header.is-past-hero > .pb-landing-header__logo {
+    scale: 0.8;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-landing-header:not(.pb-landing-header--light) {
+      --pb-header-compact: 56px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header:not(.pb-landing-header--light),
+    .pb-landing-header:not(.pb-landing-header--light)::before,
+    .pb-landing-header:not(.pb-landing-header--light) > * {
+      transition: none;
+    }
   }
 
   /* Light: white inner-page header, in the page flow. */
@@ -328,9 +390,10 @@
     opacity: 0.6;
   }
 
+  /* Sized by height: the logo is stacked (swoosh round the lettering), 123 x 68. */
   .pb-landing-header__logo :is(img, svg) {
-    width: clamp(160px, 16vw, 225px);
-    height: auto;
+    width: auto;
+    height: clamp(48px, 4.4vw, 64px);
   }
 
   .pb-landing-header__actions {
@@ -360,7 +423,7 @@
   /* Phones: smaller logo and tighter icons so search, account and cart fit beside it. */
   @media screen and (max-width: 749px) {
     .pb-landing-header__logo :is(img, svg) {
-      width: 128px;
+      height: 44px;
     }
 
     .pb-landing-header__actions {

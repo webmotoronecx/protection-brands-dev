@@ -26,7 +26,7 @@
   style="--pb-best-bg: {{ section.settings.background }}; --pb-best-text: {{ section.settings.text_color }}; --pb-best-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-best-weight: {{ heading_font.weight }};"
 >
   <div class="pb-best-sellers__inner">
-    <div class="pb-best-sellers__header">
+    <div class="pb-best-sellers__header" data-reveal>
       {%- if section.settings.heading != blank -%}
         <h2 class="pb-best-sellers__heading">{{ section.settings.heading }}</h2>
       {%- endif -%}
@@ -41,7 +41,7 @@
     </div>
 
     <pb-carousel class="pb-best-sellers__carousel">
-      <ul class="pb-best-sellers__track" role="list" tabindex="0" aria-label="{{ section.settings.heading | default: 'Products' | escape }}">
+      <ul class="pb-best-sellers__track" role="list" data-reveal tabindex="0" aria-label="{{ section.settings.heading | default: 'Products' | escape }}">
         {%- if source.products_count > 0 -%}
           {%- for product in source.products limit: max_items -%}
             <li class="pb-best-sellers__item">
@@ -193,6 +193,10 @@
     margin: 0;
     padding: 0;
     overflow-x: auto;
+    /* Without this, overflow-y computes to auto, and the cards' reveal offset and hidden
+       Add To Cart bar make the row scroll vertically: Lenis hands wheel scrolls to it and
+       the page stalls until it runs out. */
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;

@@ -249,6 +249,19 @@
     translate: 0 calc(var(--pb-hero-shift, 0px) * -0.08);
   }
 
+  /* Covered by the page, like the footer: the whole hero (background included) drifts down at
+     half the scroll speed, so the sections below slide up over it. They're stacked above it
+     (positioned, z-index 1) and have their own backgrounds, so the hero never shows through.
+     The layers above move on top of this. */
+  .pb-hero-bottle {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * 0.5);
+  }
+
+  .pb-hero-bottle-section ~ .shopify-section {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Large faint word behind the bottles. */
   .pb-hero-bottle__word {
     position: absolute;
@@ -497,17 +510,20 @@
     position: absolute;
     inset: auto calc(var(--pb-hero-side) + var(--pb-hero-zone) * 0.067) max(48px, 15svh) auto;
     z-index: 2;
-    /* The mock's size (1440px artboard): 20px text in a 370px card. Width and padding are in
-       em, so on smaller screens the card shrinks with its text and keeps its shape. It doesn't
-       grow past the mock's size on large screens. */
-    width: 18.5em;
+    /* The mock's card size (1440px artboard): 370px wide. Width and padding follow
+       --pb-note-size, so on smaller screens the card shrinks and keeps its shape; it doesn't
+       grow past the mock's size on large screens. The text is 85% of that size (17px in the
+       370px card). */
+    --pb-note-size: clamp(1rem, 1.4vw, 1.25rem);
+
+    width: calc(var(--pb-note-size) * 18.5);
     margin: 0;
-    padding: 1.3em;
-    border-radius: 0.55em;
+    padding: calc(var(--pb-note-size) * 1.3);
+    border-radius: calc(var(--pb-note-size) * 0.55);
     background: rgb(255 255 255 / 0.05);
     backdrop-filter: blur(6px);
     color: rgb(255 255 255 / 0.7);
-    font-size: clamp(1rem, 1.4vw, 1.25rem);
+    font-size: calc(var(--pb-note-size) * 0.85);
     font-weight: 300;
     line-height: 1.15;
   }

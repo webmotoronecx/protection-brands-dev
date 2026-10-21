@@ -39,7 +39,7 @@ const LABEL = { bottom: 0.52, top: 4.98 };
 
 /* Permagard Car Wash Shampoo (236 ml), measured from its product photo the same way (body
    483 px wide, 1,612 px from base to cap top): opaque white plastic, a glossy black label
-   from just above the base to the shoulder, and a ribbed black flat-top cap. Scaled to the
+   from just above the base to the shoulder, and a ribbed white flat-top cap. Scaled to the
    Detailing Spray's height so the two balance in the hero. */
 const PERMAGARD = {
   shell: [
@@ -51,6 +51,7 @@ const PERMAGARD = {
   capRibs: { bottom: 6.02, top: 6.58, radius: 0.5, count: 90 },
   // turn: radians the artwork is turned round the bottle, to centre it in the hero's pose.
   label: { bottom: 0.36, top: 5.54, radius: 1.004, turn: -0.1 },
+  capColor: 0xf2f2f2,
   height: 6.675,
 };
 
@@ -262,7 +263,7 @@ class PBHeroBottle extends HTMLElement {
       const finish = index === 1 ? this.dataset.finishSecond || 'gel' : 'liquid';
       const materials = model.clear
         ? bottleMaterials(THREE, labels.get(labelUrls[index]), liquids[index], look.gloss, finish)
-        : opaqueBottleMaterials(THREE, labels.get(labelUrls[index]), look.gloss);
+        : opaqueBottleMaterials(THREE, labels.get(labelUrls[index]), look.gloss, model.capColor);
       const group = new THREE.Group();
       for (const [name, geometry] of Object.entries(geometries.get(models[index]))) {
         const mesh = new THREE.Mesh(geometry, materials[name]);
@@ -823,8 +824,8 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
 }
 
 /* An opaque bottle (Permagard): glossy white plastic, a high-gloss black label wrap and a
-   matt black cap. No liquid. */
-function opaqueBottleMaterials(THREE, labelTexture, gloss) {
+   satin cap in the model's capColor (white for Permagard). No liquid. */
+function opaqueBottleMaterials(THREE, labelTexture, gloss, capColor = 0x141414) {
   return {
     shell: new THREE.MeshPhysicalMaterial({
       color: 0xe6e8eb,
@@ -839,7 +840,7 @@ function opaqueBottleMaterials(THREE, labelTexture, gloss) {
       clearcoat: gloss,
       clearcoatRoughness: 0.06,
     }),
-    cap: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.6 }),
+    cap: new THREE.MeshStandardMaterial({ color: capColor, roughness: 0.45 }),
   };
 }
 

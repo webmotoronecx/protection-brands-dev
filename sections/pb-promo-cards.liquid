@@ -7,7 +7,7 @@
 {%- endcomment -%}
 
 <div class="pb-promo-cards" style="--pb-promo-bg: {{ section.settings.background }};">
-  <ul class="pb-promo-cards__grid" role="list">
+  <ul class="pb-promo-cards__grid" role="list" data-reveal>
     {%- for block in section.blocks -%}
       {%- liquid
         assign image = block.settings.image
@@ -106,22 +106,26 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: scale 0.5s ease;
   }
 
-  a.pb-promo-cards__card:is(:hover, :focus-visible) .pb-promo-cards__image {
-    scale: 1.03;
+  /* Hover: the card lifts a little. */
+  .pb-promo-cards__card {
+    transition: translate 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  a.pb-promo-cards__card:is(:hover, :focus-visible) {
+    translate: 0 -6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-promo-cards__card {
+      transition: none;
+    }
   }
 
   .pb-promo-cards__card:focus-visible {
     outline: 2px solid var(--pb-accent, #ca0d0d);
     outline-offset: 3px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pb-promo-cards__image {
-      transition: none;
-    }
   }
 
   @media screen and (max-width: 749px) {

@@ -4,12 +4,15 @@
 
   Config comes from window.PBMotion = { smoothScroll, reveal }.
 
-  Reveals:
+  Reveals (slow: 40px up over 1.1s, easing out):
   - Every section in #MainContent that starts below the first screen fades and slides in once.
-  - Any element with [data-reveal] reveals its children with a stagger instead.
+  - Any element with [data-reveal] reveals its children one after another instead, and its
+    section doesn't move as a whole. The homepage sections mark their header and their row of
+    items (logos, tiles, product cards, promo cards), so the heading comes in, then each item.
   - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll,
     with parallax on its content.
   - The homepage hero (.pb-hero-bottle) has scroll parallax as it scrolls away; see below.
+  - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
@@ -31,6 +34,7 @@
   const squeeze = window.matchMedia('(min-width: 990px)');
   const FOOTER_SCRUB = 1;
   const HERO_SCRUB = 0.4;
+  const TILE_SCRUB = 1.2;
   const pageWrapper = document.querySelector('.page-wrapper');
   const scroller = () => (squeeze.matches && pageWrapper ? pageWrapper : window);
 
@@ -78,6 +82,7 @@
     gsap.killTweensOf(revealed);
     gsap.set(revealed, { clearProps: 'transform,opacity' });
     document.querySelectorAll('.pb-hero-bottle').forEach((hero) => hero.style.removeProperty('--pb-hero-shift'));
+    document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => tile.style.removeProperty('--pb-tile-shift'));
   };
 
   if (config.reveal && ScrollTrigger) {
@@ -86,8 +91,8 @@
 
     const belowFold = (el) => el.getBoundingClientRect().top > window.innerHeight;
     // Opacity, not visibility: hidden content must stay reachable by keyboard.
-    const from = { opacity: 0, y: 24 };
-    const to = { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' };
+    const from = { opacity: 0, y: 40 };
+    const to = { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', overwrite: true, clearProps: 'transform,opacity' };
 
     const groups = [...document.querySelectorAll('[data-reveal]')].filter(belowFold);
     const sections = [...document.querySelectorAll('#MainContent > .shopify-section')]
@@ -126,7 +131,7 @@
         trigger: group,
         start: 'top 90%',
         once: true,
-        onEnter: () => gsap.to(children, { ...to, stagger: 0.06 }),
+        onEnter: () => gsap.to(children, { ...to, stagger: 0.12 }),
       });
     });
 
@@ -150,7 +155,7 @@
 
       const timeline = gsap
         .timeline({
-          scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: FOOTER_SCRUB },
+          scrollTrigger: { trigger: footer, start: 'top bottom', end: '50% bottom', scrub: FOOTER_SCRUB },
         })
         .fromTo(panel, { yPercent: -55 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
         .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.1);
@@ -185,6 +190,26 @@
         .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0)
         .fromTo(fading, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.6 }, 0);
       revealed.push(...fading);
+    });
+
+    // Shop by category: each tile's image drifts within its tile as the tile scrolls past (the
+    // image is drawn at 86% of the tile, so there's room round it; see
+    // sections/pb-category-tiles.liquid): from 10% of the tile's height up to 30% down,
+    // trailing the scroll by TILE_SCRUB seconds so it eases to a stop. Sets --pb-tile-shift on
+    // the tile and the image's CSS translates by it, so the image's own scale and its hover
+    // scale stay in CSS (animating the image directly writes inline scale: none, which blocks
+    // the hover). The tile clips the image.
+    document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => {
+      if (!tile.querySelector('.pb-category-tiles__image')) return;
+      gsap.fromTo(
+        tile,
+        { '--pb-tile-shift': '-10%' },
+        {
+          '--pb-tile-shift': '20%',
+          ease: 'none',
+          scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
+        }
+      );
     });
 
     // Tabbing into content that hasn't revealed yet shows it straight away.

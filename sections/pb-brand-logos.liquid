@@ -5,9 +5,14 @@
 {%- endcomment -%}
 
 {%- liquid
-  # Nothing to show (no logo uploaded yet): render nothing.
+  # Default logos in assets/ (logo-<brand>.png), used when a logo has no image picked. Matched
+  # by the logo's Alt text: Permagard, CERFACE, OptiVAN, Oridon. Sizes in px.
+  assign default_brands = 'permagard,cerface,optivan,oridon' | split: ','
+
+  # Nothing to show (no logo picked and no default): render nothing.
   for block in section.blocks
-    if block.settings.image != blank
+    assign brand = block.settings.alt | handleize
+    if block.settings.image != blank or default_brands contains brand
       assign has_logos = true
       break
     endif
@@ -16,6 +21,7 @@
 
 {%- if has_logos or request.design_mode -%}
 <div
+  data-reveal
   class="pb-brand-logos pb-brand-logos--heading-{{ section.settings.heading_position }}{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
   style="--pb-logo-height: {{ section.settings.logo_height }}px;{% if section.settings.background != blank %} --pb-logos-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-logos-text: {{ section.settings.text_color }};{% endif %}"
 >
@@ -23,15 +29,33 @@
     <h2 class="pb-brand-logos__heading">{{ section.settings.heading }}</h2>
   {%- endif -%}
 
-  <ul class="pb-brand-logos__list" role="list">
+  <ul class="pb-brand-logos__list" role="list" data-reveal>
     {%- for block in section.blocks -%}
       {%- liquid
         assign logo = block.settings.image
-        if logo == blank and request.design_mode == false
+        assign brand = block.settings.alt | handleize
+        assign default_logo = blank
+        if logo == blank and default_brands contains brand
+          assign default_logo = 'logo-' | append: brand | append: '.png'
+          case brand
+            when 'permagard'
+              assign default_ratio = 400.0 | divided_by: 102
+            when 'cerface'
+              assign default_ratio = 468.0 | divided_by: 100
+            when 'optivan'
+              assign default_ratio = 324.0 | divided_by: 100
+            when 'oridon'
+              assign default_ratio = 266.0 | divided_by: 100
+          endcase
+        endif
+        if logo == blank and default_logo == blank and request.design_mode == false
           continue
         endif
         assign logo_alt = block.settings.alt | default: logo.alt
         assign logo_width = logo.aspect_ratio | times: section.settings.logo_height | round
+        if default_logo != blank
+          assign logo_width = default_ratio | times: section.settings.logo_height | round
+        endif
       -%}
       <li {{ block.shopify_attributes }}>
         {%- if block.settings.link != blank -%}
@@ -52,6 +76,14 @@
               width: logo_width,
               height: section.settings.logo_height
           -}}
+        {%- elsif default_logo != blank -%}
+          <img
+            src="{{ default_logo | asset_url }}"
+            alt="{{ logo_alt | escape }}"
+            width="{{ logo_width }}"
+            height="{{ section.settings.logo_height }}"
+            loading="lazy"
+          >
         {%- else -%}
           <span class="pb-brand-logos__empty">Pick a logo</span>
         {%- endif -%}
@@ -77,7 +109,7 @@
   .pb-brand-logos__heading {
     margin: 0 0 24px;
     color: inherit;
-    font-size: 15px;
+    font-size: clamp(1.5rem, 1.6vw, 2rem);
     font-weight: 500;
     letter-spacing: 0.08em;
     text-align: center;
@@ -102,7 +134,10 @@
   .pb-brand-logos__logo img {
     display: block;
     width: auto;
-    max-width: 180px;
+    /* Every logo is the Logo height tall. The default logo files carry their own spacing
+       round the artwork so they look the same size at the same height; keep it. The cap only
+       catches an unusually wide logo. */
+    max-width: 240px;
     height: var(--pb-logo-height, 48px);
     object-fit: contain;
     transition: filter 0.2s ease, opacity 0.2s ease;
@@ -116,6 +151,11 @@
   .pb-brand-logos--greyscale .pb-brand-logos__logo:is(:hover, :focus-visible) img {
     filter: none;
     opacity: 1;
+  }
+
+  /* Colour logos fade a little on hover. */
+  .pb-brand-logos:not(.pb-brand-logos--greyscale) a.pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    opacity: 0.6;
   }
 
   a.pb-brand-logos__logo:focus-visible {
@@ -163,6 +203,11 @@
     .pb-brand-logos__list {
       gap: 20px 32px;
     }
+
+    /* Two to a row on phones. */
+    .pb-brand-logos__logo img {
+      max-width: min(240px, 40vw);
+    }
   }
 {% endstylesheet %}
 
@@ -202,7 +247,7 @@
       "label": "Logo height",
       "min": 24,
       "max": 96,
-      "step": 4,
+      "step": 2,
       "unit": "px",
       "default": 48
     },
@@ -233,7 +278,7 @@
           "type": "image_picker",
           "id": "image",
           "label": "Image",
-          "info": "SVG or transparent PNG, trimmed. Logos without an image are skipped."
+          "info": "SVG or transparent PNG, trimmed. Empty: the default logo in the theme for the brand named in Alt text (Permagard, CERFACE, OptiVAN, Oridon); other logos without an image are skipped."
         },
         {
           "type": "url",

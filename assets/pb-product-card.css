@@ -16,7 +16,7 @@
   --pb-accent-hover: #a30a0a;
   --pb-on-accent: #ffffff;
   --pb-card-radius: 8px;
-  --pb-card-padding: 10px;
+  --pb-card-padding: 16px;
   --pb-buy-bg: #000000;
   --pb-buy-bg-hover: #262626;
   --pb-buy-text: #ffffff;
@@ -214,6 +214,59 @@
   border-radius: var(--pb-buy-radius);
 }
 
+/* Mouse and trackpad: at rest the title, stars and price sit at the bottom of the card and
+   the bar waits just below its bottom edge (the card clips it). On hover, or when tabbing
+   into the card, the bar slides up and pushes the text up with it. Only transforms: the
+   bar's space is always kept, so the card doesn't change height. Touch screens can't
+   hover: the bar stays. --pb-card-lift is the bar's height plus the gap above it.
+   Keyboard focus (:focus-visible) keeps it up, not a mouse click: after clicking Add To
+   Cart the button keeps focus, and the bar should still drop when the mouse leaves. */
+@media (hover: hover) and (pointer: fine) {
+  .product-card .product-grid__card.product-grid__card {
+    --pb-card-lift: calc(var(--pb-buy-height) + 8px);
+    --pb-card-slide: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    overflow: hidden;
+  }
+
+  /* The title's link uses display: contents (it can't be moved), so its children move. */
+  .product-grid__card > :not(.card-gallery, .pb-card-buy, .contents),
+  .product-grid__card > .contents > * {
+    translate: 0 var(--pb-card-lift);
+    transition: translate var(--pb-card-slide);
+  }
+
+  .product-grid__card .pb-card-buy {
+    translate: 0 calc(100% + var(--pb-card-padding));
+    transition: translate var(--pb-card-slide);
+  }
+
+  /* The product image steps back a little, the same soft shrink as the category tiles
+     (sections/pb-category-tiles.liquid). */
+  .product-grid__card .card-gallery img {
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .product-card:is(:hover, :has(:focus-visible)) .card-gallery img {
+    scale: 0.96;
+  }
+
+  .product-card:is(:hover, :has(:focus-visible)) .product-grid__card > :not(.card-gallery),
+  .product-card:is(:hover, :has(:focus-visible)) .product-grid__card > .contents > *,
+  .product-card:is(:hover, :has(:focus-visible)) .pb-card-buy {
+    translate: 0 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .product-grid__card > :not(.card-gallery),
+  .product-grid__card > .contents > *,
+  .product-grid__card .pb-card-buy,
+  .product-grid__card .card-gallery img {
+    transition: none;
+  }
+}
+
 /* Collection and search results: the grid's outer edges line up with the title bar and
    footer cards, 10px from the screen edge (8px on phones), at any screen width. Horizon
    builds the results layout from --page-margin and caps it at --page-width, so both are
@@ -251,7 +304,7 @@
 
 @media screen and (max-width: 749px) {
   :root {
-    --pb-card-padding: 12px;
+    --pb-card-padding: 16px;
     --pb-card-radius: 8px;
     --pb-buy-height: 44px;
   }
