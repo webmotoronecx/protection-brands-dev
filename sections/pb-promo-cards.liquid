@@ -1,0 +1,199 @@
+{%- comment -%}
+  Promo cards (Protection Brands): one to four finished banner images (text included), two to
+  a row, each linking somewhere. A card can have its own image for phones. Each card takes its
+  image's shape, so nothing is cropped; the card only rounds the corners.
+  A card with no image picked shows the default banner, assets/promo-test.png (1014 x 569),
+  until the real ones are picked in the theme editor.
+{%- endcomment -%}
+
+<div class="pb-promo-cards" style="--pb-promo-bg: {{ section.settings.background }};">
+  <ul class="pb-promo-cards__grid" role="list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign image = block.settings.image
+        assign mobile_image = block.settings.mobile_image | default: image
+        assign card_tag = 'div'
+        if block.settings.link != blank
+          assign card_tag = 'a'
+        endif
+      -%}
+      <li {{ block.shopify_attributes }}>
+        <{{ card_tag }}
+          class="pb-promo-cards__card"
+          {% if block.settings.link != blank %}
+            href="{{ block.settings.link }}"
+          {% endif %}
+          {% if image != blank %}
+            style="--pb-promo-ratio: {{ image.aspect_ratio }}; --pb-promo-mobile-ratio: {{ mobile_image.aspect_ratio }};"
+          {% else %}
+            style="--pb-promo-ratio: 1014 / 569;"
+          {% endif %}
+        >
+          {%- if image != blank -%}
+            <picture>
+              {%- if block.settings.mobile_image != blank -%}
+                <source
+                  media="(max-width: 749px)"
+                  srcset="
+                    {{- mobile_image | image_url: width: 600 }} 600w,
+                    {{ mobile_image | image_url: width: 900 }} 900w,
+                    {{ mobile_image | image_url: width: 1200 }} 1200w
+                  "
+                  sizes="calc(100vw - 32px)"
+                  width="{{ mobile_image.width }}"
+                  height="{{ mobile_image.height }}"
+                >
+              {%- endif -%}
+              {{-
+                image
+                | image_url: width: 1600
+                | image_tag:
+                  class: 'pb-promo-cards__image',
+                  loading: 'lazy',
+                  widths: '600, 900, 1200, 1600',
+                  sizes: '(min-width: 750px) calc((100vw - 88px) / 2), calc(100vw - 32px)'
+              -}}
+            </picture>
+          {%- else -%}
+            <img
+              class="pb-promo-cards__image"
+              src="{{ 'promo-test.png' | asset_url }}"
+              width="1014"
+              height="569"
+              alt="Limited time offer: Hydrophobic Detailing Spray"
+              loading="lazy"
+            >
+          {%- endif -%}
+        </{{ card_tag }}>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+{% stylesheet %}
+  .pb-promo-cards {
+    /* Side padding as Best sellers and Shop by category, so the edges line up. No top
+       padding: the section above (Best sellers) already ends with its own space. */
+    padding: 0 clamp(16px, 2.5vw, 40px) clamp(40px, 5vw, 72px);
+    background: var(--pb-promo-bg, #fff);
+  }
+
+  .pb-promo-cards__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The image's shape is reserved before it loads, so nothing below moves. */
+  .pb-promo-cards__card {
+    display: block;
+    aspect-ratio: var(--pb-promo-ratio, 16 / 9);
+    overflow: hidden;
+    border-radius: 8px;
+    background: #0b0b0b;
+  }
+
+  .pb-promo-cards__card picture {
+    display: contents;
+  }
+
+  .pb-promo-cards__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.5s ease;
+  }
+
+  a.pb-promo-cards__card:is(:hover, :focus-visible) .pb-promo-cards__image {
+    scale: 1.03;
+  }
+
+  .pb-promo-cards__card:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-promo-cards__image {
+      transition: none;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-promo-cards {
+      padding-inline: 16px;
+    }
+
+    .pb-promo-cards__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .pb-promo-cards__card {
+      aspect-ratio: var(--pb-promo-mobile-ratio, var(--pb-promo-ratio, 16 / 9));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Promo cards (PB)",
+  "tag": "section",
+  "class": "pb-promo-cards-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "The finished banner, text included, e.g. 1600 × 900 px. Empty shows the default banner. Full bleed (square corners, no white edge); the card rounds the corners. Set its alt text in Files to what it says."
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image",
+          "info": "Optional. Shown on phones instead, e.g. 1200 × 1200 px with larger text."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo cards (PB)",
+      "blocks": [
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

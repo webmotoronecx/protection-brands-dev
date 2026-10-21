@@ -264,12 +264,37 @@
         "background": "#ffffff",
         "text_color": "#111111"
       }
+    },
+    "pb_promo_cards": {
+      "type": "pb-promo-cards",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2"
+      ],
+      "settings": {
+        "background": "#ffffff"
+      }
     }
   },
   "order": [
     "pb_hero_bottle",
     "pb_brand_logos",
     "pb_category_tiles",
-    "pb_best_sellers"
+    "pb_best_sellers",
+    "pb_promo_cards"
   ]
 }
