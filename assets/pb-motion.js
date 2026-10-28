@@ -147,7 +147,7 @@
     // page's curved edge (the footer clips it) and its contents fade in; it's fully in place when the page reaches its end, and runs backwards
     // on the way up. Parallax: the content lags behind the panel, each part by a different
     // amount. The wordmark only fades: it sits on the footer's clipped bottom edge, so any
-    // movement down there would show it cut off. Tabbing into it drops the scrub and shows it at once.
+    // movement down there would show it cut off. Tabbing into it (keyboard focus, not a click) drops the scrub and shows it at once.
     // FOOTER_SCRUB: seconds the footer takes to catch up with the scroll, so it trails behind
     // and eases to a stop rather than being locked to the scrollbar (true = locked).
     document.querySelectorAll('[data-pb-footer]').forEach((footer) => {
@@ -170,16 +170,18 @@
         timeline.fromTo(el, from, { y: 0, yPercent: 0, ease: 'none', duration: 1 }, 0);
       });
 
-      footer.addEventListener(
-        'focusin',
-        () => {
-          timeline.scrollTrigger.kill();
-          timeline.kill();
-          gsap.to(panel, { yPercent: 0, duration: 0.3, clearProps: 'transform' });
-          gsap.to(items, { opacity: 1, y: 0, yPercent: 0, duration: 0.3, clearProps: 'transform,opacity' });
-        },
-        { once: true }
-      );
+      // Keyboard focus only (:focus-visible). A mouse click also focuses the link, on
+      // mousedown: snapping the footer then would move the link from under the pointer
+      // before mouseup, and the browser would drop the click.
+      const onFocus = (event) => {
+        if (!event.target.matches(':focus-visible')) return;
+        footer.removeEventListener('focusin', onFocus);
+        timeline.scrollTrigger.kill();
+        timeline.kill();
+        gsap.to(panel, { yPercent: 0, duration: 0.3, clearProps: 'transform' });
+        gsap.to(items, { opacity: 1, y: 0, yPercent: 0, duration: 0.3, clearProps: 'transform,opacity' });
+      };
+      footer.addEventListener('focusin', onFocus);
     });
 
     // Hero parallax, scrubbed to the scroll as the hero scrolls away: its layers move at
@@ -249,8 +251,10 @@
     //   );
     // });
 
-    // Tabbing into content that hasn't revealed yet shows it straight away.
+    // Tabbing into content that hasn't revealed yet shows it straight away. Keyboard focus only:
+    // moving it on a click's focus would drop the click (see the footer above).
     document.addEventListener('focusin', (event) => {
+      if (!event.target.matches(':focus-visible')) return;
       const target = revealed.find((el) => el.contains(event.target) && gsap.getProperty(el, 'opacity') < 1);
       if (target) gsap.to(target, { ...to, duration: 0.2 });
     });
