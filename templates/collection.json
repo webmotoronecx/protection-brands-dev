@@ -232,6 +232,11 @@
                 "alignment": "left"
               },
               "blocks": {}
+            },
+            "pb_card_buy": {
+              "type": "pb-card-buy",
+              "settings": {},
+              "blocks": {}
             }
           },
           "block_order": [
@@ -239,7 +244,8 @@
             "product_title_4nY4eT",
             "pb_review",
             "price_EzJzMm",
-            "swatches"
+            "swatches",
+            "pb_card_buy"
           ]
         }
       },
@@ -306,6 +312,7 @@
     },
     "pb_category_tiles": {
       "type": "pb-category-tiles",
+      "disabled": true,
       "blocks": {
         "tile_1": {
           "type": "tile",

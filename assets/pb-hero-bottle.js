@@ -89,12 +89,13 @@ const MODELS = {
 
 /* Layout of the bottles: position, resting tilt [x, y, z], float phase, and depth (how far
    the bottle moves with the mouse; the front bottle moves most, for parallax).
-   Positive z tilt leans the top to the left, negative to the right. */
+   Positive z tilt leans the top to the left, negative to the right. With two, the first
+   (Detailing Spray) is in front on the right and the second (Permagard) behind on the left. */
 const LAYOUTS = {
   1: [{ position: [0, 0, 0], tilt: [0.08, 0, 0.16], phase: 0, depth: 0.8 }],
   2: [
-    { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 0, depth: 0.55 },
-    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, -0.15], phase: 1.9, depth: 1 },
+    { position: [0.85, -0.6, 0.9], tilt: [0.06, 0, -0.15], phase: 0, depth: 1 },
+    { position: [-0.85, 0.6, 0], tilt: [0.1, 0, 0.2], phase: 1.9, depth: 0.55 },
   ],
 };
 
@@ -476,7 +477,7 @@ class PBHeroBottle extends HTMLElement {
             return;
           }
           if (this.#hovered < 0 || event.target.closest('a, button')) return;
-          const href = this.#texts[this.#hovered]?.querySelector('a')?.href;
+          const href = this.#textFor(this.#hovered)?.querySelector('a')?.href;
           if (href) window.location.href = href;
         },
         { signal }
@@ -510,8 +511,8 @@ class PBHeroBottle extends HTMLElement {
   }
 
   /* Which bottle is under the mouse: one ray from the camera through the pointer, checked
-     only when the pointer has moved. Bottle 1 (amber) goes with the first heading, bottle 2
-     (blue) with the second: the matching heading and its Shop now button react (CSS). */
+     only when the pointer has moved. A bottle goes with the heading on its side (#textFor):
+     the matching heading and its Shop now button react (CSS). */
   #updateHover(rect) {
     const { clientX, clientY } = this.#pointer;
     let hovered = -1;
@@ -530,10 +531,19 @@ class PBHeroBottle extends HTMLElement {
     this.#hovered = hovered;
     if (hovered < 0) delete this.dataset.hover;
     else this.dataset.hover = String(hovered + 1);
-    this.#texts.forEach((text, index) => text.classList.toggle('is-active', index === hovered));
+    const active = this.#textFor(hovered);
+    this.#texts.forEach((text) => text.classList.toggle('is-active', text === active));
     if (this.#grab) return;
     // Split layout: clicking a bottle opens its heading's link. Welcome: it can be grabbed.
     this.style.cursor = hovered < 0 ? '' : this.#texts.length ? 'pointer' : 'grab';
+  }
+
+  /* The heading beside a bottle: the first (left) heading for a bottle left of centre, the
+     second for one right of it; a single centred bottle goes with the first. */
+  #textFor(index) {
+    const x = this.#bottles[index]?.spec.position[0];
+    if (x === undefined) return null;
+    return this.#texts[x > 0 ? 1 : 0] ?? null;
   }
 
   /* Keeps each bottle's liquid surface level in the world and sloshes it against the
