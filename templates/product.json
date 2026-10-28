@@ -328,7 +328,7 @@
             "font_size": "",
             "line_height": "normal",
             "letter_spacing": "normal",
-            "case": "none",
+            "case": "uppercase",
             "wrap": "pretty",
             "background": false,
             "background_color": "#00000026",

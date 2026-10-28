@@ -24,8 +24,8 @@
   Layout "Full width" (the default collection template, templates/collection.json): edge to
   edge with no card, under the dark header, which floats over it on that template
   (sections/pb-landing-header.liquid). The title sits near the top, and the white page curves
-  up over the bottom of the photo. There is always a photo: with none picked it shows
-  assets/pb-collection-hero.jpg.
+  up over the bottom of the banner. With a hero image it shows the photo; without one, the dark
+  banner with the watermark (the collection's name by default) following the mouse.
 {%- endcomment -%}
 
 {%- liquid
@@ -75,11 +75,6 @@
   if section.settings.layout == 'full'
     assign full = true
   endif
-  assign hero_default = false
-  if full and hero_image == blank
-    assign hero_default = true
-  endif
-
   assign current_tag_handles = ''
   for tag in current_tags
     assign tag_handle = tag | handle
@@ -89,11 +84,14 @@
 
 <style>
   {{ heading_font | font_face: font_display: 'swap' }}
+  {%- if full and hero_image == blank and section.settings.marquee %}
+    {{ section.settings.watermark_font | font_face: font_display: 'swap' }}
+  {%- endif %}
 </style>
 
 <div
-  class="pb-collection-header{% if hero_image != blank or hero_default %} pb-collection-header--hero{% endif %}{% if full %} pb-collection-header--full{% endif %}"
-  style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
+  class="pb-collection-header{% if hero_image != blank %} pb-collection-header--hero{% endif %}{% if full %} pb-collection-header--full{% endif %}"
+  style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};"
 >
   {%- if hero_image != blank -%}
     {%- liquid
@@ -113,17 +111,6 @@
           sizes: hero_sizes,
           widths: '750, 1100, 1500, 2000, 2400'
       -}}
-    </div>
-  {%- elsif hero_default -%}
-    <div class="pb-collection-header__hero">
-      <img
-        src="{{ 'pb-collection-hero.jpg' | asset_url }}"
-        alt=""
-        width="2380"
-        height="1200"
-        loading="eager"
-        fetchpriority="high"
-      >
     </div>
   {%- elsif section.settings.marquee -%}
     {%- liquid
@@ -339,7 +326,27 @@
       var(--pb-collection-pad-x)
       clamp(56px, 8.2vw, 118px);
     border-radius: 0;
+  }
+
+  .pb-collection-header--full.pb-collection-header--hero {
     background: #141414;
+  }
+
+  /* No photo: the watermark sits along the bottom, behind the title, cut off by the page's
+     curve. */
+  .pb-collection-header--full .pb-collection-header__marquee {
+    --pb-marquee-height: clamp(4rem, 17vw, 20rem);
+
+    inset-block: auto calc(var(--pb-marquee-height) * -0.12);
+  }
+
+  /* Here the word is cut off at the bottom, so it fades downwards (the reverse of the
+     snippet's default, which fades upwards for a word cut off at the top), in its own font
+     ("Watermark font", Barlow SemiBold by default). */
+  .pb-collection-header--full .pb-marquee__word {
+    font-family: var(--pb-watermark-font, inherit);
+    font-weight: var(--pb-watermark-weight, 600);
+    background-image: linear-gradient(to bottom, #fff 15%, rgb(97 97 97 / 0.02) 85%);
   }
 
   .pb-collection-header--full::after {
@@ -366,10 +373,11 @@
   }
 
   /* Scroll parallax (assets/pb-motion.js sets --pb-collection-shift, px scrolled past, as the
-     banner scrolls away): the photo drifts down, slower than the page, and the title rises a
-     little faster. `translate`, so it adds to the intro animations (assets/pb-intro.css). The
+     banner scrolls away): the photo (or the watermark) drifts down, slower than the page, and
+     the title rises a little faster. The watermark's mouse drift (pb-marquee.js) uses
+     `transform`, so the two add up. `translate`, so it adds to the intro animations (assets/pb-intro.css). The
      banner clips the photo; the gap it leaves at the top is always above the screen. */
-  .pb-collection-header--full .pb-collection-header__hero {
+  .pb-collection-header--full :is(.pb-collection-header__hero, .pb-collection-header__marquee) {
     translate: 0 calc(var(--pb-collection-shift, 0px) * 0.35);
   }
 
@@ -700,7 +708,7 @@
       "type": "checkbox",
       "id": "hero_from_collection",
       "label": "Use the collection's hero image",
-      "info": "From the collection's custom.hero_image metafield (Settings > Metafields and metaobjects > Collections). Falls back to the image below, then, with the Full width layout, to the default photo (assets/pb-collection-hero.jpg).",
+      "info": "From the collection's custom.hero_image metafield (Settings > Metafields and metaobjects > Collections). Falls back to the image below. With neither, the banner shows the watermark instead.",
       "default": false
     },
     {
@@ -746,6 +754,14 @@
       "id": "marquee_text",
       "label": "Watermark text",
       "visible_if": "{{ section.settings.marquee and section.settings.marquee_source == 'custom' }}"
+    },
+    {
+      "type": "font_picker",
+      "id": "watermark_font",
+      "label": "Watermark font",
+      "info": "Full width layout without a hero image.",
+      "default": "barlow_n6",
+      "visible_if": "{{ section.settings.marquee and section.settings.layout == 'full' }}"
     },
     {
       "type": "select",
