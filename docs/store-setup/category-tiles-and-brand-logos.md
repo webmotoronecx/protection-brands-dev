@@ -22,10 +22,11 @@ A tile uses its collection's image unless you give the tile its own photo (step 
 
 **Products → Collections → (collection) → Collection image → Upload.**
 
-- Use landscape or square lifestyle photos, at least **1200 × 1200 px**. A tile is cropped to fit,
-  so keep the subject in the middle.
-- The lower part of the photo sits under the white label and a dark fade, so avoid important
-  detail along the bottom.
+- Use square product cut-outs (transparent PNG), at least **1200 × 1200 px**. The whole photo
+  always shows, never cropped: it's scaled to fit the tile, with the tile's dark studio
+  background around it.
+- The label sits along the bottom of the tile, over a dark fade, so leave a little space
+  under the product.
 - The same image shows wherever Shopify uses the collection image, such as social share
   previews. If that's a problem, set a tile image instead (step 4).
 

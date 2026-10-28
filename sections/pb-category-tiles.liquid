@@ -520,9 +520,11 @@
     z-index: -2;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* A little smaller than the tile, so the product has room around it; the tile's dark
-       background shows round the edges. Centred a little above the label. */
+    /* The whole photo always shows (never cropped, whatever the tile shape), a little
+       smaller than the tile so the product has room around it; the tile's dark background
+       fills the rest. Centred a little above the label. */
+    object-fit: contain;
+    object-position: 50% 40%;
     transform: scale(0.78);
     transform-origin: 50% 40%;
     /* Scroll parallax: assets/pb-motion.js sets --pb-tile-shift on the tile. */
