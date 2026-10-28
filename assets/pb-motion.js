@@ -1,0 +1,260 @@
+/*
+  Protection Brands motion: Lenis smooth scrolling and scroll-in reveals, driven by GSAP.
+  Loaded with `defer` by snippets/pb-head.liquid, after gsap, ScrollTrigger and Lenis.
+
+  Config comes from window.PBMotion = { smoothScroll, reveal }.
+
+  Reveals (slow: 40px up over 1.1s, easing out):
+  - Every section in #MainContent that starts below the first screen fades and slides in once.
+  - Any element with [data-reveal] reveals its children one after another instead, and its
+    section doesn't move as a whole. The homepage sections mark their header and their row of
+    items (logos, tiles, product cards, promo cards), so the heading comes in, then each item.
+  - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll,
+    with parallax on its content.
+  - The homepage hero (.pb-hero-bottle) has scroll parallax as it scrolls away; see below.
+  - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
+  - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
+    as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
+  Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
+  hidden by this script, so without JS everything is visible.
+
+  Scroller: at 990px and up Horizon scrolls .page-wrapper, not the window (see
+  assets/scroll-container.js). Lenis and ScrollTrigger are both pointed at whichever element
+  scrolls. Crossing 990px mid-visit rebuilds Lenis and shows anything not yet revealed.
+
+  Off for prefers-reduced-motion and in the theme editor.
+*/
+(() => {
+  const config = window.PBMotion || {};
+  const { gsap, ScrollTrigger, Lenis } = window;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (!gsap || reducedMotion.matches || window.Shopify?.designMode) return;
+
+  const squeeze = window.matchMedia('(min-width: 990px)');
+  const FOOTER_SCRUB = 1;
+  const HERO_SCRUB = 0.4;
+  const TILE_SCRUB = 1.2;
+  const BODY_SCALE = 1.08;
+  const BODY_SCRUB = 1;
+  const pageWrapper = document.querySelector('.page-wrapper');
+  const scroller = () => (squeeze.matches && pageWrapper ? pageWrapper : window);
+
+  let lenis = null;
+
+  /* Smooth scroll ---------------------------------------------------------------- */
+
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const root = document.documentElement;
+
+  const startLenis = () => {
+    lenis?.destroy();
+    const wrapper = scroller();
+    lenis =
+      wrapper === window
+        ? new Lenis({ anchors: true, autoRaf: false, allowNestedScroll: true })
+        : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false, allowNestedScroll: true });
+    if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+    if (root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open')) lenis.stop();
+  };
+
+  if (config.smoothScroll && Lenis && finePointer) {
+    startLenis();
+
+    // One loop: Lenis runs on GSAP's ticker, and ScrollTrigger reads Lenis' position.
+    gsap.ticker.add((time) => lenis?.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    // Pause while something covers the page: Horizon's drawers and dialogs set
+    // html[scroll-lock], the PB floating menu sets html[data-pb-menu-open].
+    const locked = () => root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open');
+    new MutationObserver(() => (locked() ? lenis?.stop() : lenis?.start())).observe(root, {
+      attributes: true,
+      attributeFilter: ['scroll-lock', 'data-pb-menu-open'],
+    });
+
+    squeeze.addEventListener('change', startLenis);
+  }
+
+  /* Reveals ---------------------------------------------------------------------- */
+
+  const revealed = [];
+  const showAll = () => {
+    ScrollTrigger?.getAll().forEach((trigger) => trigger.kill());
+    gsap.killTweensOf(revealed);
+    gsap.set(revealed, { clearProps: 'transform,opacity' });
+    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => {
+      hero.style.removeProperty('--pb-hero-shift');
+    });
+    document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => section.style.removeProperty('--pb-body-scale'));
+    document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => tile.style.removeProperty('--pb-tile-shift'));
+  };
+
+  if (config.reveal && ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.defaults({ scroller: scroller() });
+
+    const belowFold = (el) => el.getBoundingClientRect().top > window.innerHeight;
+    // Opacity, not visibility: hidden content must stay reachable by keyboard.
+    const from = { opacity: 0, y: 40 };
+    const to = { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', overwrite: true, clearProps: 'transform,opacity' };
+
+    const groups = [...document.querySelectorAll('[data-reveal]')].filter(belowFold);
+    const sections = [...document.querySelectorAll('#MainContent > .shopify-section')]
+      .filter(belowFold)
+      .filter((section) => !groups.some((group) => section.contains(group)));
+
+    if (sections.length) {
+      gsap.set(sections, from);
+      revealed.push(...sections);
+      ScrollTrigger.batch(sections, {
+        start: 'top 90%',
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { ...to, stagger: 0.08 }),
+      });
+    }
+
+    // Product cards below the first screen, in batches as they scroll in.
+    // Fade only: cards don't slide.
+    const cards = [...document.querySelectorAll('.product-grid > .product-grid__item')].filter(belowFold);
+    if (cards.length) {
+      gsap.set(cards, { opacity: 0 });
+      revealed.push(...cards);
+      ScrollTrigger.batch(cards, {
+        start: 'top 92%',
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { opacity: 1, duration: 0.6, ease: 'power1.out', overwrite: true, clearProps: 'opacity', stagger: 0.06 }),
+      });
+    }
+
+    groups.forEach((group) => {
+      const children = [...group.children];
+      if (!children.length) return;
+      gsap.set(children, from);
+      revealed.push(...children);
+      ScrollTrigger.create({
+        trigger: group,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => gsap.to(children, { ...to, stagger: 0.12 }),
+      });
+    });
+
+    // Footer: scrubbed to the scroll. As the footer comes up from the bottom of the screen,
+    // the panel (content only; the background stays on the footer) slides down from under the
+    // page's curved edge (the footer clips it) and its contents fade in; it's fully in place when the page reaches its end, and runs backwards
+    // on the way up. Parallax: the content lags behind the panel, each part by a different
+    // amount. The wordmark only fades: it sits on the footer's clipped bottom edge, so any
+    // movement down there would show it cut off. Tabbing into it drops the scrub and shows it at once.
+    // FOOTER_SCRUB: seconds the footer takes to catch up with the scroll, so it trails behind
+    // and eases to a stop rather than being locked to the scrollbar (true = locked).
+    document.querySelectorAll('[data-pb-footer]').forEach((footer) => {
+      const panel = footer.querySelector('.pb-footer__panel');
+      if (!panel || !belowFold(footer)) return;
+      const items = [...panel.children];
+      const layers = [
+        [panel.querySelector('.pb-footer__top'), { y: 90 }],
+        [panel.querySelector('.pb-footer__bottom'), { y: 50 }],
+      ].filter(([el]) => el);
+      revealed.push(panel, ...items);
+
+      const timeline = gsap
+        .timeline({
+          scrollTrigger: { trigger: footer, start: 'top bottom', end: '50% bottom', scrub: FOOTER_SCRUB },
+        })
+        .fromTo(panel, { yPercent: -55 }, { yPercent: 0, ease: 'none', duration: 1 }, 0)
+        .fromTo(items, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.3, stagger: 0.1 }, 0.1);
+      layers.forEach(([el, from]) => {
+        timeline.fromTo(el, from, { y: 0, yPercent: 0, ease: 'none', duration: 1 }, 0);
+      });
+
+      footer.addEventListener(
+        'focusin',
+        () => {
+          timeline.scrollTrigger.kill();
+          timeline.kill();
+          gsap.to(panel, { yPercent: 0, duration: 0.3, clearProps: 'transform' });
+          gsap.to(items, { opacity: 1, y: 0, yPercent: 0, duration: 0.3, clearProps: 'transform,opacity' });
+        },
+        { once: true }
+      );
+    });
+
+    // Hero parallax, scrubbed to the scroll as the hero scrolls away: its layers move at
+    // different speeds, so the scene has depth. The wordmark drifts down most (furthest back),
+    // then the bottles; the heading and note rise a little faster than the page (they don't
+    // fade).
+    // The wordmark and split-layout headings already follow the mouse with inline transforms
+    // (assets/pb-hero-bottle.js), so this only sets a variable on the hero, --pb-hero-shift (px
+    // scrolled past), and the hero's CSS moves each layer with `translate`, which adds to them.
+    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => {
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: HERO_SCRUB, invalidateOnRefresh: true },
+        })
+        .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0);
+    });
+
+    // Shop by category: each tile's image drifts within its tile as the tile scrolls past (the
+    // image is drawn at 78% of the tile, so there's room round it; see
+    // sections/pb-category-tiles.liquid): from 10% of the tile's height up to 30% down,
+    // trailing the scroll by TILE_SCRUB seconds so it eases to a stop. Sets --pb-tile-shift on
+    // the tile and the image's CSS translates by it, so the image's own scale and its hover
+    // scale stay in CSS (animating the image directly writes inline scale: none, which blocks
+    // the hover). The tile clips the image.
+    document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => {
+      if (!tile.querySelector('.pb-category-tiles__image')) return;
+      gsap.fromTo(
+        tile,
+        { '--pb-tile-shift': '-10%' },
+        {
+          '--pb-tile-shift': '20%',
+          ease: 'none',
+          scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
+        }
+      );
+    });
+
+    // Homepage body: each section after the hero is enlarged (BODY_SCALE) as it comes up from
+    // the bottom of the screen and shrinks to its size by the time its top reaches 40% down,
+    // scrubbed to the scroll (runs backwards on the way up), trailing by BODY_SCRUB seconds.
+    // Sets --pb-body-scale on the section and its CSS scales by it
+    // (sections/pb-hero-bottle.liquid), so it doesn't clash with the reveal's transform.
+    // document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => {
+    //   gsap.fromTo(
+    //     section,
+    //     { '--pb-body-scale': BODY_SCALE },
+    //     {
+    //       '--pb-body-scale': 1,
+    //       ease: 'none',
+    //       scrollTrigger: { trigger: section, start: 'top bottom', end: 'top 40%', scrub: BODY_SCRUB },
+    //     }
+    //   );
+    // });
+
+    // Tabbing into content that hasn't revealed yet shows it straight away.
+    document.addEventListener('focusin', (event) => {
+      const target = revealed.find((el) => el.contains(event.target) && gsap.getProperty(el, 'opacity') < 1);
+      if (target) gsap.to(target, { ...to, duration: 0.2 });
+    });
+
+    // Fonts and lazy images change page height after load; re-measure once.
+    window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+
+    // The scroller changes at 990px. Rather than rebuild, show whatever hasn't revealed yet.
+    squeeze.addEventListener('change', showAll, { once: true });
+  }
+
+  /* Reduced motion switched on mid-visit: stop everything, show everything. */
+  reducedMotion.addEventListener(
+    'change',
+    () => {
+      if (!reducedMotion.matches) return;
+      squeeze.removeEventListener('change', startLenis);
+      lenis?.destroy();
+      lenis = null;
+      showAll();
+    },
+    { once: true }
+  );
+})();

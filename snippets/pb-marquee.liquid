@@ -1,0 +1,110 @@
+{%- doc -%}
+  Endless right-to-left scroll of the Protection Brands wordmark (assets/label-scroling.svg,
+  or label-scroling-invert.svg, which fades upwards instead). Used behind the homepage
+  bottles, along the bottom of the inner-page footer and the top of the collection header.
+
+  Cost: one ~10 KB SVG (cached after the first page) and one CSS animation that moves only
+  `transform`, so it runs on the compositor. assets/pb-marquee.js pauses it while it is off
+  screen. It stands still for visitors who prefer reduced motion.
+
+  Size: set --pb-marquee-height on an ancestor (default clamp(4rem, 15.5vw, 22rem)).
+
+  @param {string} [class] - Extra classes on the wrapper.
+  @param {number} [duration] - Seconds per loop. Defaults to 60.
+  @param {string} [loading] - 'eager' when above the fold. Defaults to 'lazy'.
+  @param {string} [file] - SVG asset name. Defaults to 'label-scroling.svg'.
+  @param {boolean} [static] - Don't scroll; the wordmark stands still.
+  @param {boolean} [follow_mouse] - Drift slightly against the mouse (pb-marquee.js).
+  @param {string} [text] - A word to show instead of the SVG (e.g. a brand name), drawn in
+    the inverted file's look: faint, fading upwards.
+{%- enddoc -%}
+
+<pb-marquee
+  class="pb-marquee{% if static %} pb-marquee--static{% endif %}{% if class != blank %} {{ class }}{% endif %}"
+  aria-hidden="true"
+  {% if follow_mouse %}
+    data-follow-mouse
+  {% endif %}
+  style="--pb-marquee-duration: {{ duration | default: 60 }}s;"
+>
+  {%- comment -%} Four copies; the track moves left by half its width, then repeats seamlessly. {%- endcomment -%}
+  <span class="pb-marquee__track">
+    {%- for i in (1..4) -%}
+      {%- if text != blank -%}
+        <span class="pb-marquee__word">{{ text | escape }}</span>
+      {%- else -%}
+        <img
+          src="{{ file | default: 'label-scroling.svg' | asset_url }}"
+          alt=""
+          width="319"
+          height="27"
+          loading="{{ loading | default: 'lazy' }}"
+        >
+      {%- endif -%}
+    {%- endfor -%}
+  </span>
+</pb-marquee>
+
+<script type="module" src="{{ 'pb-marquee.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  .pb-marquee {
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .pb-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: pb-marquee var(--pb-marquee-duration, 60s) linear infinite;
+  }
+
+  .pb-marquee.is-paused .pb-marquee__track {
+    animation-play-state: paused;
+  }
+
+  /* Standing still. The section makes the strip wider than its container, so no empty
+     edge shows when it drifts with the mouse. */
+  .pb-marquee--static .pb-marquee__track {
+    animation: none;
+  }
+
+  .pb-marquee__track img {
+    flex: none;
+    width: auto;
+    height: var(--pb-marquee-height, clamp(4rem, 15.5vw, 22rem));
+    margin-inline-end: 6vw;
+  }
+
+  /* Text instead of the SVG, matching label-scroling-invert.svg: white fading up to grey,
+     at 9% opacity. Cap height is about 0.72em, so the font is sized up to fill the strip. */
+  .pb-marquee__word {
+    flex: none;
+    margin-inline-end: 6vw;
+    font-family: var(--font-body--family, inherit);
+    font-size: calc(var(--pb-marquee-height, clamp(4rem, 15.5vw, 22rem)) * 1.35);
+    font-weight: var(--font-body--weight, 400);
+    /* Box as tall as the strip, so it sits where the SVG did. */
+    line-height: 0.74;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: transparent;
+    background: linear-gradient(to top, #fff 15%, rgb(97 97 97 / 0.02) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    opacity: 0.09;
+  }
+
+  @keyframes pb-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-marquee__track {
+      animation: none;
+    }
+  }
+{% endstylesheet %}

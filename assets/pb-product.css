@@ -1,0 +1,497 @@
+/*
+  Protection Brands product page. Loaded on product pages by snippets/pb-head.liquid.
+  Restyles Horizon's product information section; the heading and info rows are PB blocks
+  (blocks/pb-product-heading.liquid, blocks/pb-product-info.liquid). Overrides only.
+*/
+
+.product-information {
+  --height-buy-buttons: 52px;
+}
+
+/* Same outer edge as the breadcrumb bar, title bar and footer: 10px from the screen edge
+   (8px on phones). Horizon lays the section out from --page-margin / --page-width. */
+.shopify-section:has(> .product-information),
+.product-information {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .shopify-section:has(> .product-information),
+  .product-information {
+    --page-margin: 8px;
+  }
+
+  /* Horizon runs the phone gallery edge to edge; keep it inside the 8px edge too. */
+  .product-information .product-information__media {
+    padding-inline: 8px;
+  }
+}
+
+/* Gallery: each photo on the light grey rounded tile, whole product visible. */
+/* Higher specificity than the gallery's own inline style, which paints the slides
+   (.product-media-container.constrain-height) and the slider white. */
+.product-information media-gallery .product-media-container.product-media-container {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information media-gallery slideshow-container,
+.product-information media-gallery .product-media-container img {
+  background: transparent;
+}
+
+.product-information .product-media-container img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Like the product cards: the photo sits inside the grey tile with padding around it, so the
+   tile shows even around square photos with their own background. */
+.product-information media-gallery .product-media-container .product-media {
+  padding: clamp(16px, 3vw, 40px);
+}
+
+.product-information media-gallery .product-media-container .product-media img {
+  border-radius: 8px;
+}
+
+.product-information slideshow-controls {
+  --thumbnail-radius: 8px;
+}
+
+.product-information .slideshow-controls__thumbnails .slideshow-control {
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information .slideshow-controls__thumbnails .slideshow-control img {
+  border-radius: 8px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* One thin outline on the current thumbnail (replaces Horizon's thick double outline). */
+.product-information .slideshow-controls__thumbnails .slideshow-control[aria-selected='true'] {
+  border: 0;
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
+}
+
+/* Price */
+.product-information .product-details .price {
+  color: #111;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.product-information .product-details .compare-at-price {
+  color: #9a9a9a;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* Options as rounded pills; the chosen one is solid black. */
+.product-information .variant-option__button-label {
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.product-information .variant-option__button-label:hover {
+  border-color: #111;
+}
+
+.product-information .variant-option__button-label:has(input:checked) {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.product-information .variant-option legend,
+.product-information .variant-option--dropdowns > label {
+  color: #6f6f6f;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Quantity box */
+.product-information .product-details .quantity-selector {
+  height: var(--height-buy-buttons);
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Add to cart: full-width red button with a plain plus. */
+.product-information .product-details .add-to-cart-button {
+  min-height: var(--height-buy-buttons);
+  border: 0;
+  border-radius: 6px;
+  background: var(--pb-accent, #ca0d0d);
+  color: var(--pb-on-accent, #fff);
+  font-size: 14px;
+  font-weight: var(--font-heading--weight, 400);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: none;
+  transition: background-color 0.2s ease;
+}
+
+.product-information .product-details .add-to-cart-button:is(:hover, :focus-visible) {
+  background: var(--pb-accent-hover, #a30a0a);
+}
+
+.product-information .product-details .add-to-cart-button:disabled {
+  background: #d9d9d9;
+  color: #6f6f6f;
+}
+
+.product-information .product-details .add-to-cart-button .add-to-cart-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.product-information .product-details .add-to-cart-button .add-to-cart-icon > svg {
+  display: none;
+}
+
+.product-information .product-details .add-to-cart-button .add-to-cart-icon::before,
+.product-information .product-details .add-to-cart-button .add-to-cart-icon::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  translate: -50% -50%;
+}
+
+.product-information .product-details .add-to-cart-button .add-to-cart-icon::after {
+  rotate: 90deg;
+}
+
+.product-information .product-details .add-to-cart-button .add-to-cart__added {
+  color: var(--pb-on-accent, #fff);
+}
+
+/* Express checkout buttons match the Add to cart shape. */
+.product-information shopify-accelerated-checkout {
+  --shopify-accelerated-checkout-button-border-radius: 6px;
+  --shopify-accelerated-checkout-button-block-size: var(--height-buy-buttons);
+}
+
+/* Description */
+.product-information .product-details .text-block.rte,
+.product-information .product-details .rte {
+  color: #444;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Related products heading: small, grey, uppercase. */
+product-recommendations h2 {
+  color: #8a8a8a;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Image zoom (click a photo): light grey background like the product tiles, so white photo
+   backgrounds blend in; round white close button; thumbnails on white rounded tiles with a
+   black outline on the current one. Horizon's own opening animation (the photo growing from
+   the page) is kept. */
+.product-information .dialog-zoomed-gallery__dialog {
+  background-color: var(--pb-card-bg, #f4f4f4);
+}
+
+.product-information .dialog-zoomed-gallery .product-media-container {
+  border-radius: 0;
+  background: transparent;
+}
+
+.product-information .dialog-zoomed-gallery img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.product-information .dialog-zoomed-gallery__close-button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  mix-blend-mode: normal;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.product-information .dialog-zoomed-gallery__close-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.product-information .dialog-zoomed-gallery__close-button:is(:hover, :focus-visible) {
+  color: var(--pb-accent, #ca0d0d);
+  transform: scale(1.06);
+}
+
+.product-information .dialog-thumbnails-list__thumbnail {
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+}
+
+.product-information .dialog-thumbnails-list__thumbnail img {
+  border-radius: 8px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* One crisp outline on the current thumbnail (replaces Horizon's double outline). */
+.product-information .dialog-thumbnails-list__thumbnail[aria-selected='true'],
+.product-information .dialog-thumbnails-list:has(.dialog-thumbnails-list__thumbnail[aria-selected='true'])::after {
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
+  border: 0;
+  border-radius: 8px;
+}
+
+/* Product lightbox (assets/pb-lightbox.js): click a gallery photo. */
+.product-information media-gallery :is(slideshow-slide, .media-gallery__grid > li):has(img) {
+  cursor: zoom-in;
+}
+
+.pb-lightbox {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--pb-card-bg, #f4f4f4);
+  color: #111;
+}
+
+.pb-lightbox[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  animation: pb-lightbox-in 0.3s ease;
+}
+
+.pb-lightbox:focus {
+  outline: none;
+}
+
+.pb-lightbox::backdrop {
+  background: rgb(0 0 0 / 0.35);
+}
+
+@keyframes pb-lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.pb-lightbox__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px clamp(16px, 3vw, 32px);
+}
+
+.pb-lightbox__count {
+  color: #6f6f6f;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.pb-lightbox__close,
+.pb-lightbox__arrow {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.pb-lightbox__close svg,
+.pb-lightbox__arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pb-lightbox__close:is(:hover, :focus-visible),
+.pb-lightbox__arrow:is(:hover, :focus-visible) {
+  color: var(--pb-accent, #ca0d0d);
+  transform: scale(1.06);
+}
+
+.pb-lightbox__arrow:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.pb-lightbox__stage {
+  position: relative;
+  min-height: 0;
+}
+
+.pb-lightbox__arrow {
+  position: absolute;
+  inset-block-start: 50%;
+  z-index: 1;
+  translate: 0 -50%;
+}
+
+.pb-lightbox__arrow:is(:hover, :focus-visible) {
+  transform: scale(1.06);
+}
+
+.pb-lightbox__arrow--prev {
+  inset-inline-start: clamp(12px, 3vw, 32px);
+}
+
+.pb-lightbox__arrow--next {
+  inset-inline-end: clamp(12px, 3vw, 32px);
+}
+
+.pb-lightbox__track {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.pb-lightbox__track::-webkit-scrollbar {
+  display: none;
+}
+
+.pb-lightbox__slide {
+  display: grid;
+  flex: 0 0 100%;
+  place-items: center;
+  padding: 0 clamp(16px, 8vw, 120px);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.pb-lightbox__slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  cursor: auto;
+}
+
+.pb-lightbox__thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 16px clamp(16px, 3vw, 32px) max(20px, env(safe-area-inset-bottom));
+  overflow-x: auto;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.pb-lightbox__thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.pb-lightbox__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.pb-lightbox__thumb:is(:hover, :focus-visible) {
+  opacity: 1;
+}
+
+.pb-lightbox__thumb[aria-current] {
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+.pb-lightbox--single :is(.pb-lightbox__arrow, .pb-lightbox__thumbs) {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .pb-lightbox__arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pb-lightbox__slide {
+    padding: 0 12px;
+  }
+
+  .pb-lightbox__thumbs {
+    justify-content: flex-start;
+  }
+
+  .pb-lightbox__thumb {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-lightbox[open] {
+    animation: none;
+  }
+}

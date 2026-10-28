@@ -1,0 +1,99 @@
+<!doctype html>
+{%- comment -%}
+  Protection Brands landing layout: the dark header (sections/pb-landing-header.liquid) floats
+  over the first section, then the page scrolls into the footer group (sections/pb-footer.liquid)
+  as on inner pages. Used by the homepage (templates/index.json, "layout": "pb-landing").
+  <head> matches layout/theme.liquid.
+{%- endcomment -%}
+<html
+  {% if request.design_mode %}
+    class="shopify-design-mode"
+  {% endif %}
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ request.locale.direction | default: 'ltr' }}"
+>
+  <head>
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- render 'view-transition-opt-in' -%}
+
+    {%- render 'meta-tags' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'card-hover-effect-styles' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-palette' -%}
+    {%- render 'pb-head' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+
+    {%- comment -%}
+      Logo intro (assets/pb-intro.css) plays once per browsing session. Set before first
+      paint; if storage is blocked or this fails, the logo simply shows with no intro.
+    {%- endcomment -%}
+    <script>
+      try {
+        if (!sessionStorage.getItem('pb-logo-intro')) {
+          document.documentElement.setAttribute('data-pb-logo-intro', '');
+          sessionStorage.setItem('pb-logo-intro', '1');
+        }
+      } catch (error) {}
+    </script>
+
+    <style>
+      /* --pb-landing-header-height is set with the header (sections/pb-landing-header.liquid). */
+      .pb-landing {
+        --pb-landing-footer-height: 72px;
+
+        background: #0b0b0b;
+      }
+
+      /* Behind the sections: white, so a section fading and sliding in (assets/pb-motion.js)
+         shows white around it, not the dark page. The hero paints its own background over it. */
+      .pb-landing .content-for-layout {
+        background: var(--color-background, #fff);
+      }
+
+      @media screen and (max-width: 749px) {
+        .pb-landing {
+          --pb-landing-footer-height: 0px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="pb-landing page-width-{{ settings.page_width }}">
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
+    <div class="page-wrapper">
+      {% section 'pb-landing-header' %}
+
+      <main
+        id="MainContent"
+        class="content-for-layout"
+        role="main"
+        data-template="{{ template }}"
+      >
+        {{ content_for_layout }}
+      </main>
+
+      <footer>
+        {% sections 'footer-group' %}
+      </footer>
+    </div>
+
+    {% render 'cart-drawer', render_wrapper: true %}
+    {% render 'search-modal' %}
+  </body>
+</html>

@@ -1,0 +1,98 @@
+{%- doc -%}
+  Protection Brands additions to <head>: product card styles and the motion scripts.
+  Rendered once from layout/theme.liquid. Motion scripts load only when a Motion theme
+  setting is on, and never in the theme editor.
+{%- enddoc -%}
+
+{{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
+{{ 'pb-search.css' | asset_url | stylesheet_tag }}
+{%- if template.name == 'product' -%}
+  {{ 'pb-product.css' | asset_url | stylesheet_tag }}
+  <script type="module" src="{{ 'pb-lightbox.js' | asset_url }}"></script>
+  {{ 'pb-sticky-cart.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+{%- if settings.pb_reveal -%}
+  {{ 'pb-intro.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{%- comment -%}
+  Page scrollbar in black (the window below 990px, .page-wrapper from 990px; see base.css).
+  Chrome and Firefox use scrollbar-color; Safari uses the ::-webkit-scrollbar parts. Only the
+  page's own scrollbar: drawers and other inner scroll areas keep the stock one.
+{%- endcomment -%}
+<style>
+  /* Button text in the heading font (Oswald). Horizon's buttons read these variables (set in
+     theme-styles-variables, rendered before this); its Button font setting only offers the
+     body or accent font. The hero button sets its own type, so it's listed here too (the
+     card buy bar sets it in pb-product-card.css). Only the heading font's own weight is
+     loaded, so they use it rather than a synthesised bold. */
+  :root {
+    --button-font-family-primary: var(--font-heading--family);
+    --button-font-family-secondary: var(--font-heading--family);
+  }
+
+  .pb-hero-bottle .pb-hero-bottle__button {
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+  }
+
+  html,
+  html .page-wrapper {
+    scrollbar-color: #555 #0b0b0b;
+  }
+
+  :root::-webkit-scrollbar-track,
+  .page-wrapper::-webkit-scrollbar-track {
+    background-color: #0b0b0b;
+  }
+
+  :root::-webkit-scrollbar-thumb,
+  .page-wrapper::-webkit-scrollbar-thumb {
+    background-color: #555;
+  }
+
+  :root::-webkit-scrollbar-thumb:hover,
+  .page-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+  }
+</style>
+
+{%- liquid
+  assign pb_smooth = settings.pb_smooth_scroll
+
+  assign pb_motion = false
+  if pb_smooth or settings.pb_reveal
+    assign pb_motion = true
+  endif
+  if request.design_mode
+    assign pb_motion = false
+  endif
+-%}
+
+{%- if pb_motion -%}
+  <script>
+    window.PBMotion = {
+      smoothScroll: {{ pb_smooth | json }},
+      reveal: {{ settings.pb_reveal | json }}
+    };
+  </script>
+  {%- if pb_smooth -%}
+    {{ 'lenis.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      Lenis stops itself with overflow: clip, which resets the scroll position. On desktop the
+      scroller is .page-wrapper, so opening the menu, cart drawer or a dialog would jump the
+      page to the top. overflow: hidden locks scrolling and keeps the position.
+    {%- endcomment -%}
+    <style>
+      .page-wrapper.lenis.lenis-stopped {
+        overflow: hidden;
+      }
+    </style>
+    <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
+  {%- endif -%}
+  <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+  {%- if settings.pb_reveal -%}
+    <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+  {%- endif -%}
+  <script src="{{ 'pb-motion.js' | asset_url }}" defer></script>
+{%- endif -%}

@@ -1,0 +1,1270 @@
+{%- comment -%}
+  Protection Brands homepage hero: one or two 3D product bottles that spin, float and
+  follow the mouse. Layout "Welcome": a heading and Shop now button on the left and a short
+  note in a card bottom right. Layout "Split": two linked headings either side of the bottles. The 3D is drawn by assets/pb-hero-bottle.js
+  with Three.js, which loads after the page has shown. The still image (if set) shows
+  first and stays for visitors who turn off motion or whose device can't draw 3D.
+{%- endcomment -%}
+
+{%- liquid
+  assign label_url = 'pb-label-detailing-spray.jpg' | asset_url
+  if section.settings.label != blank
+    assign label_url = section.settings.label | image_url: width: 4096
+  endif
+  # Second bottle: another Detailing Spray (its own liquid colour), or the Permagard Car Wash
+  # Shampoo bottle (white, its label made from the product photo by
+  # product-images/make-label-permagard.py).
+  assign label_second_url = label_url
+  if section.settings.bottle_2 == 'permagard'
+    assign label_second_url = 'pb-label-permagard-shampoo.jpg' | asset_url
+  endif
+
+  # Background texture: the section's image, or the theme's dark texture (assets/bg-black.jpg).
+  assign texture_url = 'bg-black.jpg' | asset_url
+  if section.settings.background_image != blank
+    assign texture_url = section.settings.background_image | image_url: width: 2400
+  endif
+
+  assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
+
+
+  # Headings use the theme's heading font (Oswald).
+  assign heading_font = settings.type_heading_font
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
+
+{%- comment -%}
+  The texture is a CSS background, which the browser would only find after the stylesheet.
+  Preloading it means it's there at first paint instead of painting in after the hero.
+{%- endcomment -%}
+{%- if section.settings.background_texture -%}
+  {{ texture_url | preload_tag: as: 'image', fetchpriority: 'high' }}
+{%- endif -%}
+
+<pb-hero-bottle
+  class="pb-hero-bottle pb-hero-bottle--{{ section.settings.layout }}{% if section.settings.bottom_curve %} pb-hero-bottle--curve{% endif %}{% if section.settings.poster != blank %} pb-hero-bottle--has-poster{% endif %}"
+  data-three="{{ 'three.module.min.js' | asset_url }}"
+  data-label="{{ label_url }}"
+  data-bottles="{{ section.settings.bottles }}"
+  data-liquid="{{ section.settings.liquid_color }}"
+  data-model-second="{{ section.settings.bottle_2 }}"
+  data-label-second="{{ label_second_url }}"
+  data-liquid-second="{{ section.settings.liquid_color_2 }}"
+  data-finish-second="{{ section.settings.liquid_finish_2 }}"
+  data-size="{{ section.settings.bottle_size | divided_by: 100.0 }}"
+  data-highlights="{{ section.settings.highlights | divided_by: 100.0 }}"
+  data-gloss="{{ section.settings.gloss | divided_by: 100.0 }}"
+  data-key-light="{{ section.settings.key_light | divided_by: 100.0 }}"
+  data-rim-light="{{ section.settings.rim_light | divided_by: 40.0 }}"
+  data-rim-color="{{ section.settings.rim_color }}"
+  data-shadow="{{ section.settings.shadow | divided_by: 100.0 }}"
+  data-shadow-blur="{{ section.settings.shadow_blur | times: 0.48 }}"
+  data-wobble="{{ section.settings.liquid_wobble }}"
+  data-sparkle="{{ section.settings.liquid_sparkle }}"
+  data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
+  style="--pb-hero-bg: {{ section.settings.background }};{% if section.settings.background_texture %} --pb-hero-texture: url('{{ texture_url }}');{% endif %} --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
+>
+  {%- if section.settings.poster != blank -%}
+    {{
+      section.settings.poster
+      | image_url: width: 2400
+      | image_tag:
+        class: 'pb-hero-bottle__poster',
+        loading: 'eager',
+        fetchpriority: 'high',
+        sizes: '100vw',
+        widths: '800, 1200, 1600, 2400',
+        alt: poster_alt
+    }}
+  {%- endif -%}
+
+  {%- case section.settings.background_style -%}
+    {%- when 'scroll' -%}
+      {%- render 'pb-marquee',
+        class: 'pb-hero-bottle__marquee',
+        duration: section.settings.scroll_duration,
+        loading: 'eager'
+      -%}
+    {%- when 'text' -%}
+      {%- if section.settings.background_text != blank -%}
+        <span class="pb-hero-bottle__word" aria-hidden="true">{{ section.settings.background_text }}</span>
+      {%- endif -%}
+  {%- endcase -%}
+
+  <canvas class="pb-hero-bottle__canvas" aria-hidden="true"></canvas>
+
+  {%- if section.settings.layout == 'intro' -%}
+    {%- comment -%}
+      Not .pb-hero-bottle__text: pb-hero-bottle.js pairs those with the bottles for the hover
+      effect, which only applies to the split layout.
+    {%- endcomment -%}
+    <div class="pb-hero-bottle__intro">
+      {%- if section.settings.intro_heading != blank -%}
+        {%- comment -%} One span per line of the Heading setting, so the lines can enter one by one. {%- endcomment -%}
+        {%- assign heading_lines = section.settings.intro_heading | escape | newline_to_br | split: '<br />' -%}
+        <h1 class="pb-hero-bottle__heading">
+          {%- for line in heading_lines -%}
+            <span class="pb-hero-bottle__heading-line">{{ line | strip }}</span>
+          {%- endfor -%}
+        </h1>
+      {%- endif -%}
+    </div>
+
+    <div class="pb-hero-bottle__aside">
+      {%- if section.settings.intro_note != blank -%}
+        <p class="pb-hero-bottle__note">{{ section.settings.intro_note | escape | newline_to_br }}</p>
+      {%- endif -%}
+      {%- if section.settings.intro_link != blank and section.settings.intro_button != blank -%}
+        <a class="pb-hero-bottle__button pb-hero-bottle__button--solid" href="{{ section.settings.intro_link }}">
+          <span class="pb-hero-bottle__button-label">{{ section.settings.intro_button }}</span>
+          <svg class="pb-hero-bottle__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+  {%- for side in (1..2) -%}
+    {%- liquid
+      if side == 1
+        assign line_1 = section.settings.start_line_1
+        assign line_2 = section.settings.start_line_2
+        assign link = section.settings.start_link
+        assign button = section.settings.start_button
+        assign modifier = 'start'
+      else
+        assign line_1 = section.settings.end_line_1
+        assign line_2 = section.settings.end_line_2
+        assign link = section.settings.end_link
+        assign button = section.settings.end_button
+        assign modifier = 'end'
+      endif
+    -%}
+    {%- if line_1 != blank or line_2 != blank -%}
+      <div class="pb-hero-bottle__text pb-hero-bottle__text--{{ modifier }}">
+        <h2 class="pb-hero-bottle__heading">
+          <span class="pb-hero-bottle__line">{{ line_1 }}</span>
+          <span class="pb-hero-bottle__line pb-hero-bottle__line--second">{{ line_2 }}</span>
+        </h2>
+        {%- if link != blank and button != blank -%}
+          <a class="pb-hero-bottle__button" href="{{ link }}">
+            <span class="pb-hero-bottle__button-label">{{ button }}</span>
+            <svg class="pb-hero-bottle__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 8h11M9 4l4 4-4 4"/>
+            </svg>
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+  {%- endif -%}
+
+  {%- comment -%} Store promises along the bottom (blocks): an icon and a short two-line text. {%- endcomment -%}
+  {%- if section.blocks.size > 0 -%}
+    <ul class="pb-hero-bottle__perks" role="list">
+      {%- for block in section.blocks -%}
+        <li class="pb-hero-bottle__perk" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a class="pb-hero-bottle__perk-body" href="{{ block.settings.link }}">
+          {%- else -%}
+            <div class="pb-hero-bottle__perk-body">
+          {%- endif -%}
+          {%- if block.settings.icon != 'none' -%}
+            <img
+              class="pb-hero-bottle__perk-icon"
+              src="{{ block.settings.icon | append: '.svg' | asset_url }}"
+              alt=""
+              width="30"
+              height="30"
+            >
+          {%- endif -%}
+          <span>{{ block.settings.text | escape | newline_to_br }}</span>
+          {%- if block.settings.link != blank -%}
+            </a>
+          {%- else -%}
+            </div>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</pb-hero-bottle>
+
+{%- comment -%}
+  Entrance for the Welcome layout: runs straight after the hero is parsed, before the first
+  paint, so nothing flashes. Without JS, with reduced motion or in the theme editor the class
+  is never added and everything shows as is.
+{%- endcomment -%}
+{%- if section.settings.layout == 'intro' and request.design_mode == false -%}
+  <script>
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.currentScript.previousElementSibling.classList.add('pb-hero-bottle--enter');
+    }
+  </script>
+{%- endif -%}
+
+<script type="module" src="{{ 'pb-hero-bottle.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  .pb-hero-bottle {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 1.1fr) 1fr;
+    align-items: center;
+    min-height: max(560px, 100svh);
+    padding: max(48px, var(--pb-landing-header-height, 0px)) var(--page-margin, 24px)
+      max(48px, var(--pb-landing-footer-height, 0px));
+    overflow: hidden;
+    color: #fff;
+    background:
+      var(--pb-hero-texture, none) center / cover no-repeat,
+      radial-gradient(
+        ellipse at 50% 45%,
+        color-mix(in srgb, var(--pb-hero-bg) 92%, #fff) 0%,
+        var(--pb-hero-bg) 70%
+      );
+  }
+
+  /* The first section below the hero that shows anything (a section with nothing set up yet
+     renders empty, so it's skipped) curves up over it: it's pulled up by the curve's height and
+     has rounded top corners, so the dark hero shows in the corners (the footer's curve, upside
+     down; sections/pb-footer.liquid). The curve belongs to that section, so it moves and
+     fades with it when assets/pb-motion.js reveals it.
+     The hero is taller than the screen by the same amount, with that much extra padding at
+     the bottom, so the overlap starts at the fold and the hero's content stays where it was. */
+  .pb-hero-bottle--curve,
+  .pb-hero-bottle-section:has(> .pb-hero-bottle--curve)
+    ~ .shopify-section:has(> *):not(.pb-hero-bottle-section ~ .shopify-section:has(> *) ~ .shopify-section) {
+    --pb-hero-curve: clamp(10px, 1.25vw, 18px);
+  }
+
+  .pb-hero-bottle--curve {
+    min-height: calc(max(560px, 100svh) + var(--pb-hero-curve));
+    padding-block-end: calc(max(48px, var(--pb-landing-footer-height, 0px)) + var(--pb-hero-curve));
+  }
+
+  .pb-hero-bottle-section:has(> .pb-hero-bottle--curve)
+    ~ .shopify-section:has(> *):not(.pb-hero-bottle-section ~ .shopify-section:has(> *) ~ .shopify-section) {
+    position: relative;
+    z-index: 1;
+    margin-block-start: calc(var(--pb-hero-curve) * -1);
+    overflow: clip;
+    border-radius: var(--pb-hero-curve) var(--pb-hero-curve) 0 0;
+    background: var(--color-background, #fff);
+  }
+
+  .pb-hero-bottle__poster,
+  .pb-hero-bottle__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Scrolling wordmark (snippets/pb-marquee.liquid) behind the bottles. */
+  /* Wider than the hero on both sides, so its own clipped edges stay off screen when it
+     drifts with the mouse (up to 110px, PARALLAX in pb-hero-bottle.js). The hero clips it. */
+  .pb-hero-bottle__marquee {
+    /* 61% bigger than the snippet's default size (x 1.15, then x 1.4). */
+    --pb-marquee-height: calc(clamp(4rem, 15.5vw, 22rem) * 1.61);
+
+    position: absolute;
+    inset-inline: -160px;
+    /* Centred a little above the middle, level with the top of the heading. */
+    inset-block-start: 40%;
+    z-index: 0;
+    translate: 0 calc(-40% + var(--pb-hero-shift, 0px) * 0.35);
+  }
+
+  /* Scroll parallax (assets/pb-motion.js sets --pb-hero-shift as the hero scrolls away):
+     each layer moves by a share of it. Positive drifts down (slower than the page, further
+     back); negative rises faster than the page. `translate`, so it adds to the mouse
+     parallax transforms from pb-hero-bottle.js. */
+  .pb-hero-bottle__canvas,
+  .pb-hero-bottle__poster {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * 0.18);
+  }
+
+  .pb-hero-bottle__intro,
+  .pb-hero-bottle__text {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * -0.15);
+  }
+
+  .pb-hero-bottle__aside,
+  .pb-hero-bottle__perks {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * -0.08);
+  }
+
+  /* Covered by the page, like the footer: the whole hero (background included) drifts down at
+     half the scroll speed, so the sections below slide up over it. They're stacked above it
+     (positioned, z-index 1) and have their own backgrounds, so the hero never shows through.
+     The layers above move on top of this. */
+  .pb-hero-bottle {
+    translate: 0 calc(var(--pb-hero-shift, 0px) * 0.5);
+  }
+
+  .pb-hero-bottle-section ~ .shopify-section {
+    position: relative;
+    z-index: 1;
+    /* Starts enlarged and settles to its size as it scrolls in (--pb-body-scale,
+       assets/pb-motion.js). `scale`, so it adds to the reveal's transform. */
+    scale: var(--pb-body-scale, 1);
+  }
+
+  /* No sideways scrollbar while the sections are enlarged. */
+  .content-for-layout:has(> .pb-hero-bottle-section) {
+    overflow-x: clip;
+  }
+
+  /* Large faint word behind the bottles. */
+  .pb-hero-bottle__word {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    z-index: 0;
+    translate: 0 calc(-40% + var(--pb-hero-shift, 0px) * 0.35);
+    overflow: hidden;
+    color: rgb(255 255 255 / 0.045);
+    font-size: clamp(4rem, 15.5vw, 22rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pb-hero-bottle__poster {
+    z-index: 0;
+    object-fit: contain;
+  }
+
+  /* The canvas starts hidden and appears at once when its first frame is drawn (the bottles
+     enter from off screen, so they are solid the whole way in; no fade). */
+  .pb-hero-bottle__canvas {
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .pb-hero-bottle.is-ready .pb-hero-bottle__canvas {
+    opacity: 1;
+  }
+
+  /* Welcome layout: the bottles pass in front of the heading and note. The canvas ignores
+     the mouse (pointer-events: none), as does the still image here, so the button underneath
+     still works. */
+  .pb-hero-bottle--intro .pb-hero-bottle__canvas,
+  .pb-hero-bottle--intro .pb-hero-bottle__poster {
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* With a still image, the 3D replaces it in a single frame (pb-hero-bottle.js draws the 3D
+     in the still's pose first), so neither fades: no moment where both show. */
+  .pb-hero-bottle.is-ready .pb-hero-bottle__poster {
+    opacity: 0;
+    transition: none;
+  }
+
+  .pb-hero-bottle__text {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .pb-hero-bottle__text--start {
+    align-items: flex-end;
+  }
+
+  .pb-hero-bottle__text--end {
+    align-items: flex-start;
+  }
+
+  .pb-hero-bottle__heading {
+    margin: 0;
+    color: #fff;
+    font-family: var(--pb-hero-heading-font, inherit);
+    font-size: clamp(2rem, 3.4vw, 3.75rem);
+    font-weight: var(--pb-hero-heading-weight, 400);
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .pb-hero-bottle__line {
+    display: block;
+  }
+
+  .pb-hero-bottle__line--second {
+    color: #efe6e6;
+  }
+
+  /* Shop now. Hover/focus: red sweeps in from the left, the label nudges left and an arrow
+     slides in on the right; press scales it down a touch. Transforms and opacity only. */
+  .pb-hero-bottle__button {
+    --pb-button-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 11px 18px;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform 0.2s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--pb-accent, #ca0d0d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button-label {
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button-arrow {
+    position: absolute;
+    inset-inline-end: 10px;
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible)::before {
+    transform: scaleX(1);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible) .pb-hero-bottle__button-label {
+    transform: translateX(-7px);
+  }
+
+  .pb-hero-bottle__button:is(:hover, :focus-visible) .pb-hero-bottle__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pb-hero-bottle__button:active {
+    transform: scale(0.96);
+  }
+
+  /* Bottle hover (pb-hero-bottle.js sets data-hover and .is-active): the matching heading
+     grows a little towards its bottle and its Shop now button plays its hover; the other
+     heading fades back. */
+  .pb-hero-bottle__text {
+    transition: opacity 0.4s ease;
+  }
+
+  .pb-hero-bottle__heading {
+    transition: transform 0.5s var(--pb-hover-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .pb-hero-bottle__text--start .pb-hero-bottle__heading {
+    transform-origin: right center;
+  }
+
+  .pb-hero-bottle__text--end .pb-hero-bottle__heading {
+    transform-origin: left center;
+  }
+
+  .pb-hero-bottle[data-hover] .pb-hero-bottle__text:not(.is-active) {
+    opacity: 0.35;
+  }
+
+  .pb-hero-bottle__text--start.is-active .pb-hero-bottle__heading {
+    transform: translateX(10px) scale(1.05);
+  }
+
+  .pb-hero-bottle__text--end.is-active .pb-hero-bottle__heading {
+    transform: translateX(-10px) scale(1.05);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button::before {
+    transform: scaleX(1);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button-label {
+    transform: translateX(-7px);
+  }
+
+  .pb-hero-bottle__text.is-active .pb-hero-bottle__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle__text,
+    .pb-hero-bottle__heading,
+    .pb-hero-bottle__button,
+    .pb-hero-bottle__button::before,
+    .pb-hero-bottle__button-label,
+    .pb-hero-bottle__button-arrow {
+      transition: none;
+    }
+  }
+
+
+  .pb-hero-bottle__text--start {
+    grid-column: 1;
+    justify-self: end;
+    margin-block-end: 8rem;
+    text-align: end;
+  }
+
+  .pb-hero-bottle__text--end {
+    grid-column: 3;
+    justify-self: start;
+    margin-block-start: 8rem;
+    text-align: start;
+  }
+
+  /* Welcome layout: the heading on the left (right-aligned towards the bottles), the bottles
+     in the middle, the note and Shop now button on the right, and the store promises in a
+     row along the bottom.
+     Sizes come from --pb-hero-zone, the content box: the full width, but never wider than
+     2.16 x the hero's height (the mock's proportions). The 3D bottles scale with the height,
+     so on wide screens the text scales and moves in with them instead of drifting off to
+     the edges. */
+  .pb-hero-bottle--intro {
+    --pb-hero-zone: min(100vw, 216svh);
+    --pb-hero-side: calc((100vw - var(--pb-hero-zone)) / 2);
+
+    /* Equal columns either side of a fixed gap for the bottles, so the heading and the note
+       sit the same distance from the centre and the layout looks balanced. */
+    grid-template-columns: minmax(0, 1fr) calc(var(--pb-hero-zone) * 0.24) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    row-gap: 32px;
+    padding-inline: max(24px, calc(var(--pb-hero-side) + var(--pb-hero-zone) * 0.02));
+  }
+
+  .pb-hero-bottle__intro,
+  .pb-hero-bottle__aside {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    grid-row: 1;
+  }
+
+  .pb-hero-bottle__intro {
+    grid-column: 1;
+    align-items: flex-end;
+    text-align: end;
+  }
+
+  .pb-hero-bottle__aside {
+    grid-column: 3;
+    align-items: flex-start;
+    gap: max(24px, calc(var(--pb-hero-zone) * 0.036));
+    /* The note's first line lines up with the heading's first line. */
+    align-self: center;
+  }
+
+  .pb-hero-bottle--intro .pb-hero-bottle__heading {
+    font-size: max(2.5rem, calc(var(--pb-hero-zone) * 0.045));
+    line-height: 1.03;
+  }
+
+  /* Lines break only where the Heading setting does, so it keeps its three lines (from
+     990px; on tablets the column is too narrow, so it wraps). */
+  @media screen and (min-width: 990px) {
+    .pb-hero-bottle--intro .pb-hero-bottle__heading {
+      white-space: nowrap;
+    }
+  }
+
+  .pb-hero-bottle__aside .pb-hero-bottle__button--solid {
+    padding: max(14px, calc(var(--pb-hero-zone) * 0.0115)) max(30px, calc(var(--pb-hero-zone) * 0.026));
+    font-size: max(14px, calc(var(--pb-hero-zone) * 0.011));
+  }
+
+  .pb-hero-bottle__note {
+    max-width: calc(var(--pb-hero-zone) * 0.28);
+    margin: 0;
+    color: #9f9f9f;
+    font-size: max(1rem, calc(var(--pb-hero-zone) * 0.0148));
+    font-weight: 300;
+    line-height: 1.22;
+  }
+
+  /* Store promises: four across, spread evenly, icon beside two lines of text. */
+  .pb-hero-bottle__perks {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px 32px;
+    grid-row: 2;
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Closer to the bottom edge: eats into the hero's bottom padding. */
+  @media screen and (min-width: 750px) {
+    .pb-hero-bottle__perks {
+      margin-block-end: min(-16px, calc(var(--pb-hero-zone) * -0.02));
+    }
+  }
+
+  .pb-hero-bottle__perk-body {
+    display: flex;
+    align-items: center;
+    gap: max(14px, calc(var(--pb-hero-zone) * 0.0125));
+    color: #fff;
+    font-family: var(--pb-hero-heading-font, inherit);
+    font-size: max(14px, calc(var(--pb-hero-zone) * 0.0098));
+    font-weight: var(--pb-hero-heading-weight, 400);
+    line-height: 1.4;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  /* A promise with a link fades a little on hover. */
+  a.pb-hero-bottle__perk-body {
+    transition: opacity 0.2s ease;
+  }
+
+  a.pb-hero-bottle__perk-body:hover {
+    opacity: 0.75;
+  }
+
+  a.pb-hero-bottle__perk-body:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 6px;
+  }
+
+  /* Hover (every promise, with a mouse): the icon and text slide towards each other, closing
+     the gap between them. `translate` only, so nothing reflows. */
+  @media (hover: hover) and (min-width: 750px) {
+    .pb-hero-bottle__perk-body > * {
+      transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .pb-hero-bottle__perk-body:is(:hover, :focus-visible) .pb-hero-bottle__perk-icon {
+      translate: 5px 0;
+    }
+
+    .pb-hero-bottle__perk-body:is(:hover, :focus-visible) .pb-hero-bottle__perk-icon + span {
+      translate: -5px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle__perk-body > * {
+      transition: none;
+    }
+  }
+
+  .pb-hero-bottle__perk-icon {
+    flex: none;
+    width: max(28px, calc(var(--pb-hero-zone) * 0.019));
+    height: auto;
+  }
+
+  .pb-hero-bottle__heading-line {
+    display: block;
+  }
+
+  /* Entrance (Welcome layout, class added by the inline script after the hero): the heading
+     slides in from the left a line at a time, the note and button from the right, then the
+     store promises appear one at a time. `transform` and opacity only; `translate` stays
+     free for the scroll parallax. */
+  .pb-hero-bottle--enter .pb-hero-bottle__heading-line {
+    animation: pb-hero-from-left 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+
+  .pb-hero-bottle--enter .pb-hero-bottle__heading-line:nth-child(2) { animation-delay: 0.3s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__heading-line:nth-child(3) { animation-delay: 0.45s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__heading-line:nth-child(4) { animation-delay: 0.6s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__heading-line:nth-child(5) { animation-delay: 0.75s; }
+
+  .pb-hero-bottle--enter .pb-hero-bottle__aside {
+    animation: pb-hero-from-right 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+  }
+
+  .pb-hero-bottle--enter .pb-hero-bottle__perk {
+    animation: pb-hero-perk 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pb-hero-bottle--enter .pb-hero-bottle__perk:nth-child(1) { animation-delay: 0.8s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__perk:nth-child(2) { animation-delay: 1s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__perk:nth-child(3) { animation-delay: 1.2s; }
+  .pb-hero-bottle--enter .pb-hero-bottle__perk:nth-child(4) { animation-delay: 1.4s; }
+
+  @keyframes pb-hero-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-80px);
+    }
+  }
+
+  @keyframes pb-hero-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(80px);
+    }
+  }
+
+  @keyframes pb-hero-perk {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-hero-bottle--enter :is(.pb-hero-bottle__heading-line, .pb-hero-bottle__aside, .pb-hero-bottle__perk) {
+      animation: none;
+    }
+  }
+
+  /* Solid red button: hover sweeps a darker red in. */
+  .pb-hero-bottle__button--solid {
+    padding: max(13px, calc(var(--pb-hero-zone) * 0.0095)) max(28px, calc(var(--pb-hero-zone) * 0.025));
+    border-radius: 4px;
+    background: var(--pb-accent, #ca0d0d);
+    font-size: max(13px, calc(var(--pb-hero-zone) * 0.0095));
+    font-weight: 500;
+  }
+
+  .pb-hero-bottle__button--solid::before {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  @media screen and (max-width: 749px) {
+    /* Phones: the heading, then the note and button straight under it, the bottles below,
+       and the store promises in one row along the bottom. */
+    .pb-hero-bottle.pb-hero-bottle--intro {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 20px;
+      padding-inline: var(--page-margin, 24px);
+    }
+
+    .pb-hero-bottle__intro {
+      grid-row: 1;
+      align-items: flex-start;
+      text-align: start;
+    }
+
+    .pb-hero-bottle__aside {
+      grid-row: 2;
+      grid-column: 1;
+      gap: 20px;
+    }
+
+    .pb-hero-bottle__note {
+      max-width: none;
+    }
+
+    /* All four in one row: icon above two short lines of small text. */
+    .pb-hero-bottle__perks {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-row: 4;
+      gap: 8px;
+      margin-inline: -8px;
+    }
+
+    .pb-hero-bottle__perk-body {
+      flex-direction: column;
+      gap: 6px;
+      font-size: 10px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .pb-hero-bottle__perk-icon {
+      width: 24px;
+    }
+
+    /* The bottles move down into the space under the button and are drawn a little smaller,
+       so they don't cover the text. The canvas keeps the hero's size (the 3D is fitted to it),
+       it just starts lower; the hero clips what hangs off the bottom. */
+    .pb-hero-bottle--intro :is(.pb-hero-bottle__canvas, .pb-hero-bottle__poster) {
+      inset-block-start: 14%;
+      scale: 0.68;
+    }
+
+    /* The scrolling wordmark much larger on phones, so it still reads behind the bottles; it
+       sits behind them, in the space under the text. */
+    .pb-hero-bottle--intro .pb-hero-bottle__marquee {
+      --pb-marquee-height: 76vw;
+
+      inset-block-start: 66%;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-hero-bottle {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      padding-block: calc(var(--pb-landing-header-height, 0px) + 16px) 32px;
+    }
+
+    .pb-hero-bottle__text--start {
+      grid-row: 1;
+      grid-column: 1;
+      justify-self: start;
+      align-self: start;
+      margin: 0;
+      align-items: flex-start;
+      text-align: start;
+    }
+
+    .pb-hero-bottle__text--end {
+      grid-row: 3;
+      grid-column: 1;
+      justify-self: end;
+      align-self: end;
+      margin: 0;
+      align-items: flex-end;
+      text-align: end;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero bottle (3D)",
+  "tag": "section",
+  "class": "pb-hero-bottle-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "intro",
+          "label": "Welcome: heading left, note and button right"
+        },
+        {
+          "value": "split",
+          "label": "Split: a heading either side"
+        }
+      ],
+      "default": "intro"
+    },
+    {
+      "type": "textarea",
+      "id": "intro_heading",
+      "label": "Heading",
+      "info": "Each new line starts a new line on desktop.",
+      "default": "Welcome to the\nProtection Brands\nonline shop",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "text",
+      "id": "intro_button",
+      "label": "Button label",
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "url",
+      "id": "intro_link",
+      "label": "Button link",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "textarea",
+      "id": "intro_note",
+      "label": "Note",
+      "info": "Shown right of the bottles, above the button. Leave empty to hide.",
+      "default": "The home of Permagard, CERFACE & OptiVAN at home maintenance products & information",
+      "visible_if": "{{ section.settings.layout == 'intro' }}"
+    },
+    {
+      "type": "header",
+      "content": "Split headings",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "start_line_1",
+      "label": "Left heading, line 1",
+      "default": "Professional",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "start_line_2",
+      "label": "Left heading, line 2",
+      "default": "Products",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "url",
+      "id": "start_link",
+      "label": "Left button link",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "start_button",
+      "label": "Left button label",
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "end_line_1",
+      "label": "Right heading, line 1",
+      "default": "Car care",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "end_line_2",
+      "label": "Right heading, line 2",
+      "default": "Products",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "url",
+      "id": "end_link",
+      "label": "Right button link",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "text",
+      "id": "end_button",
+      "label": "Right button label",
+      "default": "Shop now",
+      "visible_if": "{{ section.settings.layout == 'split' }}"
+    },
+    {
+      "type": "header",
+      "content": "Bottle"
+    },
+    {
+      "type": "select",
+      "id": "bottles",
+      "label": "Bottles",
+      "options": [
+        {
+          "value": "1",
+          "label": "One"
+        },
+        {
+          "value": "2",
+          "label": "Two"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "image_picker",
+      "id": "label",
+      "label": "Label artwork",
+      "info": "The whole label laid flat, front in the middle, about 1.4 times as wide as it is tall (e.g. 2048 × 1455 px). Empty uses the Detailing Spray label."
+    },
+    {
+      "type": "color",
+      "id": "liquid_color",
+      "label": "Liquid",
+      "default": "#b5650e"
+    },
+    {
+      "type": "select",
+      "id": "bottle_2",
+      "label": "Second bottle",
+      "info": "The lower, right-hand bottle when showing two.",
+      "options": [
+        {
+          "value": "permagard",
+          "label": "Permagard Car Wash Shampoo"
+        },
+        {
+          "value": "detailing",
+          "label": "Detailing Spray"
+        }
+      ],
+      "default": "permagard",
+      "visible_if": "{{ section.settings.bottles == '2' }}"
+    },
+    {
+      "type": "color",
+      "id": "liquid_color_2",
+      "label": "Liquid, second bottle",
+      "default": "#01FBFF",
+      "visible_if": "{{ section.settings.bottles == '2' and section.settings.bottle_2 == 'detailing' }}"
+    },
+    {
+      "type": "select",
+      "id": "liquid_finish_2",
+      "label": "Second bottle finish",
+      "visible_if": "{{ section.settings.bottles == '2' and section.settings.bottle_2 == 'detailing' }}",
+      "options": [
+        {
+          "value": "gel",
+          "label": "Gel (clear, glossy)"
+        },
+        {
+          "value": "liquid",
+          "label": "Liquid"
+        }
+      ],
+      "default": "gel"
+    },
+    {
+      "type": "range",
+      "id": "bottle_size",
+      "label": "Bottle size",
+      "info": "100% fits the bottles to the screen.",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "liquid_sparkle",
+      "label": "Sparkling liquid",
+      "info": "Small bubbles rising and tiny glints in the liquid.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "liquid_wobble",
+      "label": "Liquid moves",
+      "info": "The liquid sloshes when the bottles move. Off: it stays still and level.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "mouse_strength",
+      "label": "Mouse follow",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Reflections & lighting"
+    },
+    {
+      "type": "range",
+      "id": "highlights",
+      "label": "White reflections",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "gloss",
+      "label": "Gloss",
+      "info": "Shine on the plastic, liquid and label.",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "key_light",
+      "label": "Main light",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "rim_light",
+      "label": "Rim light",
+      "info": "Coloured light from behind, along the bottles' left edges.",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "rim_color",
+      "label": "Rim light colour",
+      "default": "#ca0d0d"
+    },
+    {
+      "type": "range",
+      "id": "shadow",
+      "label": "Shadow darkness",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "Shadow softness",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Behind the bottles",
+      "options": [
+        {
+          "value": "scroll",
+          "label": "Scrolling wordmark"
+        },
+        {
+          "value": "text",
+          "label": "Word"
+        },
+        {
+          "value": "none",
+          "label": "Nothing"
+        }
+      ],
+      "default": "scroll"
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "label": "Scroll speed",
+      "info": "Seconds for one loop. Higher is slower.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 60,
+      "visible_if": "{{ section.settings.background_style == 'scroll' }}"
+    },
+    {
+      "type": "text",
+      "id": "background_text",
+      "label": "Background word",
+      "default": "Protection",
+      "visible_if": "{{ section.settings.background_style == 'text' }}"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#0b0b0b"
+    },
+    {
+      "type": "checkbox",
+      "id": "bottom_curve",
+      "label": "Curve into the next section",
+      "info": "The section below overlaps the hero a little, with rounded top corners, as on the footer.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "background_texture",
+      "label": "Background texture",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Texture image",
+      "info": "Defaults to the dark Protection Brands texture.",
+      "visible_if": "{{ section.settings.background_texture }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Still image",
+      "info": "Shown while the 3D loads, and instead of it for visitors who turn off motion."
+    }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Store promise",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "icon-truck", "label": "Delivery truck" },
+            { "value": "icon-pin", "label": "Location pin" },
+            { "value": "icon-undo", "label": "Returns arrow" },
+            { "value": "icon-support", "label": "Support" },
+            { "value": "none", "label": "None" }
+          ],
+          "default": "icon-truck"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "info": "Each new line starts a new line.",
+          "default": "Dispatched\nwithin 48 hours"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional, e.g. the Contact page."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero bottle (3D)",
+      "blocks": [
+        { "type": "perk", "settings": { "icon": "icon-truck", "text": "Dispatched\nwithin 48 hours" } },
+        { "type": "perk", "settings": { "icon": "icon-pin", "text": "$20 flat-rate delivery\nAustralia-wide" } },
+        { "type": "perk", "settings": { "icon": "icon-undo", "text": "7-day change-of-mind\nreturns" } },
+        { "type": "perk", "settings": { "icon": "icon-support", "text": "Questions?\nContact us", "link": "/pages/contact" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

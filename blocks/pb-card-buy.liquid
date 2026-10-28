@@ -1,0 +1,126 @@
+{%- doc -%}
+  Product card buy bar: a quantity dropdown and a full-width Add To Cart button.
+  Products with more than one variant, or sold on subscription, get a Choose Options link
+  to the product page instead. Uses Horizon's product form, so the cart drawer, cart count
+  and fly-to-cart animation work as they do on the product page.
+  Styles in assets/pb-product-card.css.
+{%- enddoc -%}
+
+{% liquid
+  assign product = closest.product
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'PbCardBuy-' | append: product.id | append: '-' | append: block.id
+
+  assign needs_choice = false
+  if product.variants_count > 1 or product.requires_selling_plan or product.selling_plan_groups.size > 0
+    assign needs_choice = true
+  endif
+
+  assign qty_min = variant.quantity_rule.min | default: 1
+  assign qty_step = variant.quantity_rule.increment | default: 1
+  assign qty_max = qty_step | times: 9 | plus: qty_min
+  if variant.quantity_rule.max != null and variant.quantity_rule.max < qty_max
+    assign qty_max = variant.quantity_rule.max
+  endif
+%}
+
+<div
+  class="pb-card-buy"
+  {{ block.shopify_attributes }}
+>
+  {%- if product == blank -%}
+    {%- comment -%} Nothing to buy (theme editor placeholder card). {%- endcomment -%}
+  {%- elsif needs_choice -%}
+    <a
+      class="pb-card-buy__button pb-card-buy__button--choose"
+      href="{{ product.url }}"
+    >
+      Choose Options
+    </a>
+  {%- else -%}
+    <product-form-component
+      data-section-id="{{ section.id }}"
+      data-product-id="{{ product.id }}"
+      data-quantity-default="{{ qty_min }}"
+      on:submit="/handleSubmit"
+    >
+      <div
+        class="visually-hidden"
+        aria-live="assertive"
+        role="status"
+        aria-atomic="true"
+        ref="liveRegion"
+      ></div>
+      {%- form 'product', product, id: form_id, class: 'pb-card-buy__form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+        <input
+          type="hidden"
+          name="id"
+          ref="variantId"
+          value="{{ variant.id }}"
+          {% unless variant.available %}
+            disabled
+          {% endunless %}
+        >
+        <label
+          class="pb-card-buy__qty"
+          for="{{ form_id }}-qty"
+        >
+          <span class="visually-hidden">{{ 'accessibility.quantity' | t }}</span>
+          <select
+            id="{{ form_id }}-qty"
+            name="quantity"
+            {% unless variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {%- for qty in (qty_min..qty_max) -%}
+              {%- assign offset = qty | minus: qty_min | modulo: qty_step -%}
+              {%- if offset == 0 -%}
+                <option value="{{ qty }}">{{ qty }}</option>
+              {%- endif -%}
+            {%- endfor -%}
+          </select>
+          <span
+            class="pb-card-buy__chevron svg-wrapper"
+            aria-hidden="true"
+          >
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </span>
+        </label>
+        {%- liquid
+          if variant.available
+            assign button_text = 'actions.add_to_cart' | t
+          else
+            assign button_text = 'content.product_badge_sold_out' | t
+          endif
+          render 'add-to-cart-button', add_to_cart_text: button_text, class: 'pb-card-buy__button add-to-cart-button', can_add_to_cart: variant.available, show_icon: false, product: product
+        -%}
+      {%- endform -%}
+    </product-form-component>
+  {%- endif -%}
+</div>
+
+{% render 'add-to-cart-button-styles' %}
+{% render 'fly-to-cart-styles' %}
+
+{% schema %}
+{
+  "name": "Quantity + add to cart",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Quantity dropdown and Add To Cart button. Products with options link to the product page instead."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quantity + add to cart"
+    }
+  ]
+}
+{% endschema %}

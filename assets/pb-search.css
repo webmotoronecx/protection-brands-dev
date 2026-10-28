@@ -1,0 +1,231 @@
+/*
+  Protection Brands look for Horizon's search pop-up (snippets/search-modal.liquid), light.
+  Loaded on every page by snippets/pb-head.liquid. Overrides only; Horizon's markup and
+  predictive-search behaviour are unchanged.
+
+  White rounded panel over the same blurred backdrop as the floating menu; light grey search
+  field with a red search icon; small grey uppercase section titles; product results on the
+  light card tile used by the product cards; red hovers.
+*/
+
+/* Light colours for everything inside, whatever colour scheme Horizon gave the pop-up. */
+.search-modal .predictive-search {
+  --color-background: #fff;
+  --color-foreground: #111;
+  --color-foreground-rgb: 17 17 17;
+  --color-foreground-heading: #111;
+  --color-border: #ececec;
+  --color-input-background: #f4f4f4;
+  --color-input-text: #111;
+  --color-input-border: transparent;
+
+  background: #fff;
+  color: #111;
+}
+
+/* Panel */
+.search-modal .search-modal__content {
+  background: #fff;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.18);
+}
+
+@media screen and (min-width: 750px) {
+  .search-modal .search-modal__content {
+    overflow: hidden;
+    border-radius: 12px;
+  }
+}
+
+.search-modal .search-modal__content::backdrop {
+  background: rgb(0 0 0 / 0.35);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Header: plain search field on white with a red icon, and a plain close (x). */
+.search-modal .predictive-search-form__header {
+  gap: 10px;
+  padding: 14px;
+  border-block-end: 1px solid #ececec;
+  background: #fff;
+}
+
+.search-modal .predictive-search-form__header-inner {
+  border: 0;
+  background: transparent;
+}
+
+.search-modal .search-input {
+  background: transparent;
+  color: #111;
+  font-size: 17px;
+  outline: none;
+}
+
+.search-modal .search-input::placeholder {
+  color: #8a8a8a;
+}
+
+.search-modal .predictive-search__icon {
+  color: var(--pb-accent, #ca0d0d);
+}
+
+.search-modal .predictive-search__reset-button {
+  color: #6f6f6f;
+  font-size: 13px;
+}
+
+.search-modal .predictive-search__reset-button:is(:hover, :focus-visible) {
+  color: var(--pb-accent, #ca0d0d);
+}
+
+.search-modal .predictive-search__close-modal-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  box-shadow: none;
+  transition: color 0.2s ease;
+}
+
+.search-modal .predictive-search__close-modal-button:is(:hover, :focus-visible) {
+  background: transparent;
+  color: var(--pb-accent, #ca0d0d);
+}
+
+/* Results */
+.search-modal .predictive-search-form__content {
+  background: #fff;
+}
+
+.search-modal .predictive-search-results__title {
+  color: #8a8a8a;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.search-modal .predictive-search-results__clear {
+  color: #6f6f6f;
+  font-size: 12px;
+}
+
+.search-modal .predictive-search-results__clear:is(:hover, :focus-visible) {
+  color: var(--pb-accent, #ca0d0d);
+}
+
+/* Suggested searches */
+.search-modal .predictive-search-results__pill {
+  --pills-pill-background-color: #f4f4f4;
+
+  border-radius: 6px;
+  background: #f4f4f4;
+  color: #111;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.search-modal .predictive-search-results__pill:is(:hover, :focus-visible) {
+  background: #ececec;
+  color: var(--pb-accent, #ca0d0d);
+}
+
+/* Product results, as the product cards (assets/pb-product-card.css): the whole card is a
+   light grey rounded tile with padding, a square contained image, a two-line title and a bold
+   price. Horizon's hover box around the result is replaced by a slightly darker tile. */
+.search-modal .predictive-search-results__card--product,
+.search-modal .predictive-search-results__card--product:is(:hover, :focus-visible, [aria-selected='true'].keyboard-focus, :has(.resource-card:focus-visible)) {
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: none;
+  outline: none;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--pb-card-bg, #f4f4f4);
+  transition: background-color 0.2s ease;
+}
+
+.search-modal .predictive-search-results__card--product:hover .resource-card {
+  background: #ececec;
+}
+
+.search-modal .predictive-search-results__card--product:is([aria-selected='true'].keyboard-focus, :has(.resource-card:focus-visible)) .resource-card {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__media {
+  --resource-card-aspect-ratio: 1;
+
+  aspect-ratio: 1;
+  border-radius: 0;
+  background: transparent;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__media {
+  position: relative;
+  overflow: hidden;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Horizon swaps in the second photo on hover; keep it inside the square image area (it is
+   otherwise placed against the whole card and covers the title and price). */
+.search-modal .predictive-search-results__card--product .resource-card__image--secondary {
+  position: absolute;
+  inset: 0;
+}
+
+/* No link underline anywhere in the card on hover. */
+.search-modal .predictive-search-results__card--product :is(a, a *, .resource-card, .resource-card *) {
+  text-decoration: none;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+}
+
+.search-modal .predictive-search-results__card--product .resource-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 2lh;
+  margin: 0;
+  color: #111;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.search-modal .predictive-search-results__card--product .price {
+  color: #111;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.search-modal .predictive-search-results__no-results {
+  color: #6f6f6f;
+}

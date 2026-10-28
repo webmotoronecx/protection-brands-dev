@@ -1,0 +1,95 @@
+{%- comment -%}
+  Footer for the landing layout (layout/pb-landing.liquid): one row of links along the
+  bottom of the screen, from a Shopify menu. On phones it sits below the hero instead.
+{%- endcomment -%}
+
+{%- assign menu = section.settings.menu -%}
+
+{%- if menu.links.size > 0 -%}
+  <footer class="pb-landing-footer">
+    <nav aria-label="{{ menu.title | escape }}">
+      <ul class="pb-landing-footer__links">
+        {%- for link in menu.links -%}
+          <li>
+            <a
+              href="{{ link.url }}"
+              {% if link.current %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- link.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </footer>
+{%- endif -%}
+
+{% stylesheet %}
+  .pb-landing-footer {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 10;
+    padding: 0 var(--page-margin, 24px) 28px;
+  }
+
+  .pb-landing-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 12px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-landing-footer__links a {
+    color: rgb(255 255 255 / 0.4);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+
+  .pb-landing-footer__links a:is(:hover, :focus-visible, [aria-current='page']) {
+    color: #fff;
+  }
+
+  /* Phones: below the hero, links in two columns. */
+  @media screen and (max-width: 749px) {
+    .pb-landing-footer {
+      position: static;
+      padding-block: 24px 32px;
+    }
+
+    .pb-landing-footer__links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 16px;
+    }
+
+    .pb-landing-footer__links a {
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Landing footer",
+  "tag": "div",
+  "class": "pb-landing-footer-section",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "footer",
+      "info": "Top-level links only, shown in one row."
+    }
+  ]
+}
+{% endschema %}

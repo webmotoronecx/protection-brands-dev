@@ -1,0 +1,936 @@
+{%- comment -%}
+  Protection Brands header. Desktop (990px and up): logo on the left, a row of links beside
+  it, search, account and cart on the right. Smaller screens: menu button on the left, logo in the middle,
+  search, account and cart on the right.
+  Dark style floats over the homepage hero (layout/pb-landing.liquid) and over the default
+  collection template's full-width title bar (sections/pb-collection-header.liquid); light
+  style is the white inner-page header (header group in layout/theme.liquid).
+  The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
+{%- endcomment -%}
+
+{%- liquid
+  # Automatic: dark over the homepage hero and over the default collection template
+  # (templates/collection.json, whose title bar is full width under it); light on every other
+  # page, including other collection templates such as collection.brand.
+  assign light = false
+  case section.settings.style
+    when 'light'
+      assign light = true
+    when 'auto'
+      assign light = true
+      if template.name == 'index'
+        assign light = false
+      elsif template.name == 'collection' and template.suffix == blank
+        assign light = false
+      endif
+  endcase
+
+-%}
+
+<header class="pb-landing-header{% if light %} pb-landing-header--light{% endif %}">
+  {%- if light -%}
+    <pb-header-watch hidden></pb-header-watch>
+  {%- else -%}
+    <pb-hero-watch hidden></pb-hero-watch>
+  {%- endif -%}
+  <button
+    type="button"
+    class="pb-landing-header__menu"
+    aria-label="Menu"
+    aria-expanded="false"
+    aria-controls="PBMenu"
+    aria-haspopup="dialog"
+    data-pb-menu-toggle
+  >
+    <span class="pb-landing-header__menu-line"></span>
+    <span class="pb-landing-header__menu-line"></span>
+  </button>
+
+  <a class="pb-landing-header__logo" href="{{ routes.root_url }}">
+    {%- if section.settings.logo != blank -%}
+      {{
+        section.settings.logo
+        | image_url: width: 600
+        | image_tag: alt: shop.name, loading: 'eager', widths: '300, 450, 600', sizes: '225px'
+      }}
+    {%- else -%}
+      {%- render 'pb-logo' -%}
+    {%- endif -%}
+  </a>
+
+  {%- comment -%}
+    Desktop links: the Header links menu if one is picked, otherwise these defaults. Shop By
+    Category opens the floating menu, which lists the categories.
+  {%- endcomment -%}
+  <nav class="pb-landing-header__nav" aria-label="Main">
+    <ul class="pb-landing-header__links">
+      {%- if section.settings.nav_menu.links.size > 0 -%}
+        {%- for link in section.settings.nav_menu.links -%}
+          <li>
+            <a
+              class="pb-landing-header__link"
+              href="{{ link.url }}"
+              {% if link.current %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- link.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        <li>
+          <button
+            type="button"
+            class="pb-landing-header__link"
+            aria-expanded="false"
+            aria-controls="PBMenu"
+            aria-haspopup="dialog"
+            data-pb-menu-toggle
+          >
+            Shop By Category
+          </button>
+        </li>
+        <li><a class="pb-landing-header__link" href="{{ routes.collections_url }}">Brands</a></li>
+        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=best-selling">Best Sellers</a></li>
+        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=created-descending">New Arrivals</a></li>
+      {%- endif -%}
+    </ul>
+  </nav>
+
+  <div class="pb-landing-header__actions">
+    {%- comment -%} Opens Horizon's search dialog (snippets/search-modal.liquid) via assets/pb-menu.js. {%- endcomment -%}
+    <button
+      type="button"
+      class="pb-landing-header__icon"
+      aria-label="Search"
+      aria-haspopup="dialog"
+      aria-controls="search-modal"
+      data-pb-search-open
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <circle cx="11" cy="11" r="6.5"/>
+        <path d="m16 16 4 4"/>
+      </svg>
+    </button>
+
+    {%- if shop.customer_accounts_enabled -%}
+      <a class="pb-landing-header__icon" href="{{ routes.account_url }}" aria-label="Account">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5.5 19.2c0-3 2.9-5.2 6.5-5.2s6.5 2.2 6.5 5.2v.8h-13v-.8Z"/>
+        </svg>
+      </a>
+    {%- endif -%}
+
+    <a
+      class="pb-landing-header__icon pb-landing-header__cart"
+      href="{{ routes.cart_url }}"
+      aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}"
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M5.5 8h13l-1 12h-11l-1-12Z"/>
+        <path d="M9 10V6.5a3 3 0 0 1 6 0V10"/>
+      </svg>
+      {%- if cart.item_count > 0 -%}
+        <span class="pb-landing-header__count" aria-hidden="true">
+          {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
+        </span>
+      {%- endif -%}
+    </a>
+  </div>
+</header>
+
+{%- assign menu = section.settings.menu -%}
+<pb-menu>
+  <dialog id="PBMenu" class="pb-menu" tabindex="-1" aria-label="{{ menu.title | default: 'Menu' | escape }}">
+    <button type="button" class="pb-menu__close" aria-label="Close menu" data-pb-menu-close>
+      <span class="pb-menu__close-line"></span>
+      <span class="pb-menu__close-line"></span>
+    </button>
+
+    <div class="pb-menu__body">
+      {%- liquid
+        # Categories: the ones picked in the section, otherwise the shop's product categories.
+        # The homepage renders this section on its own (layout/pb-landing.liquid), outside the
+        # header group, so it usually has nothing picked.
+        assign categories = section.settings.categories
+        if categories == blank
+          assign category_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
+        endif
+      -%}
+      {%- capture category_links -%}
+        {%- if categories != blank -%}
+          {%- for collection in categories -%}
+            {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for handle in category_handles -%}
+            {%- assign collection = collections[handle] -%}
+            {%- if collection.id != blank -%}
+              {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endcapture -%}
+      {%- if category_links != blank -%}
+        <nav class="pb-menu__nav" aria-labelledby="PBMenuCategories">
+          <h2 id="PBMenuCategories" class="pb-menu__heading">{{ section.settings.categories_heading }}</h2>
+          <ul class="pb-menu__links">
+            {{- category_links -}}
+          </ul>
+        </nav>
+      {%- endif -%}
+      {%- if menu.links.size > 0 -%}
+        <nav class="pb-menu__nav" aria-label="{{ menu.title | escape }}">
+          <ul class="pb-menu__links">
+            {%- for link in menu.links -%}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- link.title -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+
+    </div>
+
+    {%- if section.settings.newsletter -%}
+      <div class="pb-menu__newsletter">
+        {%- form 'customer', id: 'PBMenuNewsletter', class: 'pb-menu__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <h2 class="pb-menu__heading">{{ section.settings.newsletter_heading }}</h2>
+          {%- if section.settings.newsletter_text != blank -%}
+            <p class="pb-menu__text">{{ section.settings.newsletter_text }}</p>
+          {%- endif -%}
+
+          {%- if form.posted_successfully? -%}
+            {%- comment -%} After the page reloads, pb-menu.js reopens the menu to show this. {%- endcomment -%}
+            <p class="pb-menu__message" role="status" data-pb-menu-open-on-load>Thanks for subscribing.</p>
+          {%- else -%}
+            <div class="pb-menu__field">
+              <label class="visually-hidden" for="PBMenuEmail">Email address</label>
+              <input
+                id="PBMenuEmail"
+                type="email"
+                name="contact[email]"
+                value="{{ form.email }}"
+                placeholder="Email address"
+                autocomplete="email"
+                autocorrect="off"
+                autocapitalize="off"
+                required
+                {% if form.errors %}
+                  aria-invalid="true"
+                  aria-describedby="PBMenuEmailError"
+                {% endif %}
+              >
+              <button type="submit" class="pb-menu__submit">Subscribe</button>
+            </div>
+            {%- if form.errors -%}
+              <div id="PBMenuEmailError" class="pb-menu__message pb-menu__message--error" data-pb-menu-open-on-load>
+                {{ form.errors | default_errors }}
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </dialog>
+</pb-menu>
+
+<script type="module" src="{{ 'pb-menu.js' | asset_url }}"></script>
+<script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  /* Height of the dark header. Set here so it is there in both layouts; the homepage hero and
+     the full-width title bar pad their tops by it. */
+  :root {
+    --pb-landing-header-height: 88px;
+  }
+
+  @media screen and (max-width: 749px) {
+    :root {
+      --pb-landing-header-height: 72px;
+    }
+  }
+
+  .pb-landing-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: var(--pb-landing-header-height);
+    padding-inline: var(--page-margin, 24px);
+    color: #fff;
+  }
+
+  /* Dark header over the homepage: once the page has scrolled about 100px (<pb-hero-watch>,
+     assets/pb-header.js) it becomes the inner pages' compact white bar (::before), dark logo
+     and icons, contents moved up into the bar and the logo a little smaller. The switch
+     happens out of sight: the header slides up (.is-hidden), changes at once, then slides
+     back down; the same on the way back. Only opacity, colour and transforms change. */
+  .pb-landing-header:not(.pb-landing-header--light) {
+    --pb-header-compact: 68px;
+    --pb-header-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    transition: translate 0.35s var(--pb-header-ease);
+  }
+
+  .pb-landing-header.is-hidden {
+    translate: 0 calc(-100% - 8px);
+    transition-timing-function: ease-in;
+  }
+
+  /* Nothing else animates while it is out of sight, so it switches at once (these beat the
+     transition rules below). */
+  .pb-landing-header.is-hidden:not(.pb-landing-header--light)::before,
+  .pb-landing-header.is-hidden:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    transition: none;
+  }
+
+  .pb-landing-header:not(.pb-landing-header--light)::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: var(--pb-header-compact);
+    border-radius: 0 0 var(--pb-header-radius, 12px) var(--pb-header-radius, 12px);
+    background: #fff;
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .pb-landing-header:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    transition:
+      translate 0.4s var(--pb-header-ease),
+      scale 0.4s var(--pb-header-ease);
+  }
+
+  .pb-landing-header.is-past-hero {
+    color: #111;
+  }
+
+  .pb-landing-header.is-past-hero::before {
+    opacity: 1;
+  }
+
+  .pb-landing-header.is-past-hero > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    translate: 0 calc((var(--pb-header-compact) - var(--pb-landing-header-height)) / 2);
+  }
+
+  .pb-landing-header.is-past-hero > .pb-landing-header__logo {
+    scale: 0.8;
+  }
+
+  /* Below 990px the window scrolls (not .page-wrapper, see assets/scroll-container.js), so
+     the dark header is fixed to stay at the top; from 990px it stays put by itself. */
+  @media screen and (max-width: 989px) {
+    .pb-landing-header:not(.pb-landing-header--light) {
+      position: fixed;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-landing-header:not(.pb-landing-header--light) {
+      --pb-header-compact: 56px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header:not(.pb-landing-header--light),
+    .pb-landing-header:not(.pb-landing-header--light)::before,
+    .pb-landing-header:not(.pb-landing-header--light) > * {
+      transition: none;
+    }
+  }
+
+  /* Light: white inner-page header, in the page flow. */
+  /* Light header. Heights are unitless so the compact scale can be worked out in CSS.
+     The header keeps its full height in the layout, so nothing below moves when it
+     compacts; only the white bar (::before) and the contents animate, with transforms. */
+  .pb-landing-header--light {
+    --pb-header-h: 104;
+    --pb-header-h-compact: 68;
+    --pb-header-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    isolation: isolate;
+    height: calc(var(--pb-header-h) * 1px);
+    color: #111;
+  }
+
+  .pb-landing-header--light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #fff;
+    transform-origin: top;
+    transition:
+      transform 0.4s var(--pb-header-ease),
+      border-radius 0.4s var(--pb-header-ease),
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .pb-landing-header--light > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    transition:
+      translate 0.4s var(--pb-header-ease),
+      scale 0.4s var(--pb-header-ease);
+  }
+
+  /* Once the page scrolls (assets/pb-header.js): the bar shrinks to the compact height and
+     gets a hairline shadow; the contents move up into it and the logo gets smaller. */
+  .pb-landing-header--light.is-scrolled {
+    pointer-events: none;
+  }
+
+  .pb-landing-header--light.is-scrolled > * {
+    pointer-events: auto;
+  }
+
+  .pb-landing-header--light.is-scrolled::before {
+    transform: scaleY(calc(var(--pb-header-h-compact) / var(--pb-header-h)));
+
+    /* Rounded bottom corners. The bar is squashed by scaleY, so the vertical radius is
+       stretched by the same amount to come out round. */
+    border-radius: 0 0 var(--pb-header-radius, 12px) var(--pb-header-radius, 12px) /
+      0 0 calc(var(--pb-header-radius, 12px) * var(--pb-header-h) / var(--pb-header-h-compact))
+      calc(var(--pb-header-radius, 12px) * var(--pb-header-h) / var(--pb-header-h-compact));
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
+  }
+
+  .pb-landing-header--light.is-scrolled > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    translate: 0 calc((var(--pb-header-h-compact) - var(--pb-header-h)) / 2 * 1px);
+  }
+
+  .pb-landing-header--light.is-scrolled > .pb-landing-header__logo {
+    scale: 0.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header--light::before,
+    .pb-landing-header--light > * {
+      transition: none;
+    }
+  }
+
+  /* Light header sticks to the top while the page scrolls. Like Horizon's own sticky header,
+     the header group's box is removed so the section can stick to the page, not the group. */
+  #header-group:has(.pb-landing-header--light) {
+    display: contents;
+  }
+
+  .pb-landing-header-section:has(> .pb-landing-header--light) {
+    position: sticky;
+
+    /* -1px, as in Horizon, so assets/pb-header.js can tell when the page has scrolled. */
+    top: -1px;
+    z-index: var(--layer-menu-drawer, 40);
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-landing-header--light {
+      --pb-header-h: 72;
+      --pb-header-h-compact: 56;
+    }
+  }
+
+  .pb-landing-header__menu {
+    justify-self: start;
+    display: grid;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-content: center;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pb-landing-header__menu-line {
+    display: block;
+    width: 26px;
+    height: 2px;
+    background: currentColor;
+  }
+
+  .pb-landing-header__logo {
+    display: block;
+    color: inherit; /* the inline logo's wordmark uses the header's text colour */
+    line-height: 0;
+  }
+
+  /* No box around the logo on focus. Keyboard users still get a cue: the logo dims while
+     it has keyboard focus. */
+  .pb-landing-header__logo:focus,
+  .pb-landing-header__logo:focus-visible {
+    outline: none;
+  }
+
+  .pb-landing-header__logo:focus-visible :is(img, svg) {
+    opacity: 0.6;
+  }
+
+  /* Sized by height: the logo is stacked (swoosh round the lettering), 123 x 68. */
+  .pb-landing-header__logo :is(img, svg) {
+    width: auto;
+    height: clamp(48px, 4.4vw, 64px);
+  }
+
+  .pb-landing-header__actions {
+    justify-self: end;
+    display: flex;
+    gap: 4px;
+  }
+
+  .pb-landing-header__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pb-landing-header__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Phones: smaller logo and tighter icons so search, account and cart fit beside it. */
+  @media screen and (max-width: 749px) {
+    .pb-landing-header__logo :is(img, svg) {
+      height: 44px;
+    }
+
+    .pb-landing-header__actions {
+      gap: 0;
+    }
+
+    .pb-landing-header__icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .pb-landing-header__icon svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  /* Desktop links row. Hidden below 990px, where the menu button opens the same places. */
+  .pb-landing-header__nav {
+    display: none;
+  }
+
+  .pb-landing-header__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px clamp(24px, 3.4vw, 60px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-landing-header__link {
+    position: relative;
+    display: inline-block;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-decoration: none;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Hover and the current page: full strength, with a red line drawn in underneath. */
+  .pb-landing-header__link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: var(--pb-accent, #ca0d0d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-landing-header__link:is(:hover, :focus-visible, [aria-current='page'], [aria-expanded='true']) {
+    opacity: 1;
+  }
+
+  .pb-landing-header__link:is(:hover, :focus-visible, [aria-current='page'], [aria-expanded='true'])::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header__link::after {
+      transition: none;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-landing-header {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      column-gap: clamp(40px, 5.5vw, 88px);
+    }
+
+    .pb-landing-header__menu {
+      display: none;
+    }
+
+    .pb-landing-header__nav {
+      display: block;
+    }
+
+    .pb-landing-header__logo {
+      justify-self: start;
+      transform-origin: left center;
+    }
+  }
+
+  .pb-landing-header__count {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-end: 4px;
+    min-width: 14px;
+    height: 14px;
+    padding-inline: 3px;
+    border-radius: 7px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+  }
+
+  /* Floating menu ------------------------------------------------------------------------ */
+
+  html[data-pb-menu-open] {
+    overflow: hidden;
+  }
+
+  .pb-menu {
+    --pb-menu-inset: 22px;
+
+    width: min(50vw, 640px);
+    max-width: none;
+    height: calc(100dvh - var(--pb-menu-inset) * 2);
+    max-height: none;
+    margin: var(--pb-menu-inset);
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    overflow-y: auto;
+    background: #fff;
+    color: #111;
+    opacity: 0;
+    translate: -24px 0;
+    transition:
+      opacity 0.35s ease,
+      translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-menu[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Focus starts on the panel itself (pb-menu.js), so no ring shows on the close button
+     after a mouse click; keyboard users tab to it as normal. */
+  .pb-menu:focus {
+    outline: none;
+  }
+
+  .pb-menu.is-open {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .pb-menu::backdrop {
+    background: rgb(0 0 0 / 0.35);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .pb-menu__close {
+    position: absolute;
+    inset-block-start: 20px;
+    inset-inline-start: 20px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pb-menu__close-line {
+    grid-area: 1 / 1;
+    width: 24px;
+    height: 2px;
+    background: currentColor;
+    rotate: 45deg;
+  }
+
+  .pb-menu__close-line + .pb-menu__close-line {
+    rotate: -45deg;
+  }
+
+  /* Categories and the main links side by side; newsletter pinned to the bottom. */
+  .pb-menu__body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 40px 48px;
+    flex: 1 0 auto;
+    padding: 96px 32px 40px 12%;
+  }
+
+  /* Side by side, a column without a heading starts level with the first link beside it:
+     the heading's line height plus its margin. */
+  @media screen and (min-width: 750px) {
+    .pb-menu__nav:not(:has(> .pb-menu__heading)) {
+      padding-block-start: calc(12px * 1.5 + 18px);
+    }
+  }
+
+  .pb-menu__heading {
+    margin: 0 0 18px;
+    line-height: 1.5;
+    color: #6b6b6b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-menu__newsletter {
+    padding: 32px 32px 40px 12%;
+    border-block-start: 1px solid #e6e6e6;
+  }
+
+  .pb-menu__text {
+    max-width: 36ch;
+    margin: -8px 0 18px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .pb-menu__field {
+    display: flex;
+    gap: 12px;
+    max-width: 440px;
+  }
+
+  .pb-menu__field input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+    border: 0;
+    border-block-end: 1px solid #cfcfcf;
+    border-radius: 0;
+    background: transparent;
+    color: #111;
+    font: inherit;
+    font-size: 14px;
+  }
+
+  .pb-menu__field input::placeholder {
+    color: #8a8a8a;
+  }
+
+  .pb-menu__field input:focus-visible {
+    outline: none;
+    border-block-end-color: #111;
+  }
+
+  .pb-menu__submit {
+    padding: 0 18px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-menu__submit:is(:hover, :focus-visible) {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  .pb-menu__message {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .pb-menu__message--error {
+    margin-block-start: 10px;
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-menu__message--error :is(ul, p) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-menu__links {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-menu__links a {
+    color: #111;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+
+  .pb-menu__links a:is(:hover, :focus-visible, [aria-current='page']) {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-menu {
+      --pb-menu-inset: 12px;
+
+      width: calc(100vw - var(--pb-menu-inset) * 2);
+    }
+
+    .pb-menu__body {
+      grid-template-columns: 1fr;
+      padding: 84px 24px 32px;
+    }
+
+    .pb-menu__newsletter {
+      padding: 28px 24px 32px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-menu {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header (PB)",
+  "tag": "div",
+  "class": "pb-landing-header-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Automatic"
+        },
+        {
+          "value": "dark",
+          "label": "Dark, over the page"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        }
+      ],
+      "default": "auto",
+      "info": "Automatic is dark over the homepage hero and the default collection template, and light on every other page."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Empty uses the Protection Brands logo: white text on Dark, black text on Light."
+    },
+    {
+      "type": "link_list",
+      "id": "nav_menu",
+      "label": "Header links",
+      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Brands, Best Sellers and New Arrivals."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Floating menu",
+      "default": "main-menu",
+      "info": "Opened from the menu button. Top-level links only."
+    },
+    {
+      "type": "text",
+      "id": "categories_heading",
+      "label": "Categories heading",
+      "default": "Categories"
+    },
+    {
+      "type": "collection_list",
+      "id": "categories",
+      "label": "Categories",
+      "info": "Empty: Wash & Shampoo, Cleaners & Sprays, Microfibre & Drying, Kits & Packs, Power & Emergency, Bulk & Professional.",
+      "limit": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter",
+      "label": "Show newsletter signup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Subscribe to our newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter text",
+      "default": "New products, offers and car care tips."
+    }
+  ]
+}
+{% endschema %}

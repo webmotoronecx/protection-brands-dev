@@ -1,0 +1,156 @@
+/*
+  Protection Brands look for Horizon's floating add-to-cart bar (sticky-add-to-cart in
+  sections/product-information.liquid). Loaded on product pages by snippets/pb-head.liquid.
+  Overrides only; Horizon's markup, show/hide and add-to-cart logic are unchanged.
+
+  Dark rounded bar like the footer and collection title bar, the product image on a light
+  tile like the product cards, bold white price, and the red square button. On phones the
+  button shows the same plain + as the product cards.
+*/
+
+sticky-add-to-cart .sticky-add-to-cart__bar {
+  --pb-sticky-radius: 12px;
+
+  width: 640px;
+  padding: 10px;
+  border-radius: var(--pb-sticky-radius);
+  background: linear-gradient(120deg, #161616 0%, #0b0b0b 70%);
+  color: #fff;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
+}
+
+/* Horizon draws an outline here for light schemes; the dark bar doesn't need it. */
+sticky-add-to-cart .sticky-add-to-cart__bar::before {
+  display: none;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__image {
+  height: 48px;
+  border-radius: 8px;
+  background: var(--pb-card-bg, #f4f4f4);
+}
+
+sticky-add-to-cart .sticky-add-to-cart__image-img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__title {
+  color: #fff;
+  font-weight: 500;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__variant {
+  color: #9a9a9a;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__price,
+sticky-add-to-cart .sticky-add-to-cart__price .price {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__price .compare-at-price {
+  color: #8a8a8a;
+  font-weight: 400;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button {
+  height: 48px;
+  padding-inline: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--pb-accent, #ca0d0d);
+  color: var(--pb-on-accent, #fff);
+  font-size: 13px;
+  font-weight: var(--font-heading--weight, 400);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: none;
+  transition: background-color 0.2s ease;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button:is(:hover, :focus-visible) {
+  background: var(--pb-accent-hover, #a30a0a);
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button:disabled {
+  background: #3a3a3a;
+  color: #9a9a9a;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart__added {
+  color: var(--pb-on-accent, #fff);
+}
+
+/* Icon: a plain plus, as on the product cards (drawn with two bars). */
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper > svg {
+  display: none;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper::before,
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  translate: -50% -50%;
+}
+
+sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper::after {
+  rotate: 90deg;
+}
+
+/* Desktop and tablet: bottom right, over the details column, so it never covers the photos
+   and thumbnails on the left. Horizon centres it with translateX(-50%); that is replaced in
+   every state (hidden, shown, and the starting style it animates in from). */
+@media screen and (min-width: 750px) {
+  sticky-add-to-cart .sticky-add-to-cart__bar {
+    left: auto; /* stylelint-disable-line csstools/use-logical -- pairs with Horizon's physical left */
+    right: max(20px, var(--page-margin, 20px)); /* stylelint-disable-line csstools/use-logical */
+    width: min(560px, calc(100vw - 40px));
+    transform: translateY(calc(100% + 40px));
+
+    @starting-style {
+      transform: translateY(calc(100% + 40px));
+    }
+  }
+
+  sticky-add-to-cart .sticky-add-to-cart__bar[data-stuck='true'] {
+    transform: translateY(0);
+  }
+
+  sticky-add-to-cart:not([data-variant-available='true']) .sticky-add-to-cart__bar {
+    transform: translateY(calc(100% + 40px));
+  }
+}
+
+@media screen and (max-width: 749px) {
+  sticky-add-to-cart .sticky-add-to-cart__bar {
+    width: 100%;
+    border-radius: var(--pb-sticky-radius) var(--pb-sticky-radius) 0 0;
+    padding-block-end: calc(10px + var(--safe-area-inset-bottom, 0px));
+  }
+
+  /* Icon-only square button, like the product cards' + button. */
+  sticky-add-to-cart .sticky-add-to-cart__button {
+    width: 48px;
+    padding: 0;
+  }
+
+  sticky-add-to-cart .sticky-add-to-cart__button .add-to-cart-text > .svg-wrapper {
+    width: 16px;
+    height: 16px;
+  }
+}

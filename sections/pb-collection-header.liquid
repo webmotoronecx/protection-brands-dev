@@ -1,0 +1,774 @@
+{%- comment -%}
+  Protection Brands collection header: a rounded dark card with the wordmark
+  (snippets/pb-marquee.liquid, inverted file) along the top, following the mouse or
+  scrolling, the collection title, large, light and uppercase, and a row of category links
+  (current one underlined in red). On phones the row scrolls sideways. Categories are picked
+  in the theme editor.
+
+  On the search page it shows the search title, the result count and a search box instead
+  of a collection title (used by templates/search.json).
+
+  It is the title bar for every inner page. The title comes from the page itself
+  (collection, page, blog; an article shows its blog's name) or, for pages without one
+  (cart, collections list, 404), from the "Title" setting. On the cart it also shows the
+  item count and hides the cart's own small heading.
+
+  The wordmark can be swapped for a word ("Watermark" setting): the page's own name (used by
+  templates/collection.brand.json for brand pages; a collection's custom.watermark metafield,
+  e.g. "Honda", overrides it) or fixed text.
+
+  Hero image: a photo covering the whole card behind a dark gradient, in place of the
+  wordmark. From the collection's custom.hero_image metafield when "Use the collection's hero
+  image" is on (brand pages), otherwise the "Hero image" setting.
+
+  Layout "Full width" (the default collection template, templates/collection.json): edge to
+  edge with no card, under the dark header, which floats over it on that template
+  (sections/pb-landing-header.liquid). The title sits near the top, and the white page curves
+  up over the bottom of the photo. There is always a photo: with none picked it shows
+  assets/pb-collection-hero.jpg.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+
+  assign current = collection
+  if current == blank
+    assign current = closest.collection
+  endif
+
+  assign is_search = false
+  if request.page_type == 'search'
+    assign is_search = true
+  endif
+
+  case request.page_type
+    when 'page'
+      assign title = page.title
+    when 'blog', 'article'
+      assign title = blog.title
+    else
+      assign title = current.title
+  endcase
+  # On a tag page (e.g. /collections/all/professional) the title is the tag.
+  if request.page_type == 'collection' and current_tags.size > 0
+    assign title = current_tags.first
+  endif
+  if title == blank
+    assign title = section.settings.fallback_title
+  endif
+
+  # Category row from product tags, like the old site: the current collection's tags, or all
+  # products' tags on pages without a collection (search, cart, 404...).
+  assign tag_collection = current
+  if tag_collection == blank
+    assign tag_collection = collections.all
+  endif
+  assign hero_image = blank
+  if section.settings.hero_from_collection
+    assign hero_image = current.metafields.custom.hero_image.value
+  endif
+  if hero_image == blank
+    assign hero_image = section.settings.hero_image
+  endif
+
+  assign full = false
+  if section.settings.layout == 'full'
+    assign full = true
+  endif
+  assign hero_default = false
+  if full and hero_image == blank
+    assign hero_default = true
+  endif
+
+  assign current_tag_handles = ''
+  for tag in current_tags
+    assign tag_handle = tag | handle
+    assign current_tag_handles = current_tag_handles | append: ',' | append: tag_handle | append: ','
+  endfor
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="pb-collection-header{% if hero_image != blank or hero_default %} pb-collection-header--hero{% endif %}{% if full %} pb-collection-header--full{% endif %}"
+  style="--pb-collection-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-collection-heading-weight: {{ heading_font.weight }};"
+>
+  {%- if hero_image != blank -%}
+    {%- liquid
+      assign hero_sizes = 'calc(100vw - 20px)'
+      if full
+        assign hero_sizes = '100vw'
+      endif
+    -%}
+    <div class="pb-collection-header__hero">
+      {{-
+        hero_image
+        | image_url: width: 2400
+        | image_tag:
+          alt: '',
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: hero_sizes,
+          widths: '750, 1100, 1500, 2000, 2400'
+      -}}
+    </div>
+  {%- elsif hero_default -%}
+    <div class="pb-collection-header__hero">
+      <img
+        src="{{ 'pb-collection-hero.jpg' | asset_url }}"
+        alt=""
+        width="2380"
+        height="1200"
+        loading="eager"
+        fetchpriority="high"
+      >
+    </div>
+  {%- elsif section.settings.marquee -%}
+    {%- liquid
+      assign marquee_static = true
+      if section.settings.marquee_motion == 'scroll'
+        assign marquee_static = false
+      endif
+
+      assign marquee_word = blank
+      case section.settings.marquee_source
+        when 'title'
+          assign marquee_word = current.metafields.custom.watermark.value | default: title
+        when 'custom'
+          assign marquee_word = section.settings.marquee_text
+      endcase
+    -%}
+    {%- render 'pb-marquee',
+      class: 'pb-collection-header__marquee',
+      file: 'label-scroling-invert.svg',
+      text: marquee_word,
+      duration: section.settings.marquee_duration,
+      static: marquee_static,
+      follow_mouse: marquee_static,
+      loading: 'eager'
+    -%}
+  {%- endif -%}
+
+  {%- if is_search -%}
+    <h1 class="pb-collection-header__title">{{ section.settings.search_title }}</h1>
+
+    {%- if search.performed -%}
+      <p class="pb-collection-header__meta" role="status">
+        {{ search.results_count }}
+        {{ search.results_count | pluralize: 'result', 'results' }} for &ldquo;{{ search.terms | escape }}&rdquo;
+      </p>
+    {%- endif -%}
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="pb-collection-header__search">
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="visually-hidden" for="PBSearchInput">Search products</label>
+      <input
+        id="PBSearchInput"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="Search products"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <button type="submit" aria-label="Search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="11" cy="11" r="6.5"/>
+          <path d="m16 16 4 4"/>
+        </svg>
+      </button>
+    </form>
+  {%- else -%}
+    {%- if request.page_type == 'collection' and section.settings.show_sort -%}
+      {%- comment -%} Item count and sort (snippets/pb-collection-sort.liquid) beside the title. {%- endcomment -%}
+      <div class="pb-collection-header__row">
+        <h1 class="pb-collection-header__title">{{ title }}</h1>
+        <div class="pb-collection-header__tools">
+          <p class="pb-collection-header__count">
+            {{ current.products_count }}
+            {{ current.products_count | pluralize: 'item', 'items' }}
+          </p>
+          {%- render 'pb-collection-sort', collection: current, id: 'PBSortBy', class: 'pb-collection-header__sort' -%}
+        </div>
+      </div>
+    {%- else -%}
+      <h1 class="pb-collection-header__title">{{ title }}</h1>
+    {%- endif -%}
+
+    {%- if request.page_type == 'cart' and cart.item_count > 0 -%}
+      <p class="pb-collection-header__meta">
+        {{ cart.item_count }}
+        {{ cart.item_count | pluralize: 'item', 'items' }}
+      </p>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if section.settings.show_description and current.description != blank -%}
+    <div class="pb-collection-header__description rte">{{ current.description }}</div>
+  {%- endif -%}
+
+  {%- if section.settings.category_source == 'tags' and tag_collection.all_tags.size > 0 -%}
+    <nav class="pb-collection-header__nav" aria-label="{{ section.settings.nav_label | escape }}">
+      <ul class="pb-collection-header__categories">
+        <li>
+          <a
+            href="{{ tag_collection.url }}"
+            {% if request.page_type == 'collection' and current_tags.size == 0 %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{- section.settings.all_label -}}
+          </a>
+        </li>
+        {%- for tag in tag_collection.all_tags -%}
+          {%- liquid
+            assign tag_handle = tag | handle
+            assign tag_key = ',' | append: tag_handle | append: ','
+          -%}
+          <li>
+            <a
+              href="{{ tag_collection.url }}/{{ tag_handle }}"
+              {% if current_tag_handles contains tag_key %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- tag -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- elsif section.settings.category_source == 'collections' and section.settings.categories != blank -%}
+    <nav class="pb-collection-header__nav" aria-label="{{ section.settings.nav_label | escape }}">
+      <ul class="pb-collection-header__categories">
+        {%- for category in section.settings.categories -%}
+          <li>
+            <a
+              href="{{ category.url }}"
+              {% if category.handle == current.handle %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- category.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- elsif request.design_mode -%}
+    {%- if section.settings.category_source == 'collections' -%}
+      <p class="pb-collection-header__hint">Pick the categories for this row in the section settings.</p>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .pb-collection-header {
+    --pb-collection-pad-x: clamp(24px, 4.5vw, 64px);
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin: 0 10px 14px;
+    padding: clamp(96px, 9vw, 130px) var(--pb-collection-pad-x) clamp(32px, 3.5vw, 52px);
+    border-radius: 12px;
+    background:
+      radial-gradient(ellipse 60% 90% at 20% 60%, #1c1c1c 0%, transparent 70%),
+      linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
+    color: #fff;
+  }
+
+  /* Wordmark along the top, cut off by the top of the card. */
+  .pb-collection-header__marquee {
+    --pb-marquee-height: clamp(4rem, 14vw, 17rem);
+
+    /* Wider than the card, so its clipped edges stay hidden when it drifts with the mouse
+       (up to 40px, pb-marquee.js); the card clips it. */
+    position: absolute;
+    inset-inline: -80px;
+    inset-block-start: calc(var(--pb-marquee-height) * -0.2);
+    z-index: -1;
+  }
+
+  /* Hero image: covers the card, darkened on the left and bottom where the text sits. */
+  .pb-collection-header--hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: clamp(360px, 34vw, 560px);
+  }
+
+  .pb-collection-header__hero {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .pb-collection-header__hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pb-collection-header__hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(0deg, rgb(0 0 0 / 0.8) 0%, rgb(0 0 0 / 0.2) 55%, transparent 80%),
+      linear-gradient(90deg, rgb(0 0 0 / 0.6) 0%, transparent 65%);
+  }
+
+  /* Full width: edge to edge under the floating dark header (its height is
+     --pb-landing-header-height), the title just below it, and the white page curving up over
+     the bottom of the photo (::after, the page background with rounded top corners). Sizes
+     follow the 1440px design: title top at 175px, photo 347px tall. */
+  .pb-collection-header--full {
+    --pb-collection-pad-x: clamp(20px, 3.8vw, 55px);
+    --pb-collection-curve: 12px;
+
+    justify-content: flex-start;
+    min-height: 0;
+    margin: 0;
+    padding:
+      calc(var(--pb-landing-header-height, 88px) + clamp(28px, 6vw, 87px))
+      var(--pb-collection-pad-x)
+      clamp(56px, 8.2vw, 118px);
+    border-radius: 0;
+    background: #141414;
+  }
+
+  .pb-collection-header--full::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--pb-collection-curve);
+    border-radius: var(--pb-collection-curve) var(--pb-collection-curve) 0 0;
+    background: var(--color-background, #fff);
+  }
+
+  /* The photo is shown whole, top third in view; only the left is darkened, behind the title. */
+  .pb-collection-header--full .pb-collection-header__hero img {
+    object-position: 50% 34%;
+  }
+
+  .pb-collection-header--full .pb-collection-header__hero::after {
+    background: linear-gradient(90deg, rgb(0 0 0 / 0.5) 0%, transparent 45%);
+  }
+
+  .pb-collection-header--full .pb-collection-header__title {
+    font-size: clamp(2.5rem, 4.45vw, 4rem);
+    line-height: 0.84;
+  }
+
+  /* Title with the count and sort on the right (stacked on phones). */
+  .pb-collection-header__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .pb-collection-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .pb-collection-header__count {
+    margin: 0;
+    color: #bdbdbd;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .pb-collection-header__sort select {
+    padding: 9px 34px 9px 14px;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 6px;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.5 6 4.5 4.5L12.5 6'/%3E%3C/svg%3E") no-repeat right 12px center / 12px;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .pb-collection-header__sort select:is(:hover, :focus-visible) {
+    border-color: rgb(255 255 255 / 0.6);
+    outline: none;
+  }
+
+  .pb-collection-header__sort option {
+    background: #111;
+    color: #fff;
+  }
+
+  .pb-collection-header__title {
+    max-width: 16ch;
+    margin: 0;
+    color: #fff;
+    font-family: var(--pb-collection-heading-font, inherit);
+    font-size: clamp(2.25rem, 3.4vw, 3.5rem);
+    font-weight: var(--pb-collection-heading-weight, 400);
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  /* The cart's own small "Cart (n)" heading repeats the title bar; hide it when the bar is there. */
+  body:has(.pb-collection-header) .cart-title {
+    display: none;
+  }
+
+  .pb-collection-header__meta {
+    margin: 14px 0 0;
+    color: #bdbdbd;
+    font-size: 15px;
+  }
+
+  /* Search box: dark field with a red button, like the footer signup. */
+  .pb-collection-header__search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 520px;
+    margin-block-start: 28px;
+    padding: 8px 8px 8px 20px;
+    border-radius: 8px;
+    background: rgb(0 0 0 / 0.55);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .pb-collection-header__search:focus-within {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  }
+
+  .pb-collection-header__search input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 17px;
+  }
+
+  .pb-collection-header__search input::placeholder {
+    color: #6f6f6f;
+  }
+
+  .pb-collection-header__search input:focus-visible {
+    outline: none;
+  }
+
+  /* Hide the browser's own clear (x) button; the field is cleared by selecting the text. */
+  .pb-collection-header__search input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .pb-collection-header__search button {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-collection-header__search button:is(:hover, :focus-visible) {
+    background: var(--pb-accent-hover, #a30a0a);
+  }
+
+  .pb-collection-header__search svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pb-collection-header__description {
+    max-width: 60ch;
+    margin-block-start: 16px;
+    color: #cfcfcf;
+  }
+
+  .pb-collection-header__nav {
+    margin-block-start: clamp(40px, 6vw, 88px);
+  }
+
+  .pb-collection-header__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 45px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-collection-header__categories a {
+    color: #fff;
+    font-size: 17px;
+    text-decoration: none;
+    white-space: nowrap;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+
+  .pb-collection-header__categories a:is(:hover, :focus-visible) {
+    text-decoration-line: underline;
+    text-decoration-color: rgb(255 255 255 / 0.5);
+  }
+
+  /* With one category selected, the others step back to 50%. */
+  .pb-collection-header__categories:has([aria-current='page']) a:not([aria-current='page']) {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-collection-header__categories:has([aria-current='page']) a:not([aria-current='page']):is(:hover, :focus-visible) {
+    opacity: 1;
+  }
+
+  .pb-collection-header__categories a[aria-current='page'] {
+    text-decoration-line: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-collection-header__hint {
+    margin: 24px 0 0;
+    color: #9a9a9a;
+    font-size: 14px;
+  }
+
+  /* Phones: one row that scrolls sideways, edge to edge of the card. */
+  @media screen and (max-width: 749px) {
+    .pb-collection-header {
+      --pb-collection-pad-x: 18px;
+
+      margin-inline: 8px;
+    }
+
+    .pb-collection-header--full {
+      --pb-collection-pad-x: 20px;
+
+      margin-inline: 0;
+    }
+
+    .pb-collection-header__nav {
+      margin-inline: calc(var(--pb-collection-pad-x) * -1);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .pb-collection-header__nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pb-collection-header__categories {
+      flex-wrap: nowrap;
+      gap: 28px;
+      width: max-content;
+      padding-inline: var(--pb-collection-pad-x);
+      padding-block-end: 8px;
+    }
+
+    .pb-collection-header__categories a {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Title bar (PB)",
+  "tag": "section",
+  "class": "pb-collection-header-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "card",
+          "label": "Card"
+        },
+        {
+          "value": "full",
+          "label": "Full width, under the header"
+        }
+      ],
+      "default": "card",
+      "info": "Full width is for the default collection template, where the dark header floats over it. It always shows a photo: the hero image, or a default one."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show item count and sort (collections)",
+      "info": "Turn off Horizon's own count/sort row in the product grid's Filters settings to avoid showing both.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "category_source",
+      "label": "Category row",
+      "options": [
+        {
+          "value": "tags",
+          "label": "Product tags (like the old site)"
+        },
+        {
+          "value": "collections",
+          "label": "Chosen collections"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "text",
+      "id": "all_label",
+      "label": "\"All\" link label",
+      "default": "All",
+      "visible_if": "{{ section.settings.category_source == 'tags' }}"
+    },
+    {
+      "type": "collection_list",
+      "id": "categories",
+      "label": "Categories",
+      "limit": 16,
+      "info": "Used when Category row is \"Chosen collections\"."
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "Category row label",
+      "info": "Read out by screen readers.",
+      "default": "Categories"
+    },
+    {
+      "type": "text",
+      "id": "search_title",
+      "label": "Search page title",
+      "default": "Search results"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Title",
+      "info": "Used on pages without a title of their own: cart, collections list, 404, all products.",
+      "default": "Products"
+    },
+    {
+      "type": "header",
+      "content": "Hero image"
+    },
+    {
+      "type": "checkbox",
+      "id": "hero_from_collection",
+      "label": "Use the collection's hero image",
+      "info": "From the collection's custom.hero_image metafield (Settings > Metafields and metaobjects > Collections). Falls back to the image below, then, with the Full width layout, to the default photo (assets/pb-collection-hero.jpg).",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image",
+      "info": "Covers the card behind a dark gradient, in place of the watermark. Wide, at least 2400px."
+    },
+    {
+      "type": "header",
+      "content": "Watermark"
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Show scrolling wordmark",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "marquee_source",
+      "label": "Watermark",
+      "options": [
+        {
+          "value": "wordmark",
+          "label": "Protection Brands wordmark"
+        },
+        {
+          "value": "title",
+          "label": "Page name"
+        },
+        {
+          "value": "custom",
+          "label": "Custom text"
+        }
+      ],
+      "default": "wordmark",
+      "info": "With Page name, a collection's custom.watermark metafield (e.g. \"Honda\") is used if set.",
+      "visible_if": "{{ section.settings.marquee }}"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Watermark text",
+      "visible_if": "{{ section.settings.marquee and section.settings.marquee_source == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "marquee_motion",
+      "label": "Wordmark motion",
+      "options": [
+        {
+          "value": "mouse",
+          "label": "Follows the mouse"
+        },
+        {
+          "value": "scroll",
+          "label": "Scrolls"
+        }
+      ],
+      "default": "mouse",
+      "visible_if": "{{ section.settings.marquee }}"
+    },
+    {
+      "type": "range",
+      "id": "marquee_duration",
+      "label": "Scroll speed",
+      "visible_if": "{{ section.settings.marquee and section.settings.marquee_motion == 'scroll' }}",
+      "info": "Seconds for one loop. Higher is slower.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Title bar (PB)"
+    }
+  ]
+}
+{% endschema %}

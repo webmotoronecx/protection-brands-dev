@@ -1,0 +1,329 @@
+{%- comment -%}
+  Brand logos (Protection Brands): a centred row of logos that wraps on phones, each linking to
+  its brand page. Logos are scaled to one height and shown in grey until hovered (setting).
+  Setup: docs/store-setup/category-tiles-and-brand-logos.md.
+{%- endcomment -%}
+
+{%- liquid
+  # Default logos in assets/ (logo-<brand>.png), used when a logo has no image picked. Matched
+  # by the logo's Alt text: Permagard, CERFACE, OptiVAN, Oridon. Sizes in px.
+  assign default_brands = 'permagard,cerface,optivan,oridon' | split: ','
+
+  # Nothing to show (no logo picked and no default): render nothing.
+  for block in section.blocks
+    assign brand = block.settings.alt | handleize
+    if block.settings.image != blank or default_brands contains brand
+      assign has_logos = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if has_logos or request.design_mode -%}
+<div
+  data-reveal
+  class="pb-brand-logos pb-brand-logos--heading-{{ section.settings.heading_position }}{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
+  style="--pb-logo-height: {{ section.settings.logo_height }}px;{% if section.settings.background != blank %} --pb-logos-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-logos-text: {{ section.settings.text_color }};{% endif %}"
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="pb-brand-logos__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+
+  <ul class="pb-brand-logos__list" role="list" data-reveal>
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign logo = block.settings.image
+        assign brand = block.settings.alt | handleize
+        assign default_logo = blank
+        if logo == blank and default_brands contains brand
+          assign default_logo = 'logo-' | append: brand | append: '.png'
+          case brand
+            when 'permagard'
+              assign default_ratio = 400.0 | divided_by: 102
+            when 'cerface'
+              assign default_ratio = 468.0 | divided_by: 100
+            when 'optivan'
+              assign default_ratio = 324.0 | divided_by: 100
+            when 'oridon'
+              assign default_ratio = 266.0 | divided_by: 100
+          endcase
+        endif
+        if logo == blank and default_logo == blank and request.design_mode == false
+          continue
+        endif
+        assign logo_alt = block.settings.alt | default: logo.alt
+        assign logo_width = logo.aspect_ratio | times: section.settings.logo_height | round
+        if default_logo != blank
+          assign logo_width = default_ratio | times: section.settings.logo_height | round
+        endif
+      -%}
+      <li {{ block.shopify_attributes }}>
+        {%- if block.settings.link != blank -%}
+          <a class="pb-brand-logos__logo" href="{{ block.settings.link }}">
+        {%- else -%}
+          <span class="pb-brand-logos__logo">
+        {%- endif -%}
+
+        {%- if logo != blank -%}
+          {{-
+            logo
+            | image_url: width: 480
+            | image_tag:
+              alt: logo_alt,
+              loading: 'lazy',
+              widths: '160, 320, 480',
+              sizes: '180px',
+              width: logo_width,
+              height: section.settings.logo_height
+          -}}
+        {%- elsif default_logo != blank -%}
+          <img
+            src="{{ default_logo | asset_url }}"
+            alt="{{ logo_alt | escape }}"
+            width="{{ logo_width }}"
+            height="{{ section.settings.logo_height }}"
+            loading="lazy"
+          >
+        {%- else -%}
+          <span class="pb-brand-logos__empty">Pick a logo</span>
+        {%- endif -%}
+
+        {%- if block.settings.link != blank -%}
+          </a>
+        {%- else -%}
+          </span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  .pb-brand-logos {
+    padding: 32px 10px;
+    background: var(--pb-logos-bg, transparent);
+    color: var(--pb-logos-text, inherit);
+  }
+
+  .pb-brand-logos__heading {
+    margin: 0 0 24px;
+    color: inherit;
+    font-size: clamp(1.5rem, 1.6vw, 2rem);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .pb-brand-logos__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 24px 48px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-brand-logos__logo {
+    display: block;
+  }
+
+  .pb-brand-logos__logo img {
+    display: block;
+    width: auto;
+    /* Every logo is the Logo height tall. The default logo files carry their own spacing
+       round the artwork so they look the same size at the same height; keep it. The cap only
+       catches an unusually wide logo. */
+    max-width: 240px;
+    height: var(--pb-logo-height, 48px);
+    object-fit: contain;
+    transition:
+      filter 0.2s ease,
+      opacity 0.2s ease,
+      scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Hover: the logo shrinks a little (as the category tile images). */
+  a.pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    scale: 0.94;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-brand-logos__logo img {
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+  }
+
+  .pb-brand-logos--greyscale .pb-brand-logos__logo img {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
+
+  .pb-brand-logos--greyscale .pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    filter: none;
+    opacity: 1;
+  }
+
+  /* Colour logos fade a little on hover. */
+  .pb-brand-logos:not(.pb-brand-logos--greyscale) a.pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    opacity: 0.6;
+  }
+
+  a.pb-brand-logos__logo:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 6px;
+  }
+
+  .pb-brand-logos__empty {
+    display: grid;
+    place-items: center;
+    width: 140px;
+    height: var(--pb-logo-height, 48px);
+    border: 1px dashed currentColor;
+    font-size: 13px;
+    opacity: 0.5;
+  }
+
+  /* Heading beside the logos: on the left, then a thin divider, then the logos spread out. */
+  @media screen and (min-width: 750px) {
+    .pb-brand-logos--heading-beside {
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 2.5vw, 40px);
+      padding-inline: clamp(24px, 4.5vw, 72px);
+    }
+
+    .pb-brand-logos--heading-beside .pb-brand-logos__heading {
+      flex: none;
+      margin: 0;
+      padding-right: clamp(24px, 2.5vw, 40px);
+      border-right: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+      line-height: 2.5;
+    }
+
+    .pb-brand-logos--heading-beside .pb-brand-logos__list {
+      flex: 1;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-brand-logos {
+      padding: 24px 8px;
+    }
+
+    .pb-brand-logos__list {
+      gap: 20px 32px;
+    }
+
+    /* Two to a row on phones. */
+    .pb-brand-logos__logo img {
+      max-width: min(240px, 40vw);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand logos (PB)",
+  "tag": "section",
+  "class": "pb-brand-logos-section",
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Optional, e.g. \"Our brands\"."
+    },
+    {
+      "type": "select",
+      "id": "heading_position",
+      "label": "Heading position",
+      "info": "Phones always show it above.",
+      "options": [
+        {
+          "value": "above",
+          "label": "Above the logos"
+        },
+        {
+          "value": "beside",
+          "label": "Beside the logos"
+        }
+      ],
+      "default": "above"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 24,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "checkbox",
+      "id": "greyscale",
+      "label": "Grey until hover",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Optional. Defaults to the page background."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading colour"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "SVG or transparent PNG, trimmed. Empty: the default logo in the theme for the brand named in Alt text (Permagard, CERFACE, OptiVAN, Oridon); other logos without an image are skipped."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Usually the brand's collection."
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Read by screen readers. Defaults to the image's alt text."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand logos (PB)",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

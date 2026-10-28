@@ -1,0 +1,192 @@
+{%- comment -%}
+  Product page info rows (Protection Brands): collapsible rows under the buy buttons.
+  - How to use: the custom.how_to_use product metafield (rich text or multi-line text);
+    the row only shows when it is set.
+  - Delivery & returns: text set here, the same for every product.
+  - Safety data sheet: a download row when the custom.sds metafield is set.
+  Native <details>, so it works without JavaScript and with the keyboard.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+  assign how_to_use = product.metafields.custom.how_to_use
+  assign sds_file = product.metafields.custom.sds.value.file.value
+-%}
+
+<div class="pb-product-info" {{ block.shopify_attributes }}>
+  {%- if how_to_use != blank -%}
+    <details class="pb-product-info__row">
+      <summary>
+        {{ block.settings.how_to_use_title }}
+        {%- render 'pb-product-info-chevron' -%}
+      </summary>
+      <div class="pb-product-info__body rte">
+        {%- if how_to_use.type == 'rich_text_field' -%}
+          {{ how_to_use | metafield_tag }}
+        {%- else -%}
+          {{ how_to_use.value | newline_to_br }}
+        {%- endif -%}
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if block.settings.delivery_text != blank -%}
+    <details class="pb-product-info__row">
+      <summary>
+        {{ block.settings.delivery_title }}
+        {%- render 'pb-product-info-chevron' -%}
+      </summary>
+      <div class="pb-product-info__body rte">{{ block.settings.delivery_text }}</div>
+    </details>
+  {%- endif -%}
+
+  {%- if sds_file != blank -%}
+    <a class="pb-product-info__row pb-product-info__download" href="{{ sds_file.url }}" target="_blank" rel="noopener">
+      <span class="pb-product-info__download-label">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+          <path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7l-4-4Z"/>
+          <path d="M14 3v4h4M9 13h6M9 17h4"/>
+        </svg>
+        {{ block.settings.sds_title }}
+      </span>
+      <span class="pb-product-info__download-action">PDF ↓</span>
+    </a>
+  {%- elsif request.design_mode -%}
+    <p class="pb-product-info__hint">Safety data sheet row: shows when this product's "SDS" metafield is set.</p>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .pb-product-info {
+    border-block-start: 1px solid #ececec;
+  }
+
+  .pb-product-info__row {
+    display: block;
+    border-block-end: 1px solid #ececec;
+    color: #111;
+  }
+
+  .pb-product-info__row summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .pb-product-info__row summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pb-product-info__row summary svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+  }
+
+  .pb-product-info__row[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .pb-product-info__row summary:is(:hover, :focus-visible) {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-product-info__body {
+    padding-block-end: 20px;
+    color: #444;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .pb-product-info__download {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    text-decoration: none;
+  }
+
+  .pb-product-info__download-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-product-info__download svg {
+    width: 20px;
+    height: 20px;
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-product-info__download-action {
+    color: #6f6f6f;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .pb-product-info__download:is(:hover, :focus-visible) .pb-product-info__download-label {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-product-info__hint {
+    margin: 12px 0;
+    color: #888;
+    font-size: 13px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-product-info__row summary svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product info rows (PB)",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "how_to_use_title",
+      "label": "How to use title",
+      "info": "Content comes from the product's \"How to use\" metafield (custom.how_to_use).",
+      "default": "How to use"
+    },
+    {
+      "type": "text",
+      "id": "delivery_title",
+      "label": "Delivery title",
+      "default": "Delivery & returns"
+    },
+    {
+      "type": "richtext",
+      "id": "delivery_text",
+      "label": "Delivery text",
+      "default": "<p>Delivery Australia-wide. See our <a href=\"/pages/delivery\">delivery and returns policy</a> for times and costs.</p>"
+    },
+    {
+      "type": "text",
+      "id": "sds_title",
+      "label": "Safety data sheet title",
+      "default": "Safety data sheet"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product info rows (PB)"
+    }
+  ]
+}
+{% endschema %}

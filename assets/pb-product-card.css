@@ -1,0 +1,440 @@
+/*
+  Protection Brands product cards.
+  Grey card, square contained image, two-line title, review stars, bold price with the
+  compare-at price struck through underneath, and a black quantity + Add To Cart bar
+  pinned to the bottom (blocks/pb-card-buy.liquid). Every card in a row is the same height.
+
+  Scoped to grid cards (.product-grid__card): collection, search, product lists,
+  recommendations.
+  Background, corners and padding are set here rather than in each template's card
+  settings, so every grid matches. Change the variables below.
+*/
+
+:root {
+  --pb-card-bg: #f4f4f4;
+  --pb-accent: #ca0d0d;
+  --pb-accent-hover: #a30a0a;
+  --pb-on-accent: #ffffff;
+  --pb-card-radius: 8px;
+  --pb-card-padding: 16px;
+  --pb-buy-bg: #000000;
+  --pb-buy-bg-hover: #262626;
+  --pb-buy-text: #ffffff;
+  --pb-buy-height: 40px;
+  --pb-buy-radius: 6px;
+  --pb-star-color: #c8291f;
+  --pb-title-lines: 2;
+}
+
+.product-card .product-grid__card.product-grid__card {
+  position: relative;
+  height: 100%;
+  padding: var(--pb-card-padding);
+  border-radius: var(--pb-card-radius);
+  background: var(--pb-card-bg);
+}
+
+.product-grid__card .card-gallery {
+  position: static;
+  background: transparent;
+}
+
+/* Image: square, whole product visible, white photo backgrounds blend into the card. */
+.product-grid__card .product-media-container.media-fit img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.product-grid__card :is(slideshow-container, .product-media-container) {
+  background: transparent;
+}
+
+/* The buy bar replaces Horizon's quick-add button. */
+.product-grid__card .card-gallery quick-add-component {
+  display: none;
+}
+
+/* Text: title always takes exactly two lines.
+   (The title's wrappers use display: contents, so this goes on the heading.) */
+.product-grid__card [role='heading'] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--pb-title-lines);
+  overflow: hidden;
+  min-height: calc(var(--pb-title-lines) * 1lh);
+  margin: 0;
+}
+
+/* Reviews: red stars, "2 Reviews" in the text colour, tucked under the title. Only shows
+   when a reviews app fills the product's rating metafields. */
+.product-grid__card .rating-wrapper {
+  --star-fill-color: var(--pb-star-color);
+  --star-fill-color-rgb: 200 41 31;
+
+  margin-block-start: calc(var(--product-card-gap, 16px) * -0.5);
+  gap: var(--gap-sm, 12px);
+}
+
+.product-grid__card .rating-wrapper .rating-count {
+  color: var(--color-foreground);
+  text-transform: capitalize;
+}
+
+.product-grid__card .rating-wrapper .stars {
+  --empty-star-fill-color: #c4c4c4 !important;
+}
+
+/* Price: bold sale price, compare-at price struck through underneath. */
+.product-grid__card [ref='priceContainer'] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.product-grid__card .price {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.product-grid__card .compare-at-price {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(var(--color-foreground-rgb) / 0.35);
+  text-decoration: line-through;
+}
+
+/* Buy bar: quantity dropdown | Add To Cart, one black bar pinned to the card's bottom. */
+.pb-card-buy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-block-start: auto;
+  padding-block-start: 8px;
+}
+
+.pb-card-buy__form {
+  display: flex;
+  height: var(--pb-buy-height);
+  border-radius: var(--pb-buy-radius);
+  background: var(--pb-buy-bg);
+  color: var(--pb-buy-text);
+  overflow: hidden;
+}
+
+.pb-card-buy__qty {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30%;
+  min-width: 64px;
+  max-width: 96px;
+  border-inline-end: 1px solid rgb(255 255 255 / 0.3);
+}
+
+.pb-card-buy__qty select {
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  padding-inline: 0 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+}
+
+.pb-card-buy__qty select option {
+  color: #000000;
+}
+
+.pb-card-buy__qty select:focus-visible {
+  outline: 2px solid var(--pb-buy-text);
+  outline-offset: -4px;
+}
+
+.pb-card-buy__chevron {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 14px;
+  width: 10px;
+  height: 10px;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+.pb-card-buy add-to-cart-component {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pb-card-buy .pb-card-buy__button,
+.pb-card-buy .pb-card-buy__button:is(:hover, :focus-visible) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--pb-buy-bg);
+  color: var(--pb-buy-text);
+  /* The heading font (Oswald) at its own weight, the same in every state. */
+  font-family: var(--font-heading--family);
+  font-size: 14px;
+  font-weight: var(--font-heading--weight, 400);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pb-card-buy .pb-card-buy__button:is(:hover, :focus-visible) {
+  background: var(--pb-buy-bg-hover);
+}
+
+.pb-card-buy .pb-card-buy__button:disabled {
+  opacity: 1;
+  color: rgb(255 255 255 / 0.5);
+  cursor: not-allowed;
+}
+
+.pb-card-buy .pb-card-buy__button .add-to-cart__added {
+  color: var(--pb-buy-text);
+}
+
+/* Products with options: the whole bar is a Choose Options link. */
+.pb-card-buy .pb-card-buy__button--choose {
+  height: var(--pb-buy-height);
+  border-radius: var(--pb-buy-radius);
+}
+
+/* Mouse and trackpad: at rest the title, stars and price sit at the bottom of the card and
+   the bar waits just below its bottom edge (the card clips it). On hover, or when tabbing
+   into the card, the bar slides up and pushes the text up with it. Only transforms: the
+   bar's space is always kept, so the card doesn't change height. Touch screens can't
+   hover: the bar stays. --pb-card-lift is the bar's height plus the gap above it.
+   Keyboard focus (:focus-visible) keeps it up, not a mouse click: after clicking Add To
+   Cart the button keeps focus, and the bar should still drop when the mouse leaves. */
+@media (hover: hover) and (pointer: fine) {
+  .product-card .product-grid__card.product-grid__card {
+    --pb-card-lift: calc(var(--pb-buy-height) + 8px);
+    --pb-card-slide: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    overflow: hidden;
+  }
+
+  /* The title's link uses display: contents (it can't be moved), so its children move. */
+  .product-grid__card > :not(.card-gallery, .pb-card-buy, .contents),
+  .product-grid__card > .contents > * {
+    translate: 0 var(--pb-card-lift);
+    transition: translate var(--pb-card-slide);
+  }
+
+  .product-grid__card .pb-card-buy {
+    translate: 0 calc(100% + var(--pb-card-padding));
+    transition: translate var(--pb-card-slide);
+  }
+
+  /* The product image steps back a little, the same soft shrink as the category tiles
+     (sections/pb-category-tiles.liquid). */
+  .product-grid__card .card-gallery img {
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .product-card:is(:hover, :has(:focus-visible)) .card-gallery img {
+    scale: 0.96;
+  }
+
+  .product-card:is(:hover, :has(:focus-visible)) .product-grid__card > :not(.card-gallery),
+  .product-card:is(:hover, :has(:focus-visible)) .product-grid__card > .contents > *,
+  .product-card:is(:hover, :has(:focus-visible)) .pb-card-buy {
+    translate: 0 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .product-grid__card > :not(.card-gallery),
+  .product-grid__card > .contents > *,
+  .product-grid__card .pb-card-buy,
+  .product-grid__card .card-gallery img {
+    transition: none;
+  }
+}
+
+/* Collection and search results: the grid's outer edges line up with the title bar and
+   footer cards, 10px from the screen edge (8px on phones), at any screen width. Horizon
+   builds the results layout from --page-margin and caps it at --page-width, so both are
+   changed here, for the results only. */
+.product-grid-container {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .product-grid-container {
+    --page-margin: 8px;
+  }
+
+  /* Horizon adds its own side padding on phones; the 8px margin replaces it. */
+  .product-grid-container .main-collection-grid {
+    padding-inline: 0;
+  }
+}
+
+/* Filters sidebar (collection and search pages): sticks below the compact header while the
+   products scroll; scrolls on its own if taller than the screen. Desktop/tablet only; phones
+   use Horizon's filter drawer. */
+@media screen and (min-width: 750px) {
+  .facets-block-wrapper--vertical {
+    position: sticky;
+    top: 84px;
+    align-self: start;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  :root {
+    --pb-card-padding: 16px;
+    --pb-card-radius: 8px;
+    --pb-buy-height: 44px;
+  }
+
+  .pb-card-buy__qty {
+    min-width: 52px;
+  }
+
+  .pb-card-buy__chevron {
+    inset-inline-end: 9px;
+  }
+}
+
+/* Product rows ("You may also like", product list sections on pages): the cards' outer edges
+   line up with the title bar and footer cards, 10px from the screen edge (8px on phones),
+   the same as the collection grid. Horizon lays these out from --page-margin/--page-width. */
+.shopify-section:has(> product-recommendations, .section-resource-list) {
+  --page-margin: 10px;
+  --page-width: 100vw;
+}
+
+@media screen and (max-width: 749px) {
+  .shopify-section:has(> product-recommendations, .section-resource-list) {
+    --page-margin: 8px;
+  }
+}
+
+/* At most 4 columns at any width (like halcyon.co.nz); fewer when the cards would drop
+   under 250px (Horizon's "medium" card). Overrides the auto-fill in product-grid.liquid.
+   Sized against the grid's container (product-grid.liquid sets container-type), with room
+   for three gaps of up to 32px; --product-grid-gap is a row/column pair, so it can't go in calc. */
+@media screen and (min-width: 750px) {
+  .product-grid.product-grid--grid:not([product-grid-view='zoom-out']) {
+    --product-grid-columns-desktop: repeat(auto-fill, minmax(max(250px, calc((100cqi - 96px) / 4)), 1fr));
+  }
+}
+
+/* Sort above the grid: a sort icon, then "Sort: Best selling". Horizon hides the current
+   option on desktop (desktop:hidden in snippets/sorting.liquid), hence the !important. */
+.sorting-filter .facets__summary {
+  gap: 6px;
+}
+
+.sorting-filter .facets__summary::before {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 2.5v11M2 10.5l3 3 3-3M11 13.5v-11M8 5.5l3-3 3 3'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 2.5v11M2 10.5l3 3 3-3M11 13.5v-11M8 5.5l3-3 3 3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.sorting-filter .facets__summary .facets__label:has(+ .facets__status:not(:empty))::after {
+  content: ':';
+}
+
+.sorting-filter .facets__summary .facets__status:not(:empty) {
+  display: inline-flex !important;
+  margin-inline-start: 0;
+  font-weight: 500;
+}
+
+/* Default collection page (templates/collection.json, main[data-template='collection']): the
+   cards and margins from the collection page design. Every other grid keeps the styles above.
+   - Cards: 23px/20px padding, 6px corners, the title in medium weight, black stars with light
+     grey empty ones, the price set tighter over a small light grey compare-at price.
+   - No buy bar (the template leaves out the pb-card-buy block), so the text stays where it is
+     on hover instead of making room for the bar; the image still steps back.
+   - The grid and the products bar above it (sections/pb-products-bar.liquid) sit 38px from
+     the screen edge at 1440px, as in the design, instead of 10px. */
+[data-template='collection'] {
+  --pb-card-padding: 23px 20px;
+  --pb-card-radius: 6px;
+  --pb-star-color: #000000;
+}
+
+[data-template='collection'] :is(.product-grid-container, .pb-products-bar) {
+  --page-margin: clamp(16px, 2.65vw, 38px);
+  --page-width: 100vw;
+}
+
+[data-template='collection'] .product-grid__card [role='heading'] {
+  color: #0e0e0e;
+  font-weight: 500;
+  line-height: normal;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper {
+  --star-fill-color-rgb: 0 0 0;
+
+  margin-block-start: 0;
+  gap: 9px;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper .stars {
+  --empty-star-fill-color: #bcbcbc !important;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper .rating-count {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+[data-template='collection'] .product-grid__card [ref='priceContainer'] {
+  gap: 0;
+}
+
+[data-template='collection'] .product-grid__card .price {
+  letter-spacing: -0.05em;
+}
+
+[data-template='collection'] .product-grid__card .compare-at-price {
+  color: #bcbcbc;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-template='collection'] .product-card .product-grid__card.product-grid__card {
+    --pb-card-lift: 0px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  [data-template='collection'] {
+    --pb-card-padding: 16px 12px;
+  }
+}

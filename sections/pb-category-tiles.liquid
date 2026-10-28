@@ -1,0 +1,745 @@
+{%- comment -%}
+  Shop by category (Protection Brands): a row of photo tiles, each linking to a collection.
+  A tile takes its collection's image and title; the tile's own image and label replace
+  them. Label bottom-left over a dark fade, a » arrow bottom-right that turns red on hover.
+  When there are more tiles than columns, the row scrolls sideways with the next tile peeking
+  in. Previous/next buttons underneath, and with a mouse, dragging scrolls it
+  (<pb-drag-scroll> below); a plain click still opens the tile.
+  Setup: docs/store-setup/category-tiles-and-brand-logos.md.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+
+  case section.settings.columns
+    when '5'
+      assign sizes = '(min-width: 990px) calc((100vw - 84px) / 5), (min-width: 750px) calc((100vw - 52px) / 3.3), calc((100vw - 24px) / 2.3)'
+    when '3'
+      assign sizes = '(min-width: 990px) calc((100vw - 52px) / 3), (min-width: 750px) calc((100vw - 52px) / 3.3), calc((100vw - 24px) / 2.3)'
+    else
+      assign sizes = '(min-width: 990px) calc((100vw - 68px) / 4.3), (min-width: 750px) calc((100vw - 52px) / 3.3), calc((100vw - 24px) / 2.3)'
+  endcase
+
+  # Nothing to show (no tile has a collection yet): render nothing, not an empty heading.
+  assign tile_count = 0
+  for block in section.blocks
+    if block.settings.collection != blank or request.design_mode
+      assign has_tiles = true
+      assign tile_count = tile_count | plus: 1
+    endif
+  endfor
+  assign columns = section.settings.columns | plus: 0
+-%}
+
+{%- if has_tiles or request.design_mode -%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+</style>
+
+<div
+  class="pb-category-tiles pb-category-tiles--{{ section.settings.ratio }} pb-category-tiles--heading-{{ section.settings.heading_alignment }} pb-category-tiles--label-{{ section.settings.label_alignment }}{% if tile_count <= columns %} pb-category-tiles--fits{% endif %}"
+  style="--pb-tile-bg: url('{{ 'bg-cat.png' | asset_url }}'); --pb-tiles-columns: {{ section.settings.columns }}; --pb-tiles-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-tiles-weight: {{ heading_font.weight }};{% if section.settings.background != blank %} --pb-tiles-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-tiles-text: {{ section.settings.text_color }};{% endif %}"
+>
+  {%- liquid
+    assign show_link = false
+    if section.settings.link_label != blank and section.settings.link != blank
+      assign show_link = true
+    endif
+  -%}
+  {%- if section.settings.heading != blank or show_link -%}
+    <div class="pb-category-tiles__header" data-reveal>
+      {%- if section.settings.heading != blank -%}
+        <h2 class="pb-category-tiles__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if show_link -%}
+        <a class="pb-category-tiles__link" href="{{ section.settings.link }}">
+          {{- section.settings.link_label -}}
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7M8 7h9v9"/>
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <pb-drag-scroll class="pb-category-tiles__scroller">
+  <ul class="pb-category-tiles__grid" role="list" data-reveal>
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign tile_collection = block.settings.collection
+        if tile_collection == blank and request.design_mode == false
+          continue
+        endif
+        assign tile_image = block.settings.image | default: tile_collection.featured_image
+        assign tile_label = block.settings.label | default: tile_collection.title
+      -%}
+      <li {{ block.shopify_attributes }}>
+        {%- if tile_collection != blank -%}
+          <a class="pb-category-tiles__tile" href="{{ tile_collection.url }}">
+        {%- else -%}
+          <div class="pb-category-tiles__tile pb-category-tiles__tile--empty">
+        {%- endif -%}
+
+        {%- if tile_image != blank -%}
+          {{-
+            tile_image
+            | image_url: width: 1080
+            | image_tag:
+              class: 'pb-category-tiles__image',
+              alt: '',
+              loading: 'lazy',
+              widths: '360, 540, 720, 1080',
+              sizes: sizes
+          -}}
+        {%- endif -%}
+
+        <span class="pb-category-tiles__label">
+          {%- if tile_collection != blank -%}
+            {{ tile_label }}
+          {%- else -%}
+            Pick a collection
+          {%- endif -%}
+        </span>
+
+        {%- if tile_collection != blank -%}
+            <svg class="pb-category-tiles__arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m5 5 7 7-7 7M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+  <div class="pb-category-tiles__nav">
+    <button type="button" class="pb-category-tiles__button" data-pb-scroll-prev aria-label="Previous categories" disabled>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 5-7 7 7 7"/>
+      </svg>
+    </button>
+    <button type="button" class="pb-category-tiles__button" data-pb-scroll-next aria-label="Next categories">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 5 7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+  </pb-drag-scroll>
+</div>
+{%- endif -%}
+
+{% javascript %}
+  /*
+    <pb-drag-scroll>: mouse controls for a sideways-scrolling list (its <ul>). Dragging moves
+    the row with the mouse; on release it carries on with the drag's speed and eases onto the
+    nearest item (GSAP, loaded by snippets/pb-head.liquid; a plain smooth scroll without it).
+    The click that ends a drag doesn't open the link. Touch, trackpad and keyboard scrolling
+    are the browser's own.
+    Previous/next buttons ([data-pb-scroll-prev], [data-pb-scroll-next]) under the row scroll
+    one screen of tiles, as in Best sellers; they switch off at either end, and the element
+    gets [data-static] (CSS hides them) when the row doesn't scroll.
+  */
+  if (!customElements.get('pb-drag-scroll')) {
+    customElements.define(
+      'pb-drag-scroll',
+      class extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('ul');
+          if (!this.track) return;
+          this.drag = null;
+
+          this.track.addEventListener('pointermove', this.onMove);
+          this.track.addEventListener('pointerdown', this.onDown);
+          this.track.addEventListener('pointerup', this.onUp);
+          this.track.addEventListener('pointercancel', this.onUp);
+          this.track.addEventListener('click', this.onClick, true);
+          this.track.addEventListener('dragstart', this.onDragStart);
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+          // A wheel or trackpad scroll takes over from a throw in progress.
+          this.track.addEventListener('wheel', this.stopThrow, { passive: true });
+
+          this.prev = this.querySelector('[data-pb-scroll-prev]');
+          this.next = this.querySelector('[data-pb-scroll-next]');
+          this.prev?.addEventListener('click', () => this.go(-1));
+          this.next?.addEventListener('click', () => this.go(1));
+          this.observer = new ResizeObserver(() => this.updateButtons());
+          this.observer.observe(this.track);
+          this.updateButtons();
+        }
+
+        disconnectedCallback() {
+          this.stopThrow();
+          this.observer?.disconnect();
+        }
+
+        // One screen of tiles: the row's width less its side padding (it runs to the screen edges).
+        go(direction) {
+          this.stopThrow();
+          const style = getComputedStyle(this.track);
+          const width = this.track.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          this.track.scrollBy({ left: direction * width, behavior: reduce ? 'auto' : 'smooth' });
+        }
+
+        updateButtons() {
+          const { scrollLeft } = this.track;
+          const max = this.max;
+          if (this.prev) this.prev.disabled = scrollLeft <= 1;
+          if (this.next) this.next.disabled = scrollLeft >= max - 1;
+          this.toggleAttribute('data-static', max <= 1);
+        }
+
+        get max() {
+          return this.track.scrollWidth - this.track.clientWidth;
+        }
+
+        // The scroll position that lines `item` up with the row's start (its side padding).
+        itemScroll(item) {
+          const padding = parseFloat(getComputedStyle(this.track).paddingLeft) || 0;
+          return item.getBoundingClientRect().left - this.track.getBoundingClientRect().left + this.track.scrollLeft - padding;
+        }
+
+        stopThrow = () => {
+          this.throw?.kill();
+          this.throw = null;
+        };
+
+        onMove = (event) => {
+          const drag = this.drag;
+          if (event.pointerType !== 'mouse' || !drag) return;
+          const dx = event.clientX - drag.x;
+          if (!drag.moved && Math.abs(dx) > 4) {
+            drag.moved = true;
+            this.dataset.dragging = '';
+            this.track.setPointerCapture(event.pointerId);
+          }
+          if (drag.moved) {
+            this.track.scrollLeft = drag.scroll - dx;
+            // Speed (px/ms) over the last moves, for the throw on release.
+            const now = performance.now();
+            const dt = now - drag.time;
+            if (dt > 0) drag.velocity = 0.8 * ((drag.lastX - event.clientX) / dt) + 0.2 * drag.velocity;
+            drag.lastX = event.clientX;
+            drag.time = now;
+          }
+        };
+
+        onDown = (event) => {
+          if (event.pointerType !== 'mouse' || event.button !== 0 || this.max <= 1) return;
+          this.stopThrow();
+          this.drag = {
+            x: event.clientX,
+            lastX: event.clientX,
+            time: performance.now(),
+            scroll: this.track.scrollLeft,
+            velocity: 0,
+            moved: false,
+          };
+        };
+
+        onUp = () => {
+          const drag = this.drag;
+          this.drag = null;
+          if (!drag?.moved) return;
+          this.justDragged = true;
+          setTimeout(() => (this.justDragged = false));
+
+          // Carry on with the drag's speed (a pause before letting go means no throw), then
+          // land on the item nearest to where that ends.
+          const still = performance.now() - drag.time > 80;
+          const projected = this.track.scrollLeft + (still ? 0 : drag.velocity * 300);
+          let target = projected;
+          let best = Infinity;
+          for (const item of this.track.children) {
+            const position = this.itemScroll(item);
+            if (Math.abs(position - projected) < best) {
+              best = Math.abs(position - projected);
+              target = position;
+            }
+          }
+          target = Math.min(Math.max(target, 0), this.max);
+
+          const done = () => {
+            this.throw = null;
+            delete this.dataset.dragging;
+          };
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduce) {
+            this.track.scrollLeft = target;
+            done();
+          } else if (window.gsap) {
+            const distance = Math.abs(target - this.track.scrollLeft);
+            this.throw = window.gsap.to(this.track, {
+              scrollLeft: target,
+              duration: Math.min(1.1, 0.5 + distance / 1200),
+              ease: 'power3.out',
+              onComplete: done,
+            });
+          } else {
+            this.track.scrollTo({ left: target, behavior: 'smooth' });
+            setTimeout(done, 600);
+          }
+        };
+
+        onClick = (event) => {
+          if (!this.justDragged) return;
+          event.preventDefault();
+          event.stopPropagation();
+        };
+
+        onDragStart = (event) => event.preventDefault();
+
+        onScroll = () => this.updateButtons();
+      }
+    );
+  }
+{% endjavascript %}
+
+{% stylesheet %}
+  .pb-category-tiles {
+    --pb-tiles-gutter: clamp(16px, 2.5vw, 40px);
+
+    padding: clamp(40px, 5vw, 72px) var(--pb-tiles-gutter);
+    background: var(--pb-tiles-bg, transparent);
+    color: var(--pb-tiles-text, inherit);
+  }
+
+  .pb-category-tiles__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px 16px;
+    margin-bottom: clamp(20px, 2.5vw, 32px);
+  }
+
+  .pb-category-tiles--heading-left .pb-category-tiles__header {
+    justify-content: space-between;
+  }
+
+  .pb-category-tiles__link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    color: var(--pb-accent, #ca0d0d);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .pb-category-tiles__link svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .pb-category-tiles__link:is(:hover, :focus-visible) svg {
+    transform: translate(2px, -2px);
+  }
+
+  .pb-category-tiles__heading {
+    margin: 0;
+    color: inherit;
+    font-family: var(--pb-tiles-font, inherit);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: var(--pb-tiles-weight, 400);
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .pb-category-tiles__scroller {
+    display: block;
+  }
+
+  /* A row that scrolls sideways: --pb-tiles-per-view whole tiles plus 0.3 of the next one
+     peeking in, so it's clear there's more. With no more tiles than columns (--fits), the
+     desktop row just fills the width. */
+  .pb-category-tiles__grid {
+    --pb-tiles-gap: 8px;
+    --pb-tiles-per-view: 2;
+    --pb-tiles-peek: 0.3;
+
+    display: grid;
+    grid-auto-columns: calc(
+      (100% - var(--pb-tiles-per-view) * var(--pb-tiles-gap)) / (var(--pb-tiles-per-view) + var(--pb-tiles-peek))
+    );
+    grid-auto-flow: column;
+    gap: var(--pb-tiles-gap);
+    /* Flush to the screen edges: the row runs under the section's side padding, so tiles
+       scroll out at the edge of the screen, while padding (and scroll-padding, for snapping)
+       keeps the first and last tiles in line with the heading. 6px top and bottom is room
+       for the focus outline, which overflow would otherwise clip. */
+    margin: -6px calc(-1 * var(--pb-tiles-gutter));
+    padding: 6px var(--pb-tiles-gutter);
+    scroll-padding-inline: var(--pb-tiles-gutter);
+    overflow-x: auto;
+    /* Without this, overflow-y computes to auto, and the tiles' reveal offset makes the row
+       scroll vertically (as in Best sellers). */
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    list-style: none;
+  }
+
+  /* Touch: each swipe stops on a tile. Mouse and trackpad scroll freely (snapping fights a
+     trackpad, and a drag eases onto a tile itself, see <pb-drag-scroll>). */
+  @media (hover: none), (pointer: coarse) {
+    .pb-category-tiles__grid {
+      scroll-snap-type: x mandatory;
+    }
+  }
+
+  .pb-category-tiles__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pb-category-tiles__grid > li {
+    min-width: 0;
+    scroll-snap-align: start;  }
+
+  @media screen and (min-width: 750px) {
+    .pb-category-tiles__grid {
+      --pb-tiles-gap: 16px;
+      --pb-tiles-per-view: 3;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-category-tiles__grid {
+      --pb-tiles-per-view: var(--pb-tiles-columns, 4);
+    }
+
+    .pb-category-tiles--fits .pb-category-tiles__grid {
+      --pb-tiles-peek: 0;
+      grid-auto-columns: calc(
+        (100% - (var(--pb-tiles-per-view) - 1) * var(--pb-tiles-gap)) / var(--pb-tiles-per-view)
+      );
+    }
+  }
+
+  /* Previous/next buttons under the row, as in Best sellers; white on the grey section. */
+  .pb-category-tiles__nav {
+    display: flex;
+    gap: 10px;
+    margin-top: clamp(16px, 2vw, 24px);
+  }
+
+  .pb-category-tiles__scroller[data-static] .pb-category-tiles__nav {
+    display: none;
+  }
+
+  .pb-category-tiles__button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: #fff;
+    color: #111;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .pb-category-tiles__button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pb-category-tiles__button:not(:disabled):is(:hover, :focus-visible) {
+    background: var(--pb-buy-bg, #000);
+    color: var(--pb-buy-text, #fff);
+  }
+
+  .pb-category-tiles__button:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+
+  /* No text selection while the row is dragged. */
+  .pb-category-tiles__scroller[data-dragging] .pb-category-tiles__grid {
+    user-select: none;
+  }
+
+  .pb-category-tiles__tile {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    aspect-ratio: 1;
+    padding: clamp(14px, 1.6vw, 24px);
+    overflow: hidden;
+    border-radius: 8px;
+    /* Studio spotlight behind the product (assets/bg-cat.png), over the tile's dark colour. */
+    background: var(--pb-tile-bg, none) center / cover no-repeat, #111;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .pb-category-tiles--landscape .pb-category-tiles__tile {
+    aspect-ratio: 4 / 3;
+  }
+
+  .pb-category-tiles--portrait .pb-category-tiles__tile {
+    aspect-ratio: 3 / 4;
+  }
+
+  .pb-category-tiles--tall .pb-category-tiles__tile {
+    aspect-ratio: 7 / 8;
+  }
+
+  /* Centred labels: no arrow, the label sits centred along the bottom. */
+  .pb-category-tiles--label-center .pb-category-tiles__label {
+    text-align: center;
+  }
+
+  .pb-category-tiles--label-center .pb-category-tiles__arrow {
+    display: none;
+  }
+
+  /* Dark fade from the bottom so the label reads on any photo. */
+  .pb-category-tiles__tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(0deg, rgb(0 0 0 / 0.7) 0%, transparent 55%);
+  }
+
+  .pb-category-tiles__image {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* A little smaller than the tile, so the product has room around it; the tile's dark
+       background shows round the edges. Centred a little above the label. */
+    transform: scale(0.78);
+    transform-origin: 50% 40%;
+    /* Scroll parallax: assets/pb-motion.js sets --pb-tile-shift on the tile. */
+    translate: 0 var(--pb-tile-shift, 0%);
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .pb-category-tiles__label {
+    flex: 1;
+    display: -webkit-box;
+    overflow: hidden;
+    font-family: var(--pb-tiles-font, inherit);
+    font-size: clamp(1rem, 1.5vw, 1.5rem);
+    font-weight: var(--pb-tiles-weight, 400);
+    line-height: 1.05;
+    text-transform: uppercase;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .pb-category-tiles__arrow {
+    flex: none;
+    width: clamp(22px, 2.2vw, 32px);
+    height: clamp(22px, 2.2vw, 32px);
+    transition: color 0.2s ease;
+  }
+
+  a.pb-category-tiles__tile:is(:hover, :focus-visible) .pb-category-tiles__arrow {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  /* Hover: the product steps back a little (78% -> about 75% of the tile), with the separate
+     scale property on top of the 78% transform. */
+  a.pb-category-tiles__tile:is(:hover, :focus-visible) .pb-category-tiles__image {
+    scale: 0.96;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-category-tiles__image {
+      transition: none;
+    }
+  }
+
+  a.pb-category-tiles__tile:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 3px;
+  }
+
+  .pb-category-tiles__tile--empty {
+    border: 1px dashed rgb(255 255 255 / 0.3);
+    color: #9a9a9a;
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-category-tiles {
+      --pb-tiles-gutter: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Category tiles (PB)",
+  "tag": "section",
+  "class": "pb-category-tiles-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by category"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "info": "Tiles in view at once. With more tiles than this, the row scrolls sideways. Tablets show 3, phones 2.",
+      "options": [
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
+        }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Tile shape",
+      "options": [
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "tall",
+          "label": "Slightly tall (7:8)"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait (3:4)"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "left",
+          "label": "Left, link on the right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "label_alignment",
+      "label": "Tile labels",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left, with arrow"
+        },
+        {
+          "value": "center",
+          "label": "Centred"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "info": "Optional, e.g. \"All categories\". Shown beside the heading."
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Optional. Defaults to the page background."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading colour"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "The tile links here and uses its image and title."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Optional. Replaces the collection's image on this tile."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Optional. Replaces the collection's title on this tile."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category tiles (PB)",
+      "blocks": [
+        {
+          "type": "tile"
+        },
+        {
+          "type": "tile"
+        },
+        {
+          "type": "tile"
+        },
+        {
+          "type": "tile"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,205 @@
+/*
+  Protection Brands page intro: what is on screen when an inner page loads rises into place.
+
+  Everything starts *visible* (40% opacity, slightly lower), never hidden, so first paint and
+  LCP are unaffected (.claude/skills/animation-perf, rule 1). Pure CSS: it plays at first
+  paint, needs no script, and only animates transform and opacity. Fill mode is `backwards`,
+  so once each animation ends the element is left to its normal styles.
+
+  Further down the page, product cards and the footer reveal on scroll instead
+  (assets/pb-motion.js).
+
+  No motion for visitors who prefer reduced motion.
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pb-intro-rise {
+    from {
+      opacity: 0.4;
+      transform: translateY(24px);
+    }
+  }
+
+  @keyframes pb-intro-card {
+    from {
+      opacity: 0.4;
+      transform: translateY(28px) scale(0.985);
+    }
+  }
+
+  /* Product cards: fade only, no movement. */
+  @keyframes pb-intro-fade {
+    from {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes pb-intro-drift {
+    from {
+      transform: translateX(72px);
+    }
+  }
+
+  /* Homepage (layout/pb-landing.liquid): the header rises in, the two headings slide in
+     from the left and right, and the footer links slide down last. The bottles' own
+     entrance is in the 3D scene (assets/pb-hero-bottle.js). */
+  /* Homepage: the header and headings start at 40% (they are the page's largest content,
+     so starting visible keeps LCP and Speed Index quick); the footer links, small and
+     never the main content, start fully transparent, by request. The still image of the
+     bottles (only if one is uploaded) drops in; the 3D bottles drop in on their own. CSS only. */
+  @keyframes pb-intro-from-left {
+    from {
+      opacity: 0.4;
+      transform: translateX(-56px);
+    }
+  }
+
+  @keyframes pb-intro-from-right {
+    from {
+      opacity: 0.4;
+      transform: translateX(56px);
+    }
+  }
+
+  @keyframes pb-intro-fade-up {
+    from {
+      opacity: 0.4;
+      transform: translateY(24px);
+    }
+  }
+
+  @keyframes pb-intro-bottles {
+    from {
+      opacity: 0.4;
+      transform: translateY(-64px);
+    }
+  }
+
+  @keyframes pb-intro-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+  }
+
+  /* Logo intro, first homepage view of the session (html[data-pb-logo-intro], set in
+     layout/pb-landing.liquid): the red swoosh sweeps in from the left, in the direction it
+     is drawn, then the wordmark slides in. A small element, so the clip reveal is cheap. */
+  @keyframes pb-logo-swoosh {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes pb-logo-wordmark {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+
+  html[data-pb-logo-intro] .pb-landing .pb-logo__swoosh {
+    animation: pb-logo-swoosh 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.15s backwards;
+  }
+
+  html[data-pb-logo-intro] .pb-landing .pb-logo__wordmark {
+    animation: pb-logo-wordmark 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.55s backwards;
+  }
+
+  .pb-landing .pb-landing-header {
+    animation: pb-intro-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__poster {
+    animation: pb-intro-bottles 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__text--start {
+    animation: pb-intro-from-left 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+  }
+
+  .pb-landing .pb-hero-bottle__text--end {
+    animation: pb-intro-from-right 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards;
+  }
+
+  .pb-landing .pb-landing-footer {
+    animation: pb-intro-drop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.6s backwards;
+  }
+
+  /* Collection title bar: the card, then its title and category row, while the wordmark
+     slides in behind them. */
+  .pb-collection-header {
+    animation: pb-intro-card 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .pb-collection-header__title {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+  }
+
+  .pb-collection-header__meta,
+  .pb-collection-header__search {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.17s backwards;
+  }
+
+  .pb-collection-header__nav,
+  .pb-collection-header__hint {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.22s backwards;
+  }
+
+  .pb-collection-header__marquee.pb-marquee--static .pb-marquee__track {
+    animation: pb-intro-drift 1.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .pb-breadcrumb-bar {
+    animation: pb-intro-card 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  /* Product page: gallery, then the details column, rise in. */
+  .product-information .media-gallery,
+  .product-information media-gallery {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .product-information .product-details > * {
+    animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+  }
+
+  /* Product grid (collection and search pages): the first eight cards fade in, one after
+     another, without moving. nth-of-type, because the grid's first child is a script. */
+  .product-grid > .product-grid__item:nth-of-type(-n + 8) {
+    animation: pb-intro-fade 0.7s ease-out backwards;
+    animation-delay: calc(0.25s + var(--pb-intro-index, 0) * 0.06s);
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(2) {
+    --pb-intro-index: 1;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(3) {
+    --pb-intro-index: 2;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(4) {
+    --pb-intro-index: 3;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(5) {
+    --pb-intro-index: 4;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(6) {
+    --pb-intro-index: 5;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(7) {
+    --pb-intro-index: 6;
+  }
+
+  .product-grid > .product-grid__item:nth-of-type(8) {
+    --pb-intro-index: 7;
+  }
+}
