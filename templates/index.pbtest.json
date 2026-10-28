@@ -1,0 +1,76 @@
+{
+  "layout": "pb-landing",
+  "sections": {
+    "t": {
+      "type": "pb-category-tiles",
+      "blocks": {
+        "b0": {
+          "type": "tile",
+          "settings": {
+            "collection": "car-care"
+          }
+        },
+        "b1": {
+          "type": "tile",
+          "settings": {
+            "collection": "professional"
+          }
+        },
+        "b2": {
+          "type": "tile",
+          "settings": {
+            "collection": "permagard-car-care"
+          }
+        },
+        "b3": {
+          "type": "tile",
+          "settings": {
+            "collection": "cerface-ceramic"
+          }
+        },
+        "b4": {
+          "type": "tile",
+          "settings": {
+            "collection": "optivan-caravan-maintenance"
+          }
+        }
+      },
+      "block_order": [
+        "b0",
+        "b1",
+        "b2",
+        "b3",
+        "b4"
+      ],
+      "settings": {
+        "heading": "Shop by category",
+        "columns": "4",
+        "ratio": "square"
+      }
+    },
+    "l": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "a": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/AtHomeDetailersKit.png",
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Test"
+          }
+        }
+      },
+      "block_order": [
+        "a"
+      ],
+      "settings": {
+        "logo_height": 48,
+        "greyscale": true
+      }
+    }
+  },
+  "order": [
+    "t",
+    "l"
+  ]
+}

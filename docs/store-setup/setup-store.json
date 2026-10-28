@@ -1,0 +1,130 @@
+{
+  "_readme": "What setup-store.mjs creates on a store. See automated-setup.md. Keep in step with README.md, sds.md and categories-dev-to-live.md.",
+
+  "metaobjectDefinitions": [
+    {
+      "type": "sds_document",
+      "name": "SDS document",
+      "displayNameKey": "product_name",
+      "storefront": "PUBLIC_READ",
+      "fields": [
+        { "key": "product_name", "name": "Product name", "type": "single_line_text_field", "required": true },
+        { "key": "file", "name": "File", "type": "file_reference", "required": true },
+        {
+          "key": "brand",
+          "name": "Brand",
+          "type": "single_line_text_field",
+          "choices": ["Permagard", "CERFACE", "OptiVAN", "Honda Genuine Car Care", "Protection Brands"]
+        },
+        { "key": "issue_date", "name": "Issue date", "type": "date" }
+      ]
+    }
+  ],
+
+  "metafieldDefinitions": [
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "suitable_for",
+      "name": "Suitable for",
+      "type": "list.single_line_text_field",
+      "choices": ["Permagard", "CERFACE", "OptiVAN", "Honda Genuine Car Care"],
+      "collectionCondition": true
+    },
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "sds",
+      "name": "SDS",
+      "type": "metaobject_reference",
+      "metaobjectType": "sds_document"
+    },
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "how_to_use",
+      "name": "How to use",
+      "type": "multi_line_text_field"
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "hero_image",
+      "name": "Hero image",
+      "type": "file_reference",
+      "fileTypes": ["Image"]
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "watermark",
+      "name": "Watermark",
+      "type": "single_line_text_field"
+    }
+  ],
+
+  "files": [
+    { "dir": "../../../product-images/upload-webp", "pattern": "\\.webp$" }
+  ],
+
+  "collections": [
+    { "handle": "wash-shampoo", "title": "Wash & Shampoo", "rules": [["TYPE", "Wash & Shampoo"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "cleaners-sprays", "title": "Cleaners & Sprays", "rules": [["TYPE", "Cleaners & Sprays"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "microfibre-drying", "title": "Microfibre & Drying", "rules": [["TYPE", "Microfibre & Drying"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "kits-packs", "title": "Kits & Packs", "rules": [["TYPE", "Kits & Packs"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "power-emergency", "title": "Power & Emergency", "rules": [["TYPE", "Power & Emergency"]], "sortOrder": "BEST_SELLING" },
+
+    { "handle": "permagard-car-care", "title": "Permagard Car Care", "rules": [["SUITABLE_FOR", "Permagard"]], "templateSuffix": "brand" },
+    { "handle": "cerface-ceramic", "title": "CERFACE Ceramic", "rules": [["SUITABLE_FOR", "CERFACE"]], "templateSuffix": "brand" },
+    { "handle": "optivan-caravan-maintenance", "title": "OptiVAN Caravan Maintenance", "rules": [["SUITABLE_FOR", "OptiVAN"]], "templateSuffix": "brand" },
+    { "handle": "honda-genuine-car-care", "title": "Honda Genuine Car Care", "rules": [["SUITABLE_FOR", "Honda Genuine Car Care"]], "templateSuffix": "brand", "watermark": "Honda" },
+
+    { "handle": "bulk-professional", "title": "Bulk & Professional", "rules": [["TAG", "Bulk"]] }
+  ],
+
+  "pages": [
+    {
+      "handle": "sds",
+      "title": "Safety Data Sheets",
+      "templateSuffix": "sds",
+      "published": true,
+      "body": "<p>Safety Data Sheets (SDS) for our products. If you need a sheet that isn't listed, please contact us.</p>"
+    }
+  ],
+
+  "redirects": [],
+
+  "menus": [
+    {
+      "handle": "main-menu-2026",
+      "title": "Main menu 2026",
+      "items": [
+        { "title": "Shop", "link": "catalog", "items": [
+          { "title": "By category", "link": "catalog", "items": [
+            { "title": "Wash & Shampoo", "link": "collection:wash-shampoo" },
+            { "title": "Cleaners & Sprays", "link": "collection:cleaners-sprays" },
+            { "title": "Microfibre & Drying", "link": "collection:microfibre-drying" },
+            { "title": "Kits & Packs", "link": "collection:kits-packs" },
+            { "title": "Power & Emergency", "link": "collection:power-emergency" }
+          ] },
+          { "title": "By brand", "link": "catalog", "items": [
+            { "title": "Permagard", "link": "collection:permagard-car-care" },
+            { "title": "CERFACE", "link": "collection:cerface-ceramic" },
+            { "title": "OptiVAN", "link": "collection:optivan-caravan-maintenance" },
+            { "title": "Honda Genuine Car Care", "link": "collection:honda-genuine-car-care" }
+          ] },
+          { "title": "Professional / Bulk", "link": "collection:professional" }
+        ] },
+        { "title": "Services", "link": "url:#", "items": [
+          { "title": "Product Reapplication", "link": "collection:reapplication" },
+          { "title": "Warranty Transfer", "link": "collection:warranty-transfer" },
+          { "title": "Warranty Claim", "link": "url:https://spark.permagard.com.au/warrantyclaim/" }
+        ] },
+        { "title": "Car Care Tips", "link": "blog:car-care-tips" },
+        { "title": "SDS", "link": "page:sds" },
+        { "title": "About Us", "link": "page:about-us" },
+        { "title": "Contact", "link": "page:contact-page" }
+      ]
+    }
+  ]
+}

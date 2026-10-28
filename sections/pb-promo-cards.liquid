@@ -108,13 +108,13 @@
     object-fit: cover;
   }
 
-  /* Hover: the card lifts a little. */
+  /* Hover: the card shrinks a little (as the category tiles and brand logos). */
   .pb-promo-cards__card {
-    transition: translate 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   a.pb-promo-cards__card:is(:hover, :focus-visible) {
-    translate: 0 -6px;
+    scale: 0.97;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -2,7 +2,9 @@
   Protection Brands 3D hero bottle: <pb-hero-bottle>, rendered by sections/pb-hero-bottle.liquid.
 
   One or two bottles float with their labels facing out. They drift, turn and tilt towards
-  the mouse, and lift as the hero scrolls away; they don't spin on their own. The headings
+  the mouse, and lift as the hero scrolls away; they don't spin on their own. With a mouse,
+  a bottle can be grabbed: press on it and drag, and it follows the mouse, tipping with the
+  movement; let go and it springs back to its place (GRAB). The headings
   follow the mouse slightly and the scrolling wordmark drifts the other way. Each bottle is
   built in code from a profile measured from its product photo (MODELS); the label artwork
   wraps all the way round, front facing out. The first is the clear Detailing Spray bottle
@@ -98,6 +100,21 @@ const LAYOUTS = {
 
 const FLOAT = 0.18; // float height
 
+/* Share of the key light's brightness given to the light that casts the shadows (see
+   #addLights). Higher makes the front bottle's shadow on the back bottle stronger. */
+const SHADOW_SHARE = 0.5;
+
+/* Grabbing a bottle (mouse only): while held it follows the pointer on a stiff spring and
+   grows a little; let go and a softer spring brings it back with a bounce. It tips with
+   its sideways speed (tilt per unit of speed, capped). Springs: stiffness and damping. */
+const GRAB = {
+  hold: { stiffness: 140, damping: 20 },
+  release: { stiffness: 55, damping: 6 },
+  scale: 1.08,
+  tilt: 0.05,
+  maxTilt: 0.6,
+};
+
 /* Mouse parallax, at Mouse follow 100%: bottles move towards the mouse (scene units, scaled
    by each bottle's depth), the wordmark behind moves the other way (px). */
 const PARALLAX = { bottleX: 1.6, bottleY: 1, wordmarkX: 110, wordmarkY: 36 };
@@ -124,9 +141,9 @@ const LOOK = {
   gloss: 0.5, // clear-coat shine on the plastic, liquid and label
   keyLight: 0.5, // main light from the upper right
   rimLight: 0.25, // coloured light from behind, along the left edges
-  rimColor: '#ca0d0d',
+  rimColor: '#ffffff',
   shadow: 0.45, // darkness of the shadow behind the bottles
-  shadowBlur: 24, // softness of the shadows
+  shadowBlur: 54, // softness of the shadows
 };
 
 function readLook(dataset) {
@@ -187,6 +204,7 @@ class PBHeroBottle extends HTMLElement {
   #surfacePoint;
   #pointer = { x: 0, y: 0, targetX: 0, targetY: 0, clientX: -1, clientY: -1, moved: false };
   #hovered = -1; // index of the bottle under the mouse, -1 for none
+  #grab = null; // the bottle being dragged: { index, x, y, unitsPerPx, px, py } (x, y: px where it was grabbed; px, py: the mouse drift then)
   #raycaster;
   #ndc;
   #marquee;
@@ -292,6 +310,8 @@ class PBHeroBottle extends HTMLElement {
         spec,
         surface,
         slosh: { x: 0, vx: 0, z: 0, vz: 0, px: null, py: 0, pz: 0, ry: 0, speedX: 0, speedY: 0, speedZ: 0 },
+        // Offset from its place while grabbed or springing back (scene units), and its speed.
+        drag: { x: 0, y: 0, vx: 0, vy: 0 },
       });
     });
 
@@ -325,7 +345,12 @@ class PBHeroBottle extends HTMLElement {
   }
 
   #addLights(THREE, look) {
-    const key = new THREE.DirectionalLight(0xffffff, 1.4 * look.keyLight);
+    // The key light is split in two: most of it from the upper right (highlights), and a
+    // share from in front (SHADOW_SHARE) that casts the shadows. A shadow only takes away its
+    // own light's share, so that light needs real brightness for the front bottle's shadow
+    // to show on the one behind; together they light the bottles as the key light alone did.
+    const keyIntensity = 1.4 * look.keyLight;
+    const key = new THREE.DirectionalLight(0xffffff, keyIntensity * (1 - SHADOW_SHARE));
     key.position.set(4, 6, 8);
     // Rim light from behind, picks out the edges against the dark background.
     const rim = new THREE.DirectionalLight(new THREE.Color(look.rimColor), look.rimLight);
@@ -335,7 +360,7 @@ class PBHeroBottle extends HTMLElement {
     this.#scene.add(key, rim, fill);
 
     // Shadow light: from the upper right, in front, so shadows fall down and to the left.
-    const shadowLight = new THREE.DirectionalLight(0xffffff, 0.01);
+    const shadowLight = new THREE.DirectionalLight(0xffffff, keyIntensity * SHADOW_SHARE);
     shadowLight.position.set(3, 3, 10);
     shadowLight.castShadow = true;
     const shadow = shadowLight.shadow;
@@ -396,10 +421,60 @@ class PBHeroBottle extends HTMLElement {
         { passive: true, signal }
       );
 
+      // Grab: press on a bottle (not on a link or button) and drag. The pointer is captured so
+      // the drag carries on outside the hero; the click after a drag is ignored.
+      let dragged = false;
+      this.addEventListener(
+        'pointerdown',
+        (event) => {
+          if (event.button !== 0 || reducedMotion.matches || event.target.closest('a, button')) return;
+          pointer.clientX = event.clientX;
+          pointer.clientY = event.clientY;
+          this.#updateHover(this.getBoundingClientRect());
+          if (this.#hovered < 0) return;
+          event.preventDefault(); // no text selection
+          const { spec } = this.#bottles[this.#hovered];
+          const camera = this.#camera;
+          const height = this.querySelector('canvas').getBoundingClientRect().height;
+          const view = 2 * (camera.position.z - spec.position[2]) * Math.tan(THREE_DEG(camera.fov / 2));
+          this.#grab = { index: this.#hovered, x: event.clientX, y: event.clientY, unitsPerPx: view / height, px: pointer.x, py: pointer.y };
+          dragged = false;
+          this.setPointerCapture(event.pointerId);
+          this.style.cursor = 'grabbing';
+        },
+        { signal }
+      );
+      this.addEventListener(
+        'pointermove',
+        (event) => {
+          if (this.#grab && Math.hypot(event.clientX - this.#grab.x, event.clientY - this.#grab.y) > 4) dragged = true;
+        },
+        { signal }
+      );
+      const release = () => {
+        const grab = this.#grab;
+        if (!grab) return;
+        // The held bottle ignored the mouse drift; hand the difference to its spring so it
+        // doesn't jump when the drift comes back, it springs from where it was let go.
+        const { drag, spec } = this.#bottles[grab.index];
+        const drift = spec.depth * strength;
+        drag.x += (grab.px - pointer.x) * PARALLAX.bottleX * drift;
+        drag.y -= (grab.py - pointer.y) * PARALLAX.bottleY * drift;
+        this.#grab = null;
+        this.style.cursor = this.#hovered < 0 ? '' : this.#texts.length ? 'pointer' : 'grab';
+      };
+      this.addEventListener('pointerup', release, { signal });
+      this.addEventListener('pointercancel', release, { signal });
+      this.addEventListener('lostpointercapture', release, { signal });
+
       // Clicking a bottle goes where its heading's Shop now button goes.
       this.addEventListener(
         'click',
         (event) => {
+          if (dragged) {
+            dragged = false;
+            return;
+          }
           if (this.#hovered < 0 || event.target.closest('a, button')) return;
           const href = this.#texts[this.#hovered]?.querySelector('a')?.href;
           if (href) window.location.href = href;
@@ -456,7 +531,9 @@ class PBHeroBottle extends HTMLElement {
     if (hovered < 0) delete this.dataset.hover;
     else this.dataset.hover = String(hovered + 1);
     this.#texts.forEach((text, index) => text.classList.toggle('is-active', index === hovered));
-    this.style.cursor = hovered < 0 ? '' : 'pointer';
+    if (this.#grab) return;
+    // Split layout: clicking a bottle opens its heading's link. Welcome: it can be grabbed.
+    this.style.cursor = hovered < 0 ? '' : this.#texts.length ? 'pointer' : 'grab';
   }
 
   /* Keeps each bottle's liquid surface level in the world and sloshes it against the
@@ -549,21 +626,39 @@ class PBHeroBottle extends HTMLElement {
       return introDrop(now - this.#introStart - index * INTRO.stagger);
     };
 
-    this.#bottles.forEach(({ group, spec }, index) => {
-      // The bottle under the mouse grows a little.
-      const scale = group.scale.x + ((index === this.#hovered ? 1.05 : 1) - group.scale.x) * ease * 2;
+    const grab = this.#grab;
+    this.#bottles.forEach(({ group, spec, drag }, index) => {
+      // Grabbed: follows the pointer (offset from where it was picked up); otherwise springs
+      // back to its place.
+      const held = grab?.index === index;
+      const spring = held ? GRAB.hold : GRAB.release;
+      const targetX = held ? (pointer.clientX - grab.x) * grab.unitsPerPx : 0;
+      const targetY = held ? -(pointer.clientY - grab.y) * grab.unitsPerPx : 0;
+      drag.vx += (spring.stiffness * (targetX - drag.x) - spring.damping * drag.vx) * dt;
+      drag.vy += (spring.stiffness * (targetY - drag.y) - spring.damping * drag.vy) * dt;
+      drag.x += drag.vx * dt;
+      drag.y += drag.vy * dt;
+      const tip = Math.min(Math.max(drag.vx * GRAB.tilt, -GRAB.maxTilt), GRAB.maxTilt);
+      // The held bottle stays under the pointer: no mouse drift while it's held.
+      const driftX = held ? grab.px : pointer.x;
+      const driftY = held ? grab.py : pointer.y;
+
+      // The bottle under the mouse grows a little, more while it's held.
+      const grow = held ? GRAB.scale : index === this.#hovered ? 1.05 : 1;
+      const scale = group.scale.x + (grow - group.scale.x) * ease * 2;
       group.scale.setScalar(scale);
       group.rotation.x = spec.tilt[0] + pointer.y * 0.35 * strength;
       group.rotation.y = spec.tilt[1] + pointer.x * 0.8 * strength;
-      group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength;
+      group.rotation.z = spec.tilt[2] - pointer.x * 0.2 * strength - tip;
       // Drift towards the mouse; the front bottle moves further than the one behind.
-      group.position.x = spec.position[0] + pointer.x * PARALLAX.bottleX * spec.depth * strength;
+      group.position.x = spec.position[0] + driftX * PARALLAX.bottleX * spec.depth * strength + drag.x;
       group.position.y =
         spec.position[1] -
-        pointer.y * PARALLAX.bottleY * spec.depth * strength +
+        driftY * PARALLAX.bottleY * spec.depth * strength +
         Math.sin(this.#clock * 1.1 + spec.phase) * FLOAT +
         scrolled * 3 +
-        introOffset(index);
+        introOffset(index) +
+        drag.y;
     });
 
     this.#updateLiquids(dt);

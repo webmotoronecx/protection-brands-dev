@@ -108,7 +108,10 @@
 
         go(direction) {
           const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          this.track.scrollBy({ left: direction * this.track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+          // One screen of cards: the row's width less its side padding (it runs to the screen edges).
+          const style = getComputedStyle(this.track);
+          const width = this.track.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+          this.track.scrollBy({ left: direction * width, behavior: reduce ? 'auto' : 'smooth' });
         }
 
         update() {
@@ -130,7 +133,9 @@
   }
 
   .pb-best-sellers__inner {
-    padding: clamp(40px, 5vw, 72px) clamp(16px, 2.5vw, 40px) clamp(32px, 3vw, 48px);
+    --pb-best-gutter: clamp(16px, 2.5vw, 40px);
+
+    padding: clamp(40px, 5vw, 72px) var(--pb-best-gutter) clamp(32px, 3vw, 48px);
   }
 
   .pb-best-sellers__header {
@@ -190,8 +195,12 @@
     grid-auto-columns: calc((100% - (var(--pb-best-per-view) - 1) * var(--pb-best-gap)) / var(--pb-best-per-view));
     grid-auto-flow: column;
     gap: var(--pb-best-gap);
-    margin: 0;
-    padding: 0;
+    /* Flush to the screen edges: the row runs under the section's side padding, so cards
+       scroll out at the edge of the screen, while padding (and scroll-padding, for snapping)
+       keeps the first and last cards in line with the heading. */
+    margin: 0 calc(-1 * var(--pb-best-gutter));
+    padding: 0 var(--pb-best-gutter);
+    scroll-padding-inline: var(--pb-best-gutter);
     overflow-x: auto;
     /* Without this, overflow-y computes to auto, and the cards' reveal offset and hidden
        Add To Cart bar make the row scroll vertically: Lenis hands wheel scrolls to it and
@@ -214,8 +223,7 @@
 
   .pb-best-sellers__item {
     min-width: 0;
-    scroll-snap-align: start;
-  }
+    scroll-snap-align: start;  }
 
   .pb-best-sellers__item > * {
     height: 100%;
@@ -268,7 +276,7 @@
 
   @media screen and (max-width: 749px) {
     .pb-best-sellers__inner {
-      padding-inline: 16px;
+      --pb-best-gutter: 16px;
     }
 
     .pb-best-sellers__track {

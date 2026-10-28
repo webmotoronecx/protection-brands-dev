@@ -111,7 +111,7 @@
     color: inherit;
     font-size: clamp(1.5rem, 1.6vw, 2rem);
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     text-align: center;
     text-transform: uppercase;
   }
@@ -140,7 +140,21 @@
     max-width: 240px;
     height: var(--pb-logo-height, 48px);
     object-fit: contain;
-    transition: filter 0.2s ease, opacity 0.2s ease;
+    transition:
+      filter 0.2s ease,
+      opacity 0.2s ease,
+      scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Hover: the logo shrinks a little (as the category tile images). */
+  a.pb-brand-logos__logo:is(:hover, :focus-visible) img {
+    scale: 0.94;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-brand-logos__logo img {
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
   }
 
   .pb-brand-logos--greyscale .pb-brand-logos__logo img {

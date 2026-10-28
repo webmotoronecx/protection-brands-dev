@@ -9,14 +9,16 @@ Theme files: `templates/page.sds.json`, `blocks/sds-list.liquid`, `snippets/sds-
 
 ## 1. Metaobject definition
 
-**Settings → Metafields and metaobjects → Metaobjects → Add definition**
+**Content → Metaobjects → Add definition** (if entries already exist, the button is under
+**Manage definitions**). Metaobjects are no longer listed under **Settings → Metafields and
+metaobjects**, which now only covers metafields.
 
 Name **SDS document**. Type (handle) must be `sds_document`. Turn on **Storefront access**.
 
 | Field name | Key | Type | Validation |
 |---|---|---|---|
 | Product name | `product_name` | Single line text | Required |
-| File | `file` | File | Required; accept PDFs |
+| File | `file` | File | Required; accepted file types **Any file type** (there's no PDF-only option, and *Media files only* blocks PDFs) |
 | Brand | `brand` | Single line text | Preset choices: `Permagard`, `CERFACE`, `OptiVAN`, `Honda Genuine Car Care`, `Protection Brands` |
 | Issue date | `issue_date` | Date | — |
 

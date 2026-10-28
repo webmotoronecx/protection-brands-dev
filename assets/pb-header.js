@@ -1,7 +1,7 @@
 /*
   <pb-header-watch>, placed inside the light PB header (sections/pb-landing-header.liquid).
-  Adds .is-scrolled to the header once the page has scrolled, which switches it to a
-  see-through, blurred background.
+  Adds .is-scrolled to the header once the page has scrolled, which shrinks it to the compact
+  white bar.
 
   Uses Horizon's own sticky-header technique: the header section sticks at top: -1px, so as
   soon as the page scrolls it is 1px out of view and an IntersectionObserver with threshold 1
@@ -43,16 +43,24 @@ if (!customElements.get('pb-header-watch')) customElements.define('pb-header-wat
 
 /*
   <pb-hero-watch>, placed inside the dark homepage header. Adds .is-past-hero to the header
-  while the light page sections are under it: from when the first section below the hero
-  slides up under the header until the dark footer reaches it. The header then shows as the
-  compact frosted bar with a dark logo (sections/pb-landing-header.liquid).
+  once the page has scrolled about 100px; the header then shows as the compact white bar with
+  a dark logo (sections/pb-landing-header.liquid). The change is made out of sight: the header
+  slides up (.is-hidden), switches, then slides back down. Straight away with reduced motion
+  or when the page loads already scrolled.
 
-  One IntersectionObserver on a strip along the top 10% of the screen (about the header's
-  height), watching that first section and the footer; no scroll listener. Each crossing says
-  whether the element's top is above the strip's bottom.
+  A 100px tall, empty sentinel is put at the top of the page content (a negative margin cancels
+  its height, so nothing moves) and one IntersectionObserver reports when it has scrolled out
+  of view. No scroll listener. The observer root follows Horizon's scroll container.
 */
+const SCROLL_OFFSET = 100;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 class PBHeroWatch extends HTMLElement {
   #observer;
+  #sentinel;
+  #header;
+  #past;
+  #hiding = false;
   #onChange = () => this.#observe();
 
   connectedCallback() {
@@ -62,34 +70,62 @@ class PBHeroWatch extends HTMLElement {
 
   disconnectedCallback() {
     this.#observer?.disconnect();
+    this.#sentinel?.remove();
+    this.#sentinel = undefined;
+    this.#header?.classList.remove('is-hidden');
     scrollContainerMediaQuery.removeEventListener('change', this.#onChange);
     this.closest('.pb-landing-header')?.classList.remove('is-past-hero');
   }
 
   #observe() {
     const header = this.closest('.pb-landing-header');
-    const hero = document.querySelector('.pb-hero-bottle-section');
-    if (!header || !hero) return;
+    const main = document.getElementById('MainContent');
+    if (!header || !main) return;
 
-    // The first section after the hero that shows anything (empty sections render no height).
-    let cover = hero.nextElementSibling;
-    while (cover && cover.offsetHeight === 0) cover = cover.nextElementSibling;
-    const footer = document.querySelector('.page-wrapper > footer');
-    if (!cover) return;
+    if (!this.#sentinel) {
+      this.#sentinel = document.createElement('div');
+      this.#sentinel.setAttribute('aria-hidden', 'true');
+      this.#sentinel.style.cssText = `height:${SCROLL_OFFSET}px;margin-block-end:-${SCROLL_OFFSET}px;pointer-events:none`;
+      main.prepend(this.#sentinel);
+    }
 
-    const above = new Map();
     this.#observer?.disconnect();
-    this.#observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          above.set(entry.target, entry.boundingClientRect.top < entry.rootBounds.bottom);
-        }
-        header.classList.toggle('is-past-hero', above.get(cover) === true && above.get(footer) !== true);
-      },
-      { root: getIntersectionRoot(), rootMargin: '0px 0px -90% 0px' }
-    );
-    this.#observer.observe(cover);
-    if (footer) this.#observer.observe(footer);
+    this.#header = header;
+    this.#observer = new IntersectionObserver(([entry]) => this.#set(!entry.isIntersecting), {
+      root: getIntersectionRoot(),
+    });
+    this.#observer.observe(this.#sentinel);
+  }
+
+  /** @param {boolean} past */
+  #set(past) {
+    const header = this.#header;
+    const first = this.#past === undefined;
+    this.#past = past;
+    if (!header || this.#hiding) return; // the slide already under way picks up the latest
+
+    if (first || reducedMotion.matches) {
+      header.classList.toggle('is-past-hero', past);
+      return;
+    }
+    if (header.classList.contains('is-past-hero') === past) return;
+
+    // Slide up, switch while out of sight, slide back down.
+    this.#hiding = true;
+    header.classList.add('is-hidden');
+    const swap = () => {
+      if (!this.#hiding) return;
+      this.#hiding = false;
+      header.removeEventListener('transitionend', onEnd);
+      header.classList.toggle('is-past-hero', this.#past);
+      header.getBoundingClientRect(); // apply the switch before sliding back
+      header.classList.remove('is-hidden');
+    };
+    const onEnd = (/** @type {TransitionEvent} */ event) => {
+      if (event.target === header && event.propertyName === 'translate') swap();
+    };
+    header.addEventListener('transitionend', onEnd);
+    setTimeout(swap, 800); // in case transitionend never fires
   }
 }
 

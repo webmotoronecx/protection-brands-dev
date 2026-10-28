@@ -35,6 +35,8 @@
   const FOOTER_SCRUB = 1;
   const HERO_SCRUB = 0.4;
   const TILE_SCRUB = 1.2;
+  const BODY_SCALE = 1.08;
+  const BODY_SCRUB = 1;
   const pageWrapper = document.querySelector('.page-wrapper');
   const scroller = () => (squeeze.matches && pageWrapper ? pageWrapper : window);
 
@@ -81,7 +83,10 @@
     ScrollTrigger?.getAll().forEach((trigger) => trigger.kill());
     gsap.killTweensOf(revealed);
     gsap.set(revealed, { clearProps: 'transform,opacity' });
-    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => hero.style.removeProperty('--pb-hero-shift'));
+    document.querySelectorAll('.pb-hero-bottle').forEach((hero) => {
+      hero.style.removeProperty('--pb-hero-shift');
+    });
+    document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => section.style.removeProperty('--pb-body-scale'));
     document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => tile.style.removeProperty('--pb-tile-shift'));
   };
 
@@ -177,23 +182,21 @@
 
     // Hero parallax, scrubbed to the scroll as the hero scrolls away: its layers move at
     // different speeds, so the scene has depth. The wordmark drifts down most (furthest back),
-    // then the bottles; the heading and note rise a little faster than the page and fade.
+    // then the bottles; the heading and note rise a little faster than the page (they don't
+    // fade).
     // The wordmark and split-layout headings already follow the mouse with inline transforms
-    // (assets/pb-hero-bottle.js), so this sets one variable, --pb-hero-shift (px scrolled
-    // past), and the hero's CSS moves each layer with `translate`, which adds to them.
+    // (assets/pb-hero-bottle.js), so this only sets a variable on the hero, --pb-hero-shift (px
+    // scrolled past), and the hero's CSS moves each layer with `translate`, which adds to them.
     document.querySelectorAll('.pb-hero-bottle').forEach((hero) => {
-      const fading = hero.querySelectorAll('.pb-hero-bottle__intro, .pb-hero-bottle__note, .pb-hero-bottle__text');
       gsap
         .timeline({
           scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: HERO_SCRUB, invalidateOnRefresh: true },
         })
-        .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0)
-        .fromTo(fading, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.6 }, 0);
-      revealed.push(...fading);
+        .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0);
     });
 
     // Shop by category: each tile's image drifts within its tile as the tile scrolls past (the
-    // image is drawn at 86% of the tile, so there's room round it; see
+    // image is drawn at 78% of the tile, so there's room round it; see
     // sections/pb-category-tiles.liquid): from 10% of the tile's height up to 30% down,
     // trailing the scroll by TILE_SCRUB seconds so it eases to a stop. Sets --pb-tile-shift on
     // the tile and the image's CSS translates by it, so the image's own scale and its hover
@@ -211,6 +214,23 @@
         }
       );
     });
+
+    // Homepage body: each section after the hero is enlarged (BODY_SCALE) as it comes up from
+    // the bottom of the screen and shrinks to its size by the time its top reaches 40% down,
+    // scrubbed to the scroll (runs backwards on the way up), trailing by BODY_SCRUB seconds.
+    // Sets --pb-body-scale on the section and its CSS scales by it
+    // (sections/pb-hero-bottle.liquid), so it doesn't clash with the reveal's transform.
+    // document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => {
+    //   gsap.fromTo(
+    //     section,
+    //     { '--pb-body-scale': BODY_SCALE },
+    //     {
+    //       '--pb-body-scale': 1,
+    //       ease: 'none',
+    //       scrollTrigger: { trigger: section, start: 'top bottom', end: 'top 40%', scrub: BODY_SCRUB },
+    //     }
+    //   );
+    // });
 
     // Tabbing into content that hasn't revealed yet shows it straight away.
     document.addEventListener('focusin', (event) => {

@@ -15,6 +15,48 @@
   {{ 'pb-intro.css' | asset_url | stylesheet_tag }}
 {%- endif -%}
 
+{%- comment -%}
+  Page scrollbar in black (the window below 990px, .page-wrapper from 990px; see base.css).
+  Chrome and Firefox use scrollbar-color; Safari uses the ::-webkit-scrollbar parts. Only the
+  page's own scrollbar: drawers and other inner scroll areas keep the stock one.
+{%- endcomment -%}
+<style>
+  /* Button text in the heading font (Oswald). Horizon's buttons read these variables (set in
+     theme-styles-variables, rendered before this); its Button font setting only offers the
+     body or accent font. The hero button sets its own type, so it's listed here too (the
+     card buy bar sets it in pb-product-card.css). Only the heading font's own weight is
+     loaded, so they use it rather than a synthesised bold. */
+  :root {
+    --button-font-family-primary: var(--font-heading--family);
+    --button-font-family-secondary: var(--font-heading--family);
+  }
+
+  .pb-hero-bottle .pb-hero-bottle__button {
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+  }
+
+  html,
+  html .page-wrapper {
+    scrollbar-color: #555 #0b0b0b;
+  }
+
+  :root::-webkit-scrollbar-track,
+  .page-wrapper::-webkit-scrollbar-track {
+    background-color: #0b0b0b;
+  }
+
+  :root::-webkit-scrollbar-thumb,
+  .page-wrapper::-webkit-scrollbar-thumb {
+    background-color: #555;
+  }
+
+  :root::-webkit-scrollbar-thumb:hover,
+  .page-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+  }
+</style>
+
 {%- liquid
   assign pb_smooth = settings.pb_smooth_scroll
 

@@ -1,5 +1,7 @@
 {%- comment -%}
-  Protection Brands header: menu button on the left, logo in the middle, cart on the right.
+  Protection Brands header. Desktop (990px and up): logo on the left, a row of links beside
+  it, search, account and cart on the right. Smaller screens: menu button on the left, logo in the middle,
+  search, account and cart on the right.
   Dark style floats over the homepage hero (layout/pb-landing.liquid); light style is the
   white inner-page header (header group in layout/theme.liquid).
   The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
@@ -49,6 +51,46 @@
       {%- render 'pb-logo' -%}
     {%- endif -%}
   </a>
+
+  {%- comment -%}
+    Desktop links: the Header links menu if one is picked, otherwise these defaults. Shop By
+    Category opens the floating menu, which lists the categories.
+  {%- endcomment -%}
+  <nav class="pb-landing-header__nav" aria-label="Main">
+    <ul class="pb-landing-header__links">
+      {%- if section.settings.nav_menu.links.size > 0 -%}
+        {%- for link in section.settings.nav_menu.links -%}
+          <li>
+            <a
+              class="pb-landing-header__link"
+              href="{{ link.url }}"
+              {% if link.current %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- link.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        <li>
+          <button
+            type="button"
+            class="pb-landing-header__link"
+            aria-expanded="false"
+            aria-controls="PBMenu"
+            aria-haspopup="dialog"
+            data-pb-menu-toggle
+          >
+            Shop By Category
+          </button>
+        </li>
+        <li><a class="pb-landing-header__link" href="{{ routes.collections_url }}">Brands</a></li>
+        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=best-selling">Best Sellers</a></li>
+        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=created-descending">New Arrivals</a></li>
+      {%- endif -%}
+    </ul>
+  </nav>
 
   <div class="pb-landing-header__actions">
     {%- comment -%} Opens Horizon's search dialog (snippets/search-modal.liquid) via assets/pb-menu.js. {%- endcomment -%}
@@ -102,6 +144,37 @@
     </button>
 
     <div class="pb-menu__body">
+      {%- liquid
+        # Categories: the ones picked in the section, otherwise the shop's product categories.
+        # The homepage renders this section on its own (layout/pb-landing.liquid), outside the
+        # header group, so it usually has nothing picked.
+        assign categories = section.settings.categories
+        if categories == blank
+          assign category_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
+        endif
+      -%}
+      {%- capture category_links -%}
+        {%- if categories != blank -%}
+          {%- for collection in categories -%}
+            {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for handle in category_handles -%}
+            {%- assign collection = collections[handle] -%}
+            {%- if collection.id != blank -%}
+              {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endcapture -%}
+      {%- if category_links != blank -%}
+        <nav class="pb-menu__nav" aria-labelledby="PBMenuCategories">
+          <h2 id="PBMenuCategories" class="pb-menu__heading">{{ section.settings.categories_heading }}</h2>
+          <ul class="pb-menu__links">
+            {{- category_links -}}
+          </ul>
+        </nav>
+      {%- endif -%}
       {%- if menu.links.size > 0 -%}
         <nav class="pb-menu__nav" aria-label="{{ menu.title | escape }}">
           <ul class="pb-menu__links">
@@ -121,25 +194,6 @@
         </nav>
       {%- endif -%}
 
-      {%- if section.settings.categories != blank -%}
-        <nav class="pb-menu__nav" aria-labelledby="PBMenuCategories">
-          <h2 id="PBMenuCategories" class="pb-menu__heading">{{ section.settings.categories_heading }}</h2>
-          <ul class="pb-menu__links pb-menu__links--small">
-            {%- for collection in section.settings.categories -%}
-              <li>
-                <a
-                  href="{{ collection.url }}"
-                  {% if collection.url == request.path %}
-                    aria-current="page"
-                  {% endif %}
-                >
-                  {{- collection.title -}}
-                </a>
-              </li>
-            {%- endfor -%}
-          </ul>
-        </nav>
-      {%- endif -%}
     </div>
 
     {%- if section.settings.newsletter -%}
@@ -202,16 +256,28 @@
     color: #fff;
   }
 
-  /* Dark header over the homepage: once the light page sections slide up under it (from the
-     first section below the hero until the dark footer; <pb-hero-watch>, assets/pb-header.js)
-     it becomes the inner pages' compact frosted bar: a see-through white bar over a blur
-     (::before, faded in), dark logo and icons, contents moved up into the bar and the logo a
-     little smaller. Only opacity, colour and transforms change. */
+  /* Dark header over the homepage: once the page has scrolled about 100px (<pb-hero-watch>,
+     assets/pb-header.js) it becomes the inner pages' compact white bar (::before), dark logo
+     and icons, contents moved up into the bar and the logo a little smaller. The switch
+     happens out of sight: the header slides up (.is-hidden), changes at once, then slides
+     back down; the same on the way back. Only opacity, colour and transforms change. */
   .pb-landing-header:not(.pb-landing-header--light) {
     --pb-header-compact: 68px;
     --pb-header-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-    transition: color 0.4s ease;
+    transition: translate 0.35s var(--pb-header-ease);
+  }
+
+  .pb-landing-header.is-hidden {
+    translate: 0 calc(-100% - 8px);
+    transition-timing-function: ease-in;
+  }
+
+  /* Nothing else animates while it is out of sight, so it switches at once (these beat the
+     transition rules below). */
+  .pb-landing-header.is-hidden:not(.pb-landing-header--light)::before,
+  .pb-landing-header.is-hidden:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
+    transition: none;
   }
 
   .pb-landing-header:not(.pb-landing-header--light)::before {
@@ -220,13 +286,14 @@
     inset: 0 0 auto;
     z-index: -1;
     height: var(--pb-header-compact);
-    background: rgb(255 255 255 / 0.72);
+    border-radius: 0 0 var(--pb-header-radius, 12px) var(--pb-header-radius, 12px);
+    background: #fff;
     box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
     opacity: 0;
     transition: opacity 0.4s ease;
   }
 
-  .pb-landing-header:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+  .pb-landing-header:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
     transition:
       translate 0.4s var(--pb-header-ease),
       scale 0.4s var(--pb-header-ease);
@@ -238,16 +305,22 @@
 
   .pb-landing-header.is-past-hero::before {
     opacity: 1;
-    -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    backdrop-filter: blur(16px) saturate(1.4);
   }
 
-  .pb-landing-header.is-past-hero > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+  .pb-landing-header.is-past-hero > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
     translate: 0 calc((var(--pb-header-compact) - var(--pb-landing-header-height)) / 2);
   }
 
   .pb-landing-header.is-past-hero > .pb-landing-header__logo {
     scale: 0.8;
+  }
+
+  /* Below 990px the window scrolls (not .page-wrapper, see assets/scroll-container.js), so
+     the dark header is fixed to stay at the top; from 990px it stays put by itself. */
+  @media screen and (max-width: 989px) {
+    .pb-landing-header:not(.pb-landing-header--light) {
+      position: fixed;
+    }
   }
 
   @media screen and (max-width: 749px) {
@@ -288,18 +361,19 @@
     transform-origin: top;
     transition:
       transform 0.4s var(--pb-header-ease),
+      border-radius 0.4s var(--pb-header-ease),
       background-color 0.4s ease,
       box-shadow 0.4s ease;
   }
 
-  .pb-landing-header--light > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+  .pb-landing-header--light > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
     transition:
       translate 0.4s var(--pb-header-ease),
       scale 0.4s var(--pb-header-ease);
   }
 
   /* Once the page scrolls (assets/pb-header.js): the bar shrinks to the compact height and
-     turns see-through over a blur; the contents move up into it and the logo gets smaller. */
+     gets a hairline shadow; the contents move up into it and the logo gets smaller. */
   .pb-landing-header--light.is-scrolled {
     pointer-events: none;
   }
@@ -310,13 +384,16 @@
 
   .pb-landing-header--light.is-scrolled::before {
     transform: scaleY(calc(var(--pb-header-h-compact) / var(--pb-header-h)));
-    background: rgb(255 255 255 / 0.72);
+
+    /* Rounded bottom corners. The bar is squashed by scaleY, so the vertical radius is
+       stretched by the same amount to come out round. */
+    border-radius: 0 0 var(--pb-header-radius, 12px) var(--pb-header-radius, 12px) /
+      0 0 calc(var(--pb-header-radius, 12px) * var(--pb-header-h) / var(--pb-header-h-compact))
+      calc(var(--pb-header-radius, 12px) * var(--pb-header-h) / var(--pb-header-h-compact));
     box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
-    -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    backdrop-filter: blur(16px) saturate(1.4);
   }
 
-  .pb-landing-header--light.is-scrolled > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__actions) {
+  .pb-landing-header--light.is-scrolled > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
     translate: 0 calc((var(--pb-header-h-compact) - var(--pb-header-h)) / 2 * 1px);
   }
 
@@ -441,6 +518,83 @@
     }
   }
 
+  /* Desktop links row. Hidden below 990px, where the menu button opens the same places. */
+  .pb-landing-header__nav {
+    display: none;
+  }
+
+  .pb-landing-header__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px clamp(24px, 3.4vw, 60px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-landing-header__link {
+    position: relative;
+    display: inline-block;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-decoration: none;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Hover and the current page: full strength, with a red line drawn in underneath. */
+  .pb-landing-header__link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: var(--pb-accent, #ca0d0d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-landing-header__link:is(:hover, :focus-visible, [aria-current='page'], [aria-expanded='true']) {
+    opacity: 1;
+  }
+
+  .pb-landing-header__link:is(:hover, :focus-visible, [aria-current='page'], [aria-expanded='true'])::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header__link::after {
+      transition: none;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-landing-header {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      column-gap: clamp(40px, 5.5vw, 88px);
+    }
+
+    .pb-landing-header__menu {
+      display: none;
+    }
+
+    .pb-landing-header__nav {
+      display: block;
+    }
+
+    .pb-landing-header__logo {
+      justify-self: start;
+      transform-origin: left center;
+    }
+  }
+
   .pb-landing-header__count {
     position: absolute;
     inset-block-start: 6px;
@@ -475,8 +629,8 @@
     border: 0;
     border-radius: 10px;
     overflow-y: auto;
-    background: #040404;
-    color: #fff;
+    background: #fff;
+    color: #111;
     opacity: 0;
     translate: -24px 0;
     transition:
@@ -533,7 +687,7 @@
     rotate: -45deg;
   }
 
-  /* Main links and categories side by side; newsletter pinned to the bottom. */
+  /* Categories and the main links side by side; newsletter pinned to the bottom. */
   .pb-menu__body {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -543,9 +697,18 @@
     padding: 96px 32px 40px 12%;
   }
 
+  /* Side by side, a column without a heading starts level with the first link beside it:
+     the heading's line height plus its margin. */
+  @media screen and (min-width: 750px) {
+    .pb-menu__nav:not(:has(> .pb-menu__heading)) {
+      padding-block-start: calc(12px * 1.5 + 18px);
+    }
+  }
+
   .pb-menu__heading {
     margin: 0 0 18px;
-    color: #8a8a8a;
+    line-height: 1.5;
+    color: #6b6b6b;
     font-size: 12px;
     font-weight: 400;
     letter-spacing: 0.04em;
@@ -554,13 +717,13 @@
 
   .pb-menu__newsletter {
     padding: 32px 32px 40px 12%;
-    border-block-start: 1px solid #1c1c1c;
+    border-block-start: 1px solid #e6e6e6;
   }
 
   .pb-menu__text {
     max-width: 36ch;
     margin: -8px 0 18px;
-    color: #bdbdbd;
+    color: #555;
     font-size: 14px;
     line-height: 1.4;
   }
@@ -576,21 +739,21 @@
     min-width: 0;
     padding: 12px 0;
     border: 0;
-    border-block-end: 1px solid #3a3a3a;
+    border-block-end: 1px solid #cfcfcf;
     border-radius: 0;
     background: transparent;
-    color: #fff;
+    color: #111;
     font: inherit;
     font-size: 14px;
   }
 
   .pb-menu__field input::placeholder {
-    color: #6f6f6f;
+    color: #8a8a8a;
   }
 
   .pb-menu__field input:focus-visible {
     outline: none;
-    border-block-end-color: #fff;
+    border-block-end-color: #111;
   }
 
   .pb-menu__submit {
@@ -618,7 +781,7 @@
 
   .pb-menu__message--error {
     margin-block-start: 10px;
-    color: #ff6b6b;
+    color: var(--pb-accent, #ca0d0d);
   }
 
   .pb-menu__message--error :is(ul, p) {
@@ -636,17 +799,13 @@
   }
 
   .pb-menu__links a {
-    color: #fff;
+    color: #111;
     font-size: 17px;
     font-weight: 400;
     letter-spacing: -0.02em;
     text-decoration: none;
     text-transform: uppercase;
     transition: color 0.2s ease;
-  }
-
-  .pb-menu__links--small a {
-    font-size: 15px;
   }
 
   .pb-menu__links a:is(:hover, :focus-visible, [aria-current='page']) {
@@ -712,6 +871,12 @@
     },
     {
       "type": "link_list",
+      "id": "nav_menu",
+      "label": "Header links",
+      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Brands, Best Sellers and New Arrivals."
+    },
+    {
+      "type": "link_list",
       "id": "menu",
       "label": "Floating menu",
       "default": "main-menu",
@@ -727,6 +892,7 @@
       "type": "collection_list",
       "id": "categories",
       "label": "Categories",
+      "info": "Empty: Wash & Shampoo, Cleaners & Sprays, Microfibre & Drying, Kits & Packs, Power & Emergency, Bulk & Professional.",
       "limit": 12
     },
     {

@@ -1,0 +1,17 @@
+{%- doc -%}
+  One link in the PB floating menu (sections/pb-landing-header.liquid), marked as the current
+  page when it is.
+
+  @param {string} url - The link's URL
+  @param {string} title - The link text
+{%- enddoc -%}
+<li>
+  <a
+    href="{{ url }}"
+    {% if url == request.path %}
+      aria-current="page"
+    {% endif %}
+  >
+    {{- title -}}
+  </a>
+</li>
