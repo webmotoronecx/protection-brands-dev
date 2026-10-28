@@ -1,0 +1,33 @@
+{%- doc -%}
+  Sort dropdown for a collection. Choosing an option reloads the page with ?sort_by=, keeping
+  the current tag (the form posts to the current path). A plain form and the browser's own
+  <select>, so it works with the keyboard and without JavaScript (a Sort button shows then).
+
+  Used beside the title in sections/pb-collection-header.liquid and above the grid in
+  sections/pb-products-bar.liquid; each styles it through the class it passes.
+
+  @param {object} collection - The collection being sorted.
+  @param {string} id - The select's id, unique on the page.
+  @param {string} class - Class on the form; the visible label gets the same class + "-label".
+  @param {string} [label] - Visible label text. Without one, "Sort by" is read out by screen
+    readers only.
+{%- enddoc -%}
+
+{%- if collection.sort_options.size > 0 -%}
+  <form class="{{ class }}" action="{{ request.path }}" method="get">
+    {%- if label != blank -%}
+      <label class="{{ class }}-label" for="{{ id }}">{{ label }}</label>
+    {%- else -%}
+      <label class="visually-hidden" for="{{ id }}">Sort by</label>
+    {%- endif -%}
+    <select id="{{ id }}" name="sort_by" onchange="this.form.submit()">
+      {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+      {%- for option in collection.sort_options -%}
+        <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+          {{- option.name -}}
+        </option>
+      {%- endfor -%}
+    </select>
+    <noscript><button type="submit">Sort</button></noscript>
+  </form>
+{%- endif -%}

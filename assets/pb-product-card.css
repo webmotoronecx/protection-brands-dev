@@ -369,3 +369,72 @@
   margin-inline-start: 0;
   font-weight: 500;
 }
+
+/* Default collection page (templates/collection.json, main[data-template='collection']): the
+   cards and margins from the collection page design. Every other grid keeps the styles above.
+   - Cards: 23px/20px padding, 6px corners, the title in medium weight, black stars with light
+     grey empty ones, the price set tighter over a small light grey compare-at price.
+   - No buy bar (the template leaves out the pb-card-buy block), so the text stays where it is
+     on hover instead of making room for the bar; the image still steps back.
+   - The grid and the products bar above it (sections/pb-products-bar.liquid) sit 38px from
+     the screen edge at 1440px, as in the design, instead of 10px. */
+[data-template='collection'] {
+  --pb-card-padding: 23px 20px;
+  --pb-card-radius: 6px;
+  --pb-star-color: #000000;
+}
+
+[data-template='collection'] :is(.product-grid-container, .pb-products-bar) {
+  --page-margin: clamp(16px, 2.65vw, 38px);
+  --page-width: 100vw;
+}
+
+[data-template='collection'] .product-grid__card [role='heading'] {
+  color: #0e0e0e;
+  font-weight: 500;
+  line-height: normal;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper {
+  --star-fill-color-rgb: 0 0 0;
+
+  margin-block-start: 0;
+  gap: 9px;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper .stars {
+  --empty-star-fill-color: #bcbcbc !important;
+}
+
+[data-template='collection'] .product-grid__card .rating-wrapper .rating-count {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+[data-template='collection'] .product-grid__card [ref='priceContainer'] {
+  gap: 0;
+}
+
+[data-template='collection'] .product-grid__card .price {
+  letter-spacing: -0.05em;
+}
+
+[data-template='collection'] .product-grid__card .compare-at-price {
+  color: #bcbcbc;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-template='collection'] .product-card .product-grid__card.product-grid__card {
+    --pb-card-lift: 0px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  [data-template='collection'] {
+    --pb-card-padding: 16px 12px;
+  }
+}

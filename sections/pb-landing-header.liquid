@@ -2,21 +2,27 @@
   Protection Brands header. Desktop (990px and up): logo on the left, a row of links beside
   it, search, account and cart on the right. Smaller screens: menu button on the left, logo in the middle,
   search, account and cart on the right.
-  Dark style floats over the homepage hero (layout/pb-landing.liquid); light style is the
-  white inner-page header (header group in layout/theme.liquid).
+  Dark style floats over the homepage hero (layout/pb-landing.liquid) and over the default
+  collection template's full-width title bar (sections/pb-collection-header.liquid); light
+  style is the white inner-page header (header group in layout/theme.liquid).
   The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
 {%- endcomment -%}
 
 {%- liquid
-  # Automatic: dark over the homepage hero, light on every other page.
+  # Automatic: dark over the homepage hero and over the default collection template
+  # (templates/collection.json, whose title bar is full width under it); light on every other
+  # page, including other collection templates such as collection.brand.
   assign light = false
   case section.settings.style
     when 'light'
       assign light = true
     when 'auto'
-      unless template.name == 'index'
-        assign light = true
-      endunless
+      assign light = true
+      if template.name == 'index'
+        assign light = false
+      elsif template.name == 'collection' and template.suffix == blank
+        assign light = false
+      endif
   endcase
 
 -%}
@@ -244,6 +250,18 @@
 <script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
 
 {% stylesheet %}
+  /* Height of the dark header. Set here so it is there in both layouts; the homepage hero and
+     the full-width title bar pad their tops by it. */
+  :root {
+    --pb-landing-header-height: 88px;
+  }
+
+  @media screen and (max-width: 749px) {
+    :root {
+      --pb-landing-header-height: 72px;
+    }
+  }
+
   .pb-landing-header {
     position: absolute;
     inset: 0 0 auto;
@@ -861,7 +879,7 @@
         }
       ],
       "default": "auto",
-      "info": "Automatic is dark over the homepage hero and light on every other page."
+      "info": "Automatic is dark over the homepage hero and the default collection template, and light on every other page."
     },
     {
       "type": "image_picker",

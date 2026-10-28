@@ -1,0 +1,137 @@
+{%- comment -%}
+  Products bar (Protection Brands): above the product grid, the number of products as a
+  heading on the left ("24 Products", counting only the current tag's products on a tag page)
+  and Sort on the right. Used by the default collection template (templates/collection.json)
+  in place of Horizon's own count and sort row, which is turned off there in the product
+  grid's Filters block.
+
+  Sort is snippets/pb-collection-sort.liquid: the word "Sort" with the browser's own dropdown
+  laid invisibly over it, so a click or the keyboard opens the native list of options.
+  Lined up with the product grid by Horizon's page-width grid (.section); the margins for both
+  are set together in assets/pb-product-card.css.
+{%- endcomment -%}
+
+{%- liquid
+  assign current = collection
+  if current == blank
+    assign current = closest.collection
+  endif
+  assign count = current.products_count | default: 0
+-%}
+
+<div class="pb-products-bar section">
+  <div class="pb-products-bar__inner">
+    <h2 class="pb-products-bar__count">
+      {{ count }}
+      {{ count | pluralize: 'Product', 'Products' }}
+    </h2>
+
+    {%- if section.settings.show_sort -%}
+      {%- render 'pb-collection-sort',
+        collection: current,
+        id: 'PBProductsSort',
+        class: 'pb-products-bar__sort',
+        label: section.settings.sort_label
+      -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .pb-products-bar {
+    padding-block: clamp(28px, 2.9vw, 42px) clamp(16px, 1.9vw, 27px);
+  }
+
+  .pb-products-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .pb-products-bar__count {
+    margin: 0;
+    color: #000;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+    font-weight: var(--font-heading--weight);
+    line-height: 1.1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  /* "Sort" in small bold capitals with a chevron. The select covers it, transparent, so it
+     takes the click and the focus; the ring shows on the whole control. */
+  .pb-products-bar__sort {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pb-products-bar__sort::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-block-start: -3px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    rotate: 45deg;
+  }
+
+  .pb-products-bar__sort select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .pb-products-bar__sort:has(select:focus-visible) {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  .pb-products-bar__sort-label {
+    cursor: pointer;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Products bar (PB)",
+  "tag": "section",
+  "class": "pb-products-bar-section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show sort",
+      "info": "Turn off Horizon's own sort in the product grid's Filters settings to avoid showing both.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sort_label",
+      "label": "Sort label",
+      "default": "Sort",
+      "visible_if": "{{ section.settings.show_sort }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Products bar (PB)"
+    }
+  ]
+}
+{% endschema %}
