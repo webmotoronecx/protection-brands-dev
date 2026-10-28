@@ -365,6 +365,18 @@
     line-height: 0.84;
   }
 
+  /* Scroll parallax (assets/pb-motion.js sets --pb-collection-shift, px scrolled past, as the
+     banner scrolls away): the photo drifts down, slower than the page, and the title rises a
+     little faster. `translate`, so it adds to the intro animations (assets/pb-intro.css). The
+     banner clips the photo; the gap it leaves at the top is always above the screen. */
+  .pb-collection-header--full .pb-collection-header__hero {
+    translate: 0 calc(var(--pb-collection-shift, 0px) * 0.35);
+  }
+
+  .pb-collection-header--full .pb-collection-header__title {
+    translate: 0 calc(var(--pb-collection-shift, 0px) * -0.12);
+  }
+
   /* Title with the count and sort on the right (stacked on phones). */
   .pb-collection-header__row {
     display: flex;

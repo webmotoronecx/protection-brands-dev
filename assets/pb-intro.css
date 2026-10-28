@@ -136,6 +136,23 @@
     animation: pb-intro-card 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
+  /* Full width (default collection template): the banner sits under the transparent header,
+     so moving or fading it would show the white page behind it. It stays put: the photo
+     settles from a slight zoom inside it (the banner clips it) and the text rises in. */
+  .pb-collection-header--full {
+    animation: none;
+  }
+
+  @keyframes pb-intro-zoom {
+    from {
+      scale: 1.12;
+    }
+  }
+
+  .pb-collection-header--full .pb-collection-header__hero img {
+    animation: pb-intro-zoom 1.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
   .pb-collection-header__title {
     animation: pb-intro-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
   }

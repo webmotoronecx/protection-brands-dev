@@ -22,7 +22,7 @@
 {%- if has_logos or request.design_mode -%}
 <div
   data-reveal
-  class="pb-brand-logos pb-brand-logos--heading-{{ section.settings.heading_position }}{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}"
+  class="pb-brand-logos pb-brand-logos--heading-{{ section.settings.heading_position }}{% if section.settings.greyscale %} pb-brand-logos--greyscale{% endif %}{% if section.settings.bottom_border %} pb-brand-logos--border{% endif %}"
   style="--pb-logo-height: {{ section.settings.logo_height }}px;{% if section.settings.background != blank %} --pb-logos-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-logos-text: {{ section.settings.text_color }};{% endif %}"
 >
   {%- if section.settings.heading != blank -%}
@@ -104,6 +104,11 @@
     padding: 32px 10px;
     background: var(--pb-logos-bg, transparent);
     color: var(--pb-logos-text, inherit);
+  }
+
+  /* Same line as the divider beside the heading: the heading colour at 20%. */
+  .pb-brand-logos--border {
+    border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
   }
 
   .pb-brand-logos__heading {
@@ -281,6 +286,13 @@
       "type": "color",
       "id": "text_color",
       "label": "Heading colour"
+    },
+    {
+      "type": "checkbox",
+      "id": "bottom_border",
+      "label": "Bottom border",
+      "info": "A 1px line under the section, the same as the divider beside the heading.",
+      "default": false
     }
   ],
   "blocks": [

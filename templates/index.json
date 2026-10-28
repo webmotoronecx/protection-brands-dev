@@ -152,7 +152,8 @@
         "greyscale": false,
         "heading_position": "beside",
         "background": "#ffffff",
-        "text_color": "#111111"
+        "text_color": "#111111",
+        "bottom_border": true
       }
     },
     "pb_best_sellers": {

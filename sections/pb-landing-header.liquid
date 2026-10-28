@@ -311,6 +311,27 @@
     transition: opacity 0.4s ease;
   }
 
+  /* Transparent (dark) state: black fading to clear down the header's height, so the links
+     stay readable over a busy photo. Gone once it becomes the white bar. */
+  .pb-landing-header:not(.pb-landing-header--light)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0) 100%);
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .pb-landing-header.is-past-hero::after {
+    opacity: 0;
+  }
+
+  /* Switches at once while the header is out of sight, like the white bar. */
+  .pb-landing-header.is-hidden:not(.pb-landing-header--light)::after {
+    transition: none;
+  }
+
   .pb-landing-header:not(.pb-landing-header--light) > :is(.pb-landing-header__menu, .pb-landing-header__logo, .pb-landing-header__nav, .pb-landing-header__actions) {
     transition:
       translate 0.4s var(--pb-header-ease),
@@ -350,6 +371,7 @@
   @media (prefers-reduced-motion: reduce) {
     .pb-landing-header:not(.pb-landing-header--light),
     .pb-landing-header:not(.pb-landing-header--light)::before,
+    .pb-landing-header:not(.pb-landing-header--light)::after,
     .pb-landing-header:not(.pb-landing-header--light) > * {
       transition: none;
     }
