@@ -168,6 +168,64 @@
         { "title": "About Us", "link": "page:about-us" },
         { "title": "Contact", "link": "page:contact-page" }
       ]
+    },
+
+    {
+      "handle": "footer-shop",
+      "title": "Footer shop",
+      "items": [
+        {
+          "title": "Shop All",
+          "link": "catalog"
+        },
+        {
+          "title": "Wash & Shampoo",
+          "link": "collection:wash-shampoo"
+        },
+        {
+          "title": "Cleaners & Sprays",
+          "link": "collection:cleaners-sprays"
+        },
+        {
+          "title": "Microfibre & Drying",
+          "link": "collection:microfibre-drying"
+        },
+        {
+          "title": "Kits & Packs",
+          "link": "collection:kits-packs"
+        },
+        {
+          "title": "Power & Emergency",
+          "link": "collection:power-emergency"
+        },
+        {
+          "title": "Bulk & Professional",
+          "link": "collection:bulk-professional"
+        }
+      ]
+    },
+
+    {
+      "handle": "footer-brands",
+      "title": "Footer brands",
+      "items": [
+        {
+          "title": "Permagard",
+          "link": "collection:permagard-car-care"
+        },
+        {
+          "title": "CERFACE",
+          "link": "collection:cerface-ceramic"
+        },
+        {
+          "title": "OptiVAN",
+          "link": "collection:optivan-caravan-maintenance"
+        },
+        {
+          "title": "Honda Genuine Car Care",
+          "link": "collection:honda-genuine-car-care"
+        }
+      ]
     }
   ]
 }
