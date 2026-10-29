@@ -25,22 +25,14 @@
           "type": "menu",
           "settings": {
             "heading": "Shop",
-            "menu": "main-menu"
+            "menu": "footer-shop"
           }
         },
         "col_brands": {
-          "type": "links",
+          "type": "menu",
           "settings": {
             "heading": "Our brands",
-            "new_tab": true,
-            "label_1": "OptiVAN",
-            "url_1": "https://optivan.com.au/",
-            "label_2": "OptiVAN Instagram",
-            "url_2": "https://www.instagram.com/protection_brands/",
-            "label_3": "Permagard",
-            "url_3": "https://permagardautomotive.com.au/",
-            "label_4": "Permagard Instagram",
-            "url_4": "https://www.instagram.com/permagard_australia/"
+            "menu": "footer-brands"
           }
         }
       },
