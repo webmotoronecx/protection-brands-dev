@@ -1,7 +1,13 @@
 {%- comment -%}
-  Product page heading (Protection Brands): a small breadcrumb, the brand (vendor) in red,
-  the product title large, light and uppercase, and "Suitable for" tags from the
-  custom.suitable_for metafield (Permagard / CERFACE / OptiVAN).
+  Product page heading (Protection Brands): a small breadcrumb, a red label (the product's
+  category, snippets/pb-product-category.liquid, or its brand), the product title large and
+  uppercase, and "Suitable for" tags from the custom.suitable_for metafield (Permagard /
+  CERFACE / OptiVAN).
+
+  On templates/product.json the breadcrumb and tags are off: the breadcrumb is at the top of
+  the card (sections/pb-breadcrumb-bar.liquid), and Horizon's review block follows with the
+  stars. The title is in the heading font's medium weight, loaded on product pages by
+  snippets/pb-head.liquid (--pb-heading-medium-weight).
 {%- endcomment -%}
 
 {%- liquid
@@ -19,7 +25,20 @@
     endfor
   endif
 
-  assign suitable_for = product.metafields.custom.suitable_for.value
+  assign label = blank
+  case block.settings.label_source
+    when 'category'
+      capture label
+        render 'pb-product-category', product: product
+      endcapture
+    when 'vendor'
+      assign label = product.vendor | escape
+  endcase
+
+  assign suitable_for = blank
+  if block.settings.show_suitable
+    assign suitable_for = product.metafields.custom.suitable_for.value
+  endif
 
   assign heading_font = settings.type_heading_font
 -%}
@@ -43,8 +62,8 @@
     </nav>
   {%- endif -%}
 
-  {%- if block.settings.show_vendor and product.vendor != blank -%}
-    <p class="pb-product-heading__brand">{{ product.vendor }}</p>
+  {%- if label != blank -%}
+    <p class="pb-product-heading__brand">{{ label }}</p>
   {%- endif -%}
 
   <h1 class="pb-product-heading__title">{{ product.title }}</h1>
@@ -62,10 +81,11 @@
 </div>
 
 {% stylesheet %}
+  /* Sizes from the 1440px design: label, title and stars 31px apart. */
   .pb-product-heading {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: clamp(14px, 2.15vw, 31px);
   }
 
   .pb-product-heading__crumbs {
@@ -88,22 +108,22 @@
   }
 
   .pb-product-heading__brand {
-    margin: 6px 0 0;
+    margin: 0;
     color: var(--pb-accent, #ca0d0d);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: normal;
     text-transform: uppercase;
   }
 
   .pb-product-heading__title {
     margin: 0;
-    color: #111;
+    color: #000;
     font-family: var(--pb-product-heading-font, inherit);
-    font-size: clamp(1.9rem, 2.6vw, 2.75rem);
-    font-weight: var(--pb-product-heading-weight, 400);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+    font-weight: var(--pb-heading-medium-weight, var(--pb-product-heading-weight, 400));
+    line-height: 1.1;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
@@ -112,7 +132,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-block-start: 4px;
   }
 
   .pb-product-heading__tags-label {
@@ -148,19 +167,42 @@
       "type": "checkbox",
       "id": "show_breadcrumb",
       "label": "Show breadcrumb",
-      "default": true
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "label_source",
+      "label": "Label above the title",
+      "options": [
+        {
+          "value": "category",
+          "label": "Category"
+        },
+        {
+          "value": "vendor",
+          "label": "Brand"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "category",
+      "info": "Category: the first of the product's tags listed under Theme settings > Products (Protection Brands), else its product type."
     },
     {
       "type": "checkbox",
-      "id": "show_vendor",
-      "label": "Show brand",
-      "default": true
+      "id": "show_suitable",
+      "label": "Show \"Suitable for\" tags",
+      "info": "From the product's custom.suitable_for metafield.",
+      "default": false
     },
     {
       "type": "text",
       "id": "suitable_label",
       "label": "Suitable for label",
-      "default": "Suitable for"
+      "default": "Suitable for",
+      "visible_if": "{{ block.settings.show_suitable }}"
     }
   ],
   "presets": [

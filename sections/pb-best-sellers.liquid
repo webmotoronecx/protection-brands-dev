@@ -3,6 +3,10 @@
   cards from one collection that scrolls sideways, with previous/next buttons underneath.
   The cards are the same as the collection grid's (stars, price, Add To Cart bar): edit them
   under "Product card" in this section. Order the collection by best selling in the admin.
+
+  On the product page (templates/product.json, "Products you might like") it can show the
+  product's own collection instead: the one the visitor came from, else the product's first
+  (skipping the home page and catch-all collections), leaving out the product itself.
 {%- endcomment -%}
 
 {%- liquid
@@ -12,6 +16,24 @@
   if source == blank
     assign source = collections.all
   endif
+
+  assign skip_id = blank
+  if section.settings.product_collection and product != blank
+    assign skip_id = product.id
+    assign related = collection
+    if related == blank
+      for item in product.collections
+        unless item.handle == 'frontpage' or item.handle == 'all'
+          assign related = item
+          break
+        endunless
+      endfor
+    endif
+    if related != blank
+      assign source = related
+    endif
+  endif
+
   assign max_items = section.settings.max_products
 
   assign link = section.settings.link | default: source.url
@@ -43,7 +65,11 @@
     <pb-carousel class="pb-best-sellers__carousel">
       <ul class="pb-best-sellers__track" role="list" data-reveal tabindex="0" aria-label="{{ section.settings.heading | default: 'Products' | escape }}">
         {%- if source.products_count > 0 -%}
-          {%- for product in source.products limit: max_items -%}
+          {%- assign shown = 0 -%}
+          {%- for product in source.products -%}
+            {%- if product.id == skip_id -%}{%- continue -%}{%- endif -%}
+            {%- if shown >= max_items -%}{%- break -%}{%- endif -%}
+            {%- assign shown = shown | plus: 1 -%}
             <li class="pb-best-sellers__item">
               {% content_for 'block',
                 type: '_product-card',
@@ -306,6 +332,13 @@
       "id": "collection",
       "label": "Collection",
       "info": "Shows this collection's products in its own sort order. Leave empty for all products."
+    },
+    {
+      "type": "checkbox",
+      "id": "product_collection",
+      "label": "On product pages, show the product's collection",
+      "info": "For \"Products you might like\": the collection the visitor came from, else the product's first. The product itself is left out.",
+      "default": false
     },
     {
       "type": "range",

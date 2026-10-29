@@ -1,8 +1,21 @@
 /*
   Protection Brands product page. Loaded on product pages by snippets/pb-head.liquid.
-  Restyles Horizon's product information section; the heading and info rows are PB blocks
-  (blocks/pb-product-heading.liquid, blocks/pb-product-info.liquid). Overrides only.
+  Restyles Horizon's product information section; the heading, features and description are
+  PB blocks and sections (blocks/pb-product-heading.liquid, blocks/pb-product-features.liquid,
+  sections/pb-product-description.liquid). Overrides only.
+
+  Default product template (templates/product.json, Figma file i2SqY8ol4JIu1WbMO1YBLi, node
+  793:513): a dark page under the dark header (sections/pb-landing-header.liquid), with a
+  white card holding the breadcrumb (sections/pb-breadcrumb-bar.liquid, card layout) and this
+  section: tall thumbnails on the left, the photo, then the info column. Sizes follow the
+  1440px design and scale down with the screen.
 */
+
+:root {
+  /* Card: 31px from the screen edge and 40px inside at 1440px. */
+  --pb-pdp-margin: clamp(8px, 2.15vw, 31px);
+  --pb-pdp-pad: clamp(16px, 2.8vw, 40px);
+}
 
 .product-information {
   --height-buy-buttons: 52px;
@@ -25,6 +38,224 @@
   /* Horizon runs the phone gallery edge to edge; keep it inside the 8px edge too. */
   .product-information .product-information__media {
     padding-inline: 8px;
+  }
+}
+
+/* Dark page behind the card and the description band: black, lifting to a soft grey glow
+   around the band (the design's blurred photo at 82% black). The sections after the band
+   are white. */
+main[data-template='product'] {
+  background:
+    radial-gradient(ellipse 75% 45% at 45% 62%, #232323 0%, rgb(20 20 20 / 0.6) 45%, transparent 75%),
+    linear-gradient(to bottom, #000 0%, #070707 40%, #0d0d0d 100%);
+}
+
+/* The card's lower part: this section, white with rounded bottom corners, under the
+   breadcrumb (the card's top). */
+main[data-template='product'] .shopify-section:has(> .product-information) {
+  --page-margin: 0px;
+
+  padding-inline: var(--pb-pdp-margin);
+}
+
+/* .section doubled to beat Horizon's transparent section background
+   (.shopify-section:not(.header-section) :is(.section, ...)). */
+main[data-template='product'] .product-information.section.section {
+  --page-margin: var(--pb-pdp-pad);
+  --sidebar-width: clamp(300px, 29vw, 418px);
+  --height-buy-buttons: 39px;
+
+  padding-block-end: var(--pb-pdp-pad);
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+  color: #000;
+}
+
+/* Gallery (carousel with thumbnails on the left, templates/product.json): thumbnails 203px
+   wide and 17px apart, three to the photo's height (697px), the photo 639 × 697, all on the
+   light grey 6px tile. Set on the slideshow, inside <media-gallery>, whose inline style sets
+   the same variables from the block settings. */
+main[data-template='product'] .product-information media-gallery slideshow-component {
+  --thumbnail-width: clamp(72px, 14.1vw, 203px);
+  --gallery-aspect-ratio: 639 / 697;
+  --media-radius: 6px;
+}
+
+main[data-template='product'] .product-information slideshow-component:has(slideshow-controls[pagination-position='left']) {
+  column-gap: 19px;
+}
+
+main[data-template='product'] .product-information slideshow-controls[pagination-position='left'] {
+  --slideshow-thumbnails-padding-inline: 0px;
+  --slideshow-thumbnails-padding-block: 0px;
+
+  position: relative;
+  width: var(--thumbnail-width);
+}
+
+/* The thumbnails column runs the photo's height and scrolls if there are more than fit. */
+main[data-template='product'] .product-information slideshow-controls[pagination-position='left'] .slideshow-controls__thumbnails-container {
+  position: absolute;
+  inset: 0;
+  max-height: none;
+  overflow: hidden auto;
+}
+
+main[data-template='product'] .product-information slideshow-controls[pagination-position='left'] .slideshow-controls__thumbnails {
+  flex-direction: column;
+  gap: 17px;
+  width: 100%;
+  margin: 0;
+}
+
+main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control {
+  width: 100%;
+  aspect-ratio: 203 / 221;
+  border-radius: 6px;
+}
+
+/* Photos fill their tiles, as in the design (cut-outs keep their own white space round the
+   product); the lightbox (assets/pb-lightbox.js) shows them whole. */
+main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control img {
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* No arrows on the photo: the thumbnails (and swipe on phones) move between photos. */
+main[data-template='product'] .product-information media-gallery slideshow-arrows {
+  display: none;
+}
+
+main[data-template='product'] .product-information media-gallery .product-media-container.product-media-container {
+  border-radius: 6px;
+}
+
+main[data-template='product'] .product-information media-gallery .product-media-container .product-media {
+  padding: 0;
+}
+
+main[data-template='product'] .product-information media-gallery .product-media-container .product-media img {
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Info column, 408px at 1440px, 19px from the photo. Label, title and stars 31px apart (the
+   heading block), then 92px to the price, 39px to the buttons, 92px to the features. */
+main[data-template='product'] .product-information .product-details > .group-block {
+  padding: 0;
+}
+
+main[data-template='product'] .product-information .product-details > .group-block > .group-block-content {
+  gap: 0;
+}
+
+main[data-template='product'] .product-information .product-details .group-block-content .group-block-content {
+  gap: 0;
+}
+
+main[data-template='product'] .product-information .product-details .rating-wrapper {
+  --star-fill-color-rgb: 0 0 0;
+
+  margin-block-start: clamp(14px, 2.15vw, 31px);
+  gap: 9px;
+}
+
+main[data-template='product'] .product-information .product-details .rating-wrapper .stars {
+  --empty-star-fill-color: #bcbcbc !important;
+}
+
+main[data-template='product'] .product-information .product-details .rating-wrapper .rating-count {
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+main[data-template='product'] .product-information .product-details product-price {
+  margin-block-start: clamp(36px, 6.4vw, 92px);
+}
+
+main[data-template='product'] .product-information .product-details .price {
+  color: #000;
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.75rem, 4.45vw, 4rem);
+  font-weight: var(--pb-heading-medium-weight, var(--font-heading--weight));
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+main[data-template='product'] .product-information .product-details .compare-at-price {
+  color: #9a9a9a;
+  font-family: var(--font-heading--family);
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-weight: var(--font-heading--weight);
+}
+
+main[data-template='product'] .product-information .product-details :is(variant-picker, .variant-picker) {
+  margin-block-start: 24px;
+}
+
+main[data-template='product'] .product-information .product-details .buy-buttons-block {
+  margin-block-start: clamp(24px, 2.7vw, 39px);
+}
+
+/* Quantity (107 × 39, thin black outline) and Add to cart (151 × 39, red) side by side. */
+main[data-template='product'] .product-information .product-details .product-form-buttons {
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+main[data-template='product'] .product-information .product-details .quantity-selector {
+  flex: none;
+  width: 107px;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+main[data-template='product'] .product-information .product-details .quantity-selector :is(button, input) {
+  color: #000;
+  font-size: 14px;
+}
+
+/* Horizon wraps the button in a span that grows to fill the row; the design's is 151px. */
+main[data-template='product'] .product-information .product-details .product-form-buttons > span:has(add-to-cart-component) {
+  flex: 0 0 auto;
+}
+
+main[data-template='product'] .product-information .product-details .add-to-cart-button {
+  min-width: 151px;
+  min-height: var(--height-buy-buttons);
+  padding-inline: 24px;
+  border-radius: 4px;
+  font-family: var(--font-heading--family);
+  font-size: 16px;
+  font-weight: var(--pb-heading-medium-weight, var(--font-heading--weight));
+  letter-spacing: 0;
+}
+
+main[data-template='product'] .product-information .product-details .add-to-cart-button .add-to-cart-icon {
+  display: none;
+}
+
+/* 92px to the features' box in the design, whose icons sit 25px down inside it. */
+main[data-template='product'] .product-information .product-details .pb-product-features {
+  margin-block-start: clamp(40px, 8.1vw, 117px);
+}
+
+@media screen and (max-width: 749px) {
+  main[data-template='product'] .product-information {
+    --page-margin: 16px;
+  }
+
+  main[data-template='product'] .product-information .product-information__media {
+    padding-inline: 0;
+  }
+
+  main[data-template='product'] .product-information .product-details .product-form-buttons > span:has(add-to-cart-component) {
+    flex: 1 1 auto;
+  }
+
+  main[data-template='product'] .product-information .product-details .add-to-cart-button {
+    width: 100%;
   }
 }
 
@@ -494,4 +725,15 @@ product-recommendations h2 {
   .pb-lightbox[open] {
     animation: none;
   }
+}
+
+/* "Products you might like" (sections/pb-best-sellers.liquid) as in the product page design:
+   a 32px heading, 52px from the top of the white page. */
+main[data-template='product'] .pb-best-sellers__inner {
+  padding-block-start: clamp(32px, 3.6vw, 52px);
+}
+
+main[data-template='product'] .pb-best-sellers__heading {
+  font-size: clamp(1.625rem, 2.2vw, 2rem);
+  font-weight: var(--pb-heading-medium-weight, var(--pb-best-weight, 400));
 }

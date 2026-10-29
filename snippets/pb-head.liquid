@@ -1,7 +1,8 @@
 {%- doc -%}
-  Protection Brands additions to <head>: product card styles and the motion scripts.
-  Rendered once from layout/theme.liquid. Motion scripts load only when a Motion theme
-  setting is on, and never in the theme editor.
+  Protection Brands additions to <head>: product card styles, the product page's styles,
+  scripts and medium heading weight, and the motion scripts. Rendered once from
+  layout/theme.liquid and layout/pb-landing.liquid. Motion scripts load only when a Motion
+  theme setting is on, and never in the theme editor.
 {%- enddoc -%}
 
 {{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
@@ -10,6 +11,20 @@
   {{ 'pb-product.css' | asset_url | stylesheet_tag }}
   <script type="module" src="{{ 'pb-lightbox.js' | asset_url }}"></script>
   {{ 'pb-sticky-cart.css' | asset_url | stylesheet_tag }}
+  {%- comment -%}
+    The product page design sets its title, price, buttons and tabs in the heading font's
+    medium weight (Oswald 500). Loaded here only; PB styles read --pb-heading-medium-weight
+    and fall back to the regular weight if the font has no medium.
+  {%- endcomment -%}
+  {%- assign pb_heading_medium = settings.type_heading_font | font_modify: 'weight', '500' -%}
+  {%- if pb_heading_medium -%}
+    <style>
+      {{ pb_heading_medium | font_face: font_display: 'swap' }}
+      :root {
+        --pb-heading-medium-weight: {{ pb_heading_medium.weight }};
+      }
+    </style>
+  {%- endif -%}
 {%- endif -%}
 {%- if settings.pb_reveal -%}
   {{ 'pb-intro.css' | asset_url | stylesheet_tag }}
