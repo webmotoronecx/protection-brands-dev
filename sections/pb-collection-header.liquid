@@ -53,6 +53,20 @@
   if request.page_type == 'collection' and current_tags.size > 0
     assign title = current_tags.first
   endif
+  # All products sorted by best-selling or newest (the header's Best Sellers and New Arrivals
+  # links): named after the link instead of the collection.
+  if request.page_type == 'collection' and current.handle == 'all' and current_tags == blank
+    case current.sort_by
+      when 'best-selling'
+        if section.settings.best_sellers_title != blank
+          assign title = section.settings.best_sellers_title
+        endif
+      when 'created-descending'
+        if section.settings.new_arrivals_title != blank
+          assign title = section.settings.new_arrivals_title
+        endif
+    endcase
+  endif
   if title == blank
     assign title = section.settings.fallback_title
   endif
@@ -699,6 +713,20 @@
       "label": "Title",
       "info": "Used on pages without a title of their own: cart, collections list, 404, all products.",
       "default": "Products"
+    },
+    {
+      "type": "text",
+      "id": "best_sellers_title",
+      "label": "Title for best sellers",
+      "info": "All products sorted by best-selling (the header's Best Sellers link). Empty uses the collection title.",
+      "default": "Best Sellers"
+    },
+    {
+      "type": "text",
+      "id": "new_arrivals_title",
+      "label": "Title for new arrivals",
+      "info": "All products sorted newest first (the header's New Arrivals link). Empty uses the collection title.",
+      "default": "New Arrivals"
     },
     {
       "type": "header",
