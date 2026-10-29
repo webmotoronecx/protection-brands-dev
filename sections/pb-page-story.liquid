@@ -1,0 +1,331 @@
+{%- comment -%}
+  Page body (Protection Brands), under the full-width title bar: templates/page.about.json
+  (About Us) and templates/page.json (every other page: delivery, privacy, terms…).
+  Breadcrumb ("Home / <page>"), then the page's own text from admin, unchanged, laid out by
+  CSS alone. Two layouts:
+
+  - Story (About Us): on desktop the first paragraph large in the heading font on the left (it
+    stays in view while the rest scrolls), the other paragraphs on the right, and the last
+    paragraph (the "find your dealer" line) as a dark card.
+  - Document (longer pages): on desktop the page title large on the left, staying in view,
+    and the text on the right.
+  - Contact (templates/page.contact.json): the page title and the page's text on the left, and
+    the section's blocks (the contact form) on the right.
+
+  On mobile both are one column, in the same order. Admin's wrappers (<blockquote>, <div>) lose
+  their own indent, rule and italics, so the text lines up with the breadcrumb.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+  assign title = page.title | default: section.settings.fallback_title
+-%}
+
+<div
+  class="pb-page-story pb-page-story--{{ section.settings.layout }}"
+  style="--pb-page-story-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-page-story-weight: {{ heading_font.weight }};"
+>
+  <nav class="pb-page-story__crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
+      <li><span aria-current="page">{{ title }}</span></li>
+    </ol>
+  </nav>
+
+  {%- if section.settings.layout == 'contact' -%}
+    <div class="pb-page-story__layout">
+      <div class="pb-page-story__intro">
+        {%- comment -%} The title bar's h1 already names the page for screen readers. {%- endcomment -%}
+        <p class="pb-page-story__aside" aria-hidden="true">{{ title }}</p>
+        {%- if page.content != blank -%}
+          <div class="pb-page-story__body">{{ page.content }}</div>
+        {%- endif -%}
+      </div>
+      <div class="pb-page-story__blocks">{% content_for 'blocks' %}</div>
+    </div>
+  {%- elsif page.content != blank -%}
+    <div class="pb-page-story__layout">
+      {%- if section.settings.layout == 'document' -%}
+        {%- comment -%} The title bar's h1 already names the page for screen readers. {%- endcomment -%}
+        <p class="pb-page-story__aside" aria-hidden="true">{{ title }}</p>
+      {%- endif -%}
+      <div class="pb-page-story__body">{{ page.content }}</div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  /* Section-specific styles for pb-page-story. */
+
+  .pb-page-story {
+    display: block;
+    padding: 24px clamp(20px, 3vw, 44px) clamp(56px, 8vw, 120px);
+  }
+
+  .pb-page-story__crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+  }
+
+  .pb-page-story__crumbs li {
+    display: flex;
+    gap: 4px;
+  }
+
+  .pb-page-story__crumbs li + li::before {
+    content: '/';
+    color: #737373;
+  }
+
+  .pb-page-story__crumbs a {
+    color: #737373;
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+
+  .pb-page-story__crumbs a:is(:hover, :focus-visible) {
+    color: #000;
+    text-decoration-line: underline;
+  }
+
+  .pb-page-story__crumbs [aria-current] {
+    color: #000;
+  }
+
+  .pb-page-story__layout {
+    max-width: 1280px;
+    margin-block-start: clamp(40px, 6vw, 88px);
+  }
+
+  .pb-page-story__body {
+    color: #222;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  /* Admin's wrappers: no quote indent, rule or italics. Text pasted from a PDF comes wrapped in
+     <div class="page"><div class="section">…, and Horizon lays out .section as its page grid,
+     which indented the text; inside the body every wrapper is a plain block. */
+  .pb-page-story__body :is(blockquote, div) {
+    display: block;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-style: normal;
+  }
+
+  .pb-page-story__body div + :is(p, div),
+  .pb-page-story__body p + div {
+    margin-block-start: 1.1em;
+  }
+
+  .pb-page-story__body p {
+    margin: 0;
+  }
+
+  /* Margins, not row-gap: in the story layout the opening line spans empty rows, which a gap
+     would pad. */
+  .pb-page-story__body p + :is(p, ul, ol),
+  .pb-page-story__body :is(ul, ol) + p {
+    margin-block-start: 1.1em;
+  }
+
+  .pb-page-story__body :is(ul, ol) {
+    margin-block: 0.6em 0;
+    padding-inline-start: 1.3em;
+  }
+
+  .pb-page-story__body li + li {
+    margin-block-start: 0.25em;
+  }
+
+  .pb-page-story__body :is(h2, h3, h4) {
+    margin: 1.6em 0 0.5em;
+    color: #000;
+    font-family: var(--pb-page-story-font, inherit);
+    font-weight: var(--pb-page-story-weight, 400);
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+
+  .pb-page-story__body :is(b, strong) {
+    color: #000;
+    font-weight: 700;
+  }
+
+  .pb-page-story__body a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .pb-page-story__body a:is(:hover, :focus-visible) {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  /* Document: the page title large on the left. */
+  .pb-page-story__aside {
+    display: none;
+    margin: 0;
+    color: #000;
+    font-family: var(--pb-page-story-font, inherit);
+    font-size: clamp(30px, 3.2vw, 48px);
+    font-weight: var(--pb-page-story-weight, 400);
+    line-height: 1.05;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  /* Story: the text sits in admin's <blockquote>, or straight in the body when there isn't one. */
+  .pb-page-story--story
+    :is(.pb-page-story__body:has(> blockquote) > blockquote, .pb-page-story__body:not(:has(> blockquote))) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Story: the opening line, large in the heading font. */
+  .pb-page-story--story .pb-page-story__body p:first-of-type {
+    margin-block-end: 0.4em;
+    color: #000;
+    font-family: var(--pb-page-story-font, inherit);
+    font-size: clamp(26px, 2.6vw, 40px);
+    font-weight: var(--pb-page-story-weight, 400);
+    line-height: 1.15;
+  }
+
+  .pb-page-story--story .pb-page-story__body p:first-of-type :is(b, strong) {
+    color: var(--pb-accent, #ca0d0d);
+    font-weight: inherit;
+  }
+
+  /* Story: the "find your dealer" line as a dark card. */
+  .pb-page-story--story .pb-page-story__body p:last-of-type:not(:first-of-type) {
+    margin-block-start: 2em;
+    padding: clamp(22px, 2.4vw, 32px) clamp(22px, 2.6vw, 36px);
+    border-inline-start: 4px solid var(--pb-accent, #ca0d0d);
+    border-radius: 12px;
+    background: #111;
+    color: #fff;
+    font-size: 16px;
+  }
+
+  /* Contact: the title shows on mobile too, above the intro, since the form follows. */
+  .pb-page-story--contact .pb-page-story__aside {
+    display: block;
+  }
+
+  .pb-page-story--contact .pb-page-story__body {
+    margin-block-start: 20px;
+  }
+
+  .pb-page-story--contact .pb-page-story__blocks {
+    margin-block-start: 40px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-page-story--contact .pb-page-story__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: clamp(48px, 7vw, 120px);
+      align-items: start;
+    }
+
+    .pb-page-story--contact .pb-page-story__blocks {
+      margin-block-start: 0;
+    }
+
+    .pb-page-story--story
+      :is(.pb-page-story__body:has(> blockquote) > blockquote, .pb-page-story__body:not(:has(> blockquote))) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: clamp(48px, 7vw, 120px);
+    }
+
+    .pb-page-story--story .pb-page-story__body p {
+      grid-column: 2;
+    }
+
+    /* Spans the right-hand rows and stays in view while they scroll past. */
+    .pb-page-story--story .pb-page-story__body p:first-of-type {
+      grid-column: 1;
+      grid-row: 1 / span 20;
+      align-self: start;
+      position: sticky;
+      inset-block-start: calc(var(--pb-landing-header-height, 88px) + 32px);
+      margin: 0;
+    }
+
+    .pb-page-story--story .pb-page-story__body p:nth-of-type(2) {
+      margin-block-start: 0;
+    }
+
+    .pb-page-story--document .pb-page-story__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: clamp(48px, 7vw, 120px);
+      align-items: start;
+    }
+
+    .pb-page-story--document .pb-page-story__aside {
+      display: block;
+      position: sticky;
+      inset-block-start: calc(var(--pb-landing-header-height, 88px) + 32px);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Page text (PB)",
+  "tag": "section",
+  "class": "pb-page-story-section",
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the page's own text (Online Store → Pages). Edit the words there."
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "info": "Story: the opening line large on the left, the last line as a dark card. Document: the page title on the left, the text on the right. Contact: the title and text on the left, the blocks (the contact form) on the right.",
+      "options": [
+        { "value": "story", "label": "Story" },
+        { "value": "document", "label": "Document" },
+        { "value": "contact", "label": "Contact" }
+      ],
+      "default": "document"
+    },
+    {
+      "type": "text",
+      "id": "home_label",
+      "label": "Breadcrumb home",
+      "default": "Home"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Page name",
+      "info": "Used when the page has no title, e.g. in the theme editor preview.",
+      "default": "Page"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Page text (PB)"
+    }
+  ]
+}
+{% endschema %}

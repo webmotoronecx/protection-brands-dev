@@ -17,8 +17,9 @@
       }
     },
     "about": {
-      "type": "pb-about-story",
+      "type": "pb-page-story",
       "settings": {
+        "layout": "story",
         "home_label": "Home",
         "fallback_title": "About Us"
       }
@@ -26,12 +27,41 @@
     "pb_brand_logos": {
       "type": "pb-brand-logos",
       "blocks": {
-        "logo_permagard": { "type": "logo", "settings": { "link": "shopify://collections/permagard-car-care", "alt": "Permagard" } },
-        "logo_cerface": { "type": "logo", "settings": { "link": "shopify://collections/cerface-ceramic", "alt": "CERFACE" } },
-        "logo_optivan": { "type": "logo", "settings": { "link": "shopify://collections/optivan-caravan-maintenance", "alt": "OptiVAN" } },
-        "logo_oridon": { "type": "logo", "settings": { "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter", "alt": "Oridon" } }
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
+        }
       },
-      "block_order": ["logo_permagard", "logo_cerface", "logo_optivan", "logo_oridon"],
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_oridon"
+      ],
       "settings": {
         "heading": "Our brands",
         "logo_height": 80,
@@ -41,16 +71,11 @@
         "text_color": "#111111",
         "bottom_border": true
       }
-    },
-    "pb_promo_cards": {
-      "type": "pb-promo-cards",
-      "blocks": {
-        "card_1": { "type": "card", "settings": { "link": "shopify://products/hydrophobic-detailing-finishing-spray" } },
-        "card_2": { "type": "card", "settings": { "link": "shopify://products/hydrophobic-detailing-finishing-spray" } }
-      },
-      "block_order": ["card_1", "card_2"],
-      "settings": { "background": "#ffffff" }
     }
   },
-  "order": ["pb_title_bar", "about", "pb_brand_logos", "pb_promo_cards"]
+  "order": [
+    "pb_title_bar",
+    "about",
+    "pb_brand_logos"
+  ]
 }

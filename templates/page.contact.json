@@ -25,80 +25,14 @@
         "marquee_source": "title"
       }
     },
-    "main": {
-      "type": "main-page",
-      "blocks": {
-        "title": {
-          "type": "text",
-          "name": "t:names.title",
-          "settings": {
-            "text": "<h1>{{ closest.page.title }}</h1>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "center",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {},
-          "disabled": true
-        },
-        "content": {
-          "type": "text",
-          "name": "t:names.content",
-          "settings": {
-            "text": "{{ closest.page.content }}",
-            "width": "100%",
-            "max_width": "narrow",
-            "alignment": "center",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "title",
-        "content"
-      ],
-      "settings": {
-        "content_direction": "column",
-        "gap": 32,
-        "padding-block-start": 40,
-        "padding-block-end": 0
-      }
-    },
-    "form": {
-      "type": "section",
+    "page_text": {
+      "type": "pb-page-story",
       "blocks": {
         "contact_form_UwiCkQ": {
           "type": "contact-form",
           "settings": {
             "width": "custom",
-            "custom_width": 50,
+            "custom_width": 100,
             "width_mobile": "custom",
             "custom_width_mobile": 100,
             "padding-block-start": 0,
@@ -127,38 +61,64 @@
       "block_order": [
         "contact_form_UwiCkQ"
       ],
-      "name": "t:names.contact_form",
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 32,
-        "section_width": "page-width",
-        "section_height": "",
-        "section_height_custom": 50,
-        "background_media": "none",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
-        "padding-block-start": 32,
-        "padding-block-end": 84
+        "layout": "contact",
+        "home_label": "Home",
+        "fallback_title": "Contact us"
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
+        }
+      },
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_oridon"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 80,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#ffffff",
+        "text_color": "#111111",
+        "bottom_border": true
       }
     }
   },
   "order": [
     "pb_title_bar",
-    "main",
-    "form"
+    "page_text",
+    "pb_brand_logos"
   ]
 }
