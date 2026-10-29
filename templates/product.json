@@ -301,13 +301,13 @@
               "type": "pb-product-features",
               "settings": {
                 "icon_1": "delivery-truck",
-                "text_1": "Dispatched within 48 hours",
+                "text_1": "Dispatched\nwithin 48\nhours",
                 "link_1": "",
                 "icon_2": "location",
-                "text_2": "$20 flat-rate delivery Australia-wide",
+                "text_2": "$20 flat-rate\ndelivery\nAustralia-wide",
                 "link_2": "shopify://pages/delivery-returns",
                 "icon_3": "returns",
-                "text_3": "7-day change-of-mind returns",
+                "text_3": "7-day\nchange-of-mind\nreturns",
                 "link_3": "shopify://pages/delivery-returns"
               },
               "blocks": {}

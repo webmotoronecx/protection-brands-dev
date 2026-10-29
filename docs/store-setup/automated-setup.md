@@ -14,8 +14,11 @@ for:
 | `redirects` | URL redirects (none listed yet) | categories-dev-to-live.md §4 |
 | `menus` | A **new** menu `main-menu-2026`. The existing *Main menu* is never touched. | README §5 |
 
-Still manual: the product CSV import, Search & Discovery filters (no API), SDS entries and
-their PDFs, collection images and descriptions, theme editor settings and app embeds.
+SDS PDFs and their entries have their own script, [`upload-sds.mjs`](upload-sds.mjs) (see
+[sds.md](sds.md) §4).
+
+Still manual: the product CSV import, Search & Discovery filters (no API), collection images and
+descriptions, theme editor settings and app embeds.
 
 ## How it keeps the live store safe
 
@@ -47,7 +50,7 @@ no such template.
 ## One-time login per store
 
 ```bash
-shopify store auth --store protection-brands-dev.myshopify.com --scopes read_products,write_products,read_metaobject_definitions,write_metaobject_definitions,read_files,write_files,read_publications,write_publications,read_online_store_pages,write_online_store_pages,read_content,read_online_store_navigation,write_online_store_navigation
+shopify store auth --store protection-brands-dev.myshopify.com --scopes read_products,write_products,read_metaobject_definitions,write_metaobject_definitions,read_metaobjects,write_metaobjects,read_files,write_files,read_publications,write_publications,read_online_store_pages,write_online_store_pages,read_content,read_online_store_navigation,write_online_store_navigation
 ```
 
 Run it again with `--store protection-brands.myshopify.com` for live. It opens the browser

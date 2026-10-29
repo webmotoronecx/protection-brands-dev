@@ -113,6 +113,11 @@
                 on:click="/select/{{ forloop.index0 }}"
                 style="--aspect-ratio: {% if aspect_ratio == 'adapt' %}{{ media.preview_image.aspect_ratio | default: 1.0 }}{% else %}{{ aspect_ratio }}{% endif %};"
                 ref="thumbnails[]"
+                {%- comment -%} PB: non-square photos fill the thumbnail (assets/pb-product.css). {%- endcomment -%}
+                {% assign pb_thumb_ratio = media.preview_image.aspect_ratio | default: 1 | round: 2 %}
+                {% if pb_thumb_ratio != 1 %}
+                  data-pb-fill
+                {% endif %}
                 {% if forloop.first %}
                   aria-selected="true"
                 {% endif %}

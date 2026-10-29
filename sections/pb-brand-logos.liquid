@@ -101,14 +101,24 @@
 
 {% stylesheet %}
   .pb-brand-logos {
-    padding: 32px 10px;
+    padding: 22px 10px;
     background: var(--pb-logos-bg, transparent);
     color: var(--pb-logos-text, inherit);
   }
 
-  /* Same line as the divider beside the heading: the heading colour at 20%. */
+  /* Straight under a banner that ends in the white curve (collection and brand banners, 12px):
+     the logos start on the curve itself, with its rounded corners, rather than below it. */
+  .shopify-section:has(> .pb-collection-header--full, > .pb-brand-header) + .shopify-section > .pb-brand-logos {
+    position: relative;
+    margin-block-start: -12px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* A soft shadow under the section. Raised above the next section so it isn't covered. */
   .pb-brand-logos--border {
-    border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.08);
   }
 
   .pb-brand-logos__heading {
@@ -216,7 +226,7 @@
 
   @media screen and (max-width: 749px) {
     .pb-brand-logos {
-      padding: 24px 8px;
+      padding: 22px 8px;
     }
 
     .pb-brand-logos__list {
@@ -290,8 +300,8 @@
     {
       "type": "checkbox",
       "id": "bottom_border",
-      "label": "Bottom border",
-      "info": "A 1px line under the section, the same as the divider beside the heading.",
+      "label": "Bottom shadow",
+      "info": "A light drop shadow under the section.",
       "default": false
     }
   ],

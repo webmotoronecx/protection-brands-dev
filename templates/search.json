@@ -20,7 +20,8 @@
         "marquee_motion": "mouse",
         "marquee_duration": 60,
         "category_source": "none",
-        "all_label": "All"
+        "all_label": "All",
+        "layout": "full"
       }
     },
     "search": {
@@ -72,14 +73,14 @@
           "type": "filters",
           "static": true,
           "settings": {
-            "enable_filtering": true,
+            "enable_filtering": false,
             "filter_style": "vertical",
             "filter_width": "centered",
             "text_label_case": "default",
             "show_swatch_label": false,
             "show_filter_label": false,
-            "enable_sorting": true,
-            "enable_grid_density": true,
+            "enable_sorting": false,
+            "enable_grid_density": false,
             "padding-block-start": 8,
             "padding-block-end": 8,
             "padding-inline-start": 0,
@@ -202,14 +203,96 @@
         "columns_gap_vertical": 24,
         "padding-inline-start": 0,
         "padding-inline-end": 0,
-        "padding-block-start": 40,
-        "padding-block-end": 40
+        "padding-block-start": 0,
+        "padding-block-end": 32
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
+        }
+      },
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_oridon"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 70,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#ffffff",
+        "text_color": "#111111",
+        "bottom_border": true
+      }
+    },
+    "pb_products_bar": {
+      "type": "pb-products-bar",
+      "settings": {
+        "show_sort": true,
+        "sort_label": "Sort"
+      }
+    },
+    "pb_promo_cards": {
+      "type": "pb-promo-cards",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2"
+      ],
+      "settings": {
+        "background": "#ffffff"
       }
     }
   },
   "order": [
     "pb_search_header",
     "search",
-    "main"
+    "pb_brand_logos",
+    "pb_products_bar",
+    "main",
+    "pb_promo_cards"
   ]
 }

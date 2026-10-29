@@ -7,6 +7,9 @@
     (sections/pb-landing-header.liquid floats over it there). Small grey capitals,
     "Home / <category> / <product>", with the product in black. The product section below
     continues the card (assets/pb-product.css), so the two read as one.
+  - On the page (templates/collection.json, page.json): the card's small grey capitals on the
+    white page, no card. "Home / <collection>" lined up with the product grid, or
+    "Home / <page>" lined up with the page's text column; the last crumb in black.
 
   The middle crumb is the collection the visitor came from. Otherwise, in the card layout,
   the product's category tag (snippets/pb-product-category.liquid), linking to all products
@@ -16,13 +19,19 @@
 
 {%- liquid
   assign card = false
+  assign inline = false
   if section.settings.layout == 'card'
     assign card = true
+  elsif section.settings.layout == 'inline'
+    assign inline = true
   endif
 
   assign crumb_title = blank
   assign crumb_url = blank
-  if collection != blank
+  if request.page_type == 'page'
+    assign crumb_title = page.title | escape
+    assign crumb_url = page.url
+  elsif collection != blank
     assign crumb_title = collection.title | escape
     assign crumb_url = collection.url
   elsif product != blank
@@ -48,8 +57,8 @@
   endif
 -%}
 
-<div class="pb-breadcrumb-bar{% if card %} pb-breadcrumb-bar--card{% endif %}">
-  {%- if section.settings.marquee and card == false -%}
+<div class="pb-breadcrumb-bar{% if card %} pb-breadcrumb-bar--card{% endif %}{% if inline %} pb-breadcrumb-bar--inline section{% if request.page_type == 'page' %} page-width-content{% endif %}{% endif %}">
+  {%- if section.settings.marquee and card == false and inline == false -%}
     {%- render 'pb-marquee',
       class: 'pb-breadcrumb-bar__marquee',
       file: 'label-scroling-invert.svg',
@@ -61,13 +70,17 @@
 
   <nav class="pb-breadcrumb-bar__crumbs" aria-label="Breadcrumb">
     <ol>
-      {%- if card -%}
+      {%- if card or inline -%}
         <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
       {%- else -%}
         <li><a href="{{ routes.all_products_collection_url }}">{{ section.settings.shop_label }}</a></li>
       {%- endif -%}
       {%- if crumb_title != blank -%}
-        <li><a href="{{ crumb_url }}">{{ crumb_title }}</a></li>
+        {%- if inline and product == blank -%}
+          <li><span aria-current="page">{{ crumb_title }}</span></li>
+        {%- else -%}
+          <li><a href="{{ crumb_url }}">{{ crumb_title }}</a></li>
+        {%- endif -%}
       {%- endif -%}
       {%- if section.settings.show_product and product != blank -%}
         <li><span aria-current="page">{{ product.title }}</span></li>
@@ -160,7 +173,18 @@
     color: #000;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs ol {
+  /* On the page: no card; the side margins come from Horizon's page-width grid (.section),
+     set with the product grid's in assets/pb-product-card.css. */
+  .pb-breadcrumb-bar--inline {
+    overflow: visible;
+    margin: 0;
+    padding: clamp(20px, 2.2vw, 32px) 0 0;
+    border-radius: 0;
+    background: none;
+    color: #000;
+  }
+
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs ol {
     gap: 4px;
     font-size: 12px;
     font-weight: 700;
@@ -168,25 +192,25 @@
     text-transform: uppercase;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs li {
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs li {
     gap: 4px;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs li + li::before,
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs a {
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs li + li::before,
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs a {
     color: #737373;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs a {
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs a {
     text-underline-offset: 3px;
     text-decoration-thickness: 1px;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs a:is(:hover, :focus-visible) {
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs a:is(:hover, :focus-visible) {
     color: #000;
   }
 
-  .pb-breadcrumb-bar--card .pb-breadcrumb-bar__crumbs [aria-current] {
+  :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs [aria-current] {
     color: #000;
   }
 
@@ -203,6 +227,15 @@
     .pb-breadcrumb-bar--card {
       margin-inline: var(--pb-pdp-margin, 8px);
       padding: 20px 18px 16px;
+    }
+
+    .pb-breadcrumb-bar--inline {
+      margin-inline: 0;
+      padding: 20px 0 0;
+    }
+
+    .pb-breadcrumb-bar--inline .pb-breadcrumb-bar__crumbs ol {
+      font-size: 12px;
     }
   }
 {% endstylesheet %}
@@ -225,10 +258,14 @@
         {
           "value": "card",
           "label": "Top of the product card"
+        },
+        {
+          "value": "inline",
+          "label": "On the page"
         }
       ],
       "default": "bar",
-      "info": "\"Top of the product card\" is for the product page, under the dark header: Home / category / product."
+      "info": "\"Top of the product card\" is for the product page, under the dark header: Home / category / product. \"On the page\" is for collection pages and pages, under the title bar: Home / collection or Home / page."
     },
     {
       "type": "text",
@@ -242,7 +279,7 @@
       "id": "home_label",
       "label": "First link label",
       "default": "Home",
-      "visible_if": "{{ section.settings.layout == 'card' }}"
+      "visible_if": "{{ section.settings.layout != 'bar' }}"
     },
     {
       "type": "checkbox",

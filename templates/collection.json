@@ -310,7 +310,8 @@
         "background": "#ffffff",
         "text_color": "#111111",
         "bottom_border": true
-      }
+      },
+      "disabled": true
     },
     "pb_category_tiles": {
       "type": "pb-category-tiles",
@@ -396,12 +397,23 @@
       "settings": {
         "background": "#ffffff"
       }
+    },
+    "pb_breadcrumb": {
+      "type": "pb-breadcrumb-bar",
+      "settings": {
+        "layout": "inline",
+        "home_label": "Home",
+        "shop_label": "Shop",
+        "show_product": false,
+        "marquee": false
+      }
     }
   },
   "order": [
     "pb_collection_header",
     "pb_brand_logos",
     "pb_category_tiles",
+    "pb_breadcrumb",
     "pb_products_bar",
     "section",
     "main",

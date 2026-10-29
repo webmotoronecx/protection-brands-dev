@@ -1,0 +1,549 @@
+{%- comment -%}
+  Safety Data Sheets library (Protection Brands), the body of templates/page.sds.json, under
+  the full-width title bar. Breadcrumb ("Home / <page>"), then a sidebar with a search box and
+  the brands with their document counts, and a grid of cards (snippets/pb-sds-card.liquid),
+  one per entry of the `sds_document` metaobject (fields: product_name, file, brand,
+  issue_date; see docs/store-setup/sds.md).
+
+  Search matches the product name and brand; a brand button shows only that brand's sheets
+  (press it again for all). The two combine. Brands come from the "Brand order" setting,
+  anything else counts as "Other"; brands without documents aren't listed.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+  assign brand_order = section.settings.brand_order | split: ','
+  assign known_brands = '|'
+  for brand_name in brand_order
+    assign brand = brand_name | strip
+    assign known_brands = known_brands | append: brand | append: '|'
+  endfor
+-%}
+
+<pb-sds-library
+  class="pb-sds-library"
+  style="--pb-sds-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-sds-weight: {{ heading_font.weight }};"
+>
+  <nav class="pb-sds-library__crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
+      <li><span aria-current="page">{{ page.title | default: section.settings.fallback_title }}</span></li>
+    </ol>
+  </nav>
+
+  {%- if section.settings.show_content and page.content != blank -%}
+    <div class="pb-sds-library__intro rte">{{ page.content }}</div>
+  {%- endif -%}
+
+  {%- paginate shop.metaobjects.sds_document.values by 250 -%}
+    {%- assign documents = shop.metaobjects.sds_document.values -%}
+
+    {%- if documents.size == 0 -%}
+      <p class="pb-sds-library__empty">{{ section.settings.empty_text }}</p>
+    {%- else -%}
+      <div class="pb-sds-library__layout">
+        <aside class="pb-sds-library__sidebar">
+          <div class="pb-sds-library__search">
+            <label class="visually-hidden" for="SdsSearch-{{ section.id }}">{{ section.settings.search_label }}</label>
+            <input
+              type="search"
+              id="SdsSearch-{{ section.id }}"
+              class="pb-sds-library__input"
+              placeholder="{{ section.settings.search_label | escape }}"
+              autocomplete="off"
+              ref="input"
+            >
+            <span class="pb-sds-library__search-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" focusable="false">
+                <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+                <path d="m12.5 12.5 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+
+          <h2 class="pb-sds-library__heading" id="SdsBrands-{{ section.id }}">{{ section.settings.brands_heading }}</h2>
+          <ul class="pb-sds-library__brands" role="list" aria-labelledby="SdsBrands-{{ section.id }}">
+            {%- for brand_name in brand_order -%}
+              {%- liquid
+                assign brand = brand_name | strip
+                assign count = 0
+                for document in documents
+                  if document.brand.value == brand and document.product_name.value != blank and document.file.value != blank
+                    assign count = count | plus: 1
+                  endif
+                endfor
+              -%}
+              {%- if count > 0 -%}
+                <li>
+                  <button type="button" class="pb-sds-library__brand" data-brand="{{ brand | handle }}" aria-pressed="false">
+                    <span>{{ brand }}</span>
+                    <span class="pb-sds-library__count">{{ count }}</span>
+                  </button>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- liquid
+              assign count = 0
+              for document in documents
+                assign brand_key = '|' | append: document.brand.value | append: '|'
+                unless known_brands contains brand_key
+                  if document.product_name.value != blank and document.file.value != blank
+                    assign count = count | plus: 1
+                  endif
+                endunless
+              endfor
+            -%}
+            {%- if count > 0 -%}
+              <li>
+                <button type="button" class="pb-sds-library__brand" data-brand="other" aria-pressed="false">
+                  <span>{{ section.settings.other_label }}</span>
+                  <span class="pb-sds-library__count">{{ count }}</span>
+                </button>
+              </li>
+            {%- endif -%}
+          </ul>
+        </aside>
+
+        <div class="pb-sds-library__results">
+          <ul class="pb-sds-library__grid" role="list">
+            {%- for document in documents -%}
+              {%- liquid
+                assign brand_key = '|' | append: document.brand.value | append: '|'
+                if known_brands contains brand_key
+                  assign brand_handle = document.brand.value | handle
+                else
+                  assign brand_handle = 'other'
+                endif
+              -%}
+              {% render 'pb-sds-card', document: document, brand_key: brand_handle, section: section %}
+            {%- endfor -%}
+          </ul>
+          <p class="pb-sds-library__empty" hidden ref="noResults">{{ section.settings.no_results_text }}</p>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endpaginate -%}
+</pb-sds-library>
+
+{% stylesheet %}
+  /* Sizes follow the 1440px design: breadcrumb 44px in, sidebar 260px wide, cards 3-up in
+     the rest with 10px gaps. */
+  .pb-sds-library {
+    display: block;
+    padding: 24px clamp(20px, 3vw, 44px) clamp(56px, 8vw, 120px);
+  }
+
+  .pb-sds-library__crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+  }
+
+  .pb-sds-library__crumbs li {
+    display: flex;
+    gap: 4px;
+  }
+
+  .pb-sds-library__crumbs li + li::before {
+    content: '/';
+    color: #737373;
+  }
+
+  .pb-sds-library__crumbs a {
+    color: #737373;
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+
+  .pb-sds-library__crumbs a:is(:hover, :focus-visible) {
+    color: #000;
+    text-decoration-line: underline;
+  }
+
+  .pb-sds-library__crumbs [aria-current] {
+    color: #000;
+  }
+
+  .pb-sds-library__intro {
+    max-width: 48rem;
+    margin-block-start: 32px;
+  }
+
+  .pb-sds-library__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    gap: 32px clamp(32px, 10vw, 140px);
+    align-items: start;
+    margin-block-start: clamp(28px, 3vw, 40px);
+  }
+
+  .pb-sds-library__sidebar {
+    padding-block-start: 10px;
+  }
+
+  .pb-sds-library__search {
+    position: relative;
+    border-bottom: 1px solid #b3b3b3;
+  }
+
+  .pb-sds-library__input {
+    width: 100%;
+    padding: 0 36px 14px 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: #000;
+    font-family: var(--pb-sds-font);
+    font-size: clamp(24px, 2.2vw, 32px);
+    font-weight: var(--pb-sds-weight, 400);
+    line-height: 1.1;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .pb-sds-library__input::placeholder {
+    color: #000;
+    opacity: 1;
+    text-transform: uppercase;
+  }
+
+  .pb-sds-library__input:focus {
+    outline: none;
+  }
+
+  .pb-sds-library__search:focus-within {
+    border-bottom-color: #000;
+  }
+
+  .pb-sds-library__input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .pb-sds-library__search-icon {
+    position: absolute;
+    inset: 0 0 14px auto;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .pb-sds-library__search-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pb-sds-library__heading {
+    margin: clamp(40px, 5vw, 72px) 0 18px;
+    font-family: var(--pb-sds-font);
+    font-size: clamp(24px, 2.2vw, 32px);
+    font-weight: var(--pb-sds-weight, 400);
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  .pb-sds-library__brands {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-sds-library__brand {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 6px 8px 6px 0;
+    border: 0;
+    background: none;
+    color: #000;
+    font: inherit;
+    font-size: 19px;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .pb-sds-library__brand:is(:hover, :focus-visible) > span:first-child,
+  .pb-sds-library__brand[aria-pressed='true'] > span:first-child {
+    text-decoration: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+
+  .pb-sds-library__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-sds-library__empty {
+    margin: 32px 0 0;
+  }
+
+  .pb-sds-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 6px;
+    background: #f4f4f4;
+    color: #000;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-sds-card[hidden] {
+    display: none;
+  }
+
+  .pb-sds-card:hover {
+    background: #ebebeb;
+  }
+
+  .pb-sds-card__tile {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 285 / 156;
+    border-radius: 4px;
+    background:
+      radial-gradient(ellipse 70% 120% at 10% 0%, #3a3a3a 0%, transparent 60%),
+      linear-gradient(120deg, #1a1a1a 0%, #050505 70%, #000 100%);
+    color: #fff;
+  }
+
+  .pb-sds-card__icon {
+    display: flex;
+    width: clamp(30px, 2.7vw, 39px);
+  }
+
+  .pb-sds-card__icon svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .pb-sds-card__name {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 26px 10px 0;
+    font-size: 16px;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .pb-sds-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* The whole card links to the PDF. */
+  .pb-sds-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .pb-sds-card__link:focus-visible {
+    outline: none;
+  }
+
+  .pb-sds-card:has(.pb-sds-card__link:focus-visible) {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 2px;
+  }
+
+  .pb-sds-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: auto 10px 0;
+    padding-block-start: 32px;
+  }
+
+  .pb-sds-card__date {
+    margin: 0;
+    color: #808080;
+    font-size: 13px;
+  }
+
+  .pb-sds-card__download {
+    display: flex;
+    margin-inline-start: auto;
+  }
+
+  .pb-sds-card__download svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .pb-sds-card:hover .pb-sds-card__download {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  @media screen and (max-width: 1199px) {
+    .pb-sds-library__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .pb-sds-library__layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pb-sds-library__heading {
+      margin-block-start: 28px;
+    }
+
+    .pb-sds-library__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  if (!customElements.get('pb-sds-library')) {
+    customElements.define(
+      'pb-sds-library',
+      class PbSdsLibrary extends HTMLElement {
+        connectedCallback() {
+          this.input = this.querySelector('[ref="input"]');
+          this.noResults = this.querySelector('[ref="noResults"]');
+          this.brands = this.querySelectorAll('.pb-sds-library__brand');
+          this.brand = '';
+          if (!this.input) return;
+
+          this.input.addEventListener('input', () => this.filter());
+          this.brands.forEach((button) => {
+            button.addEventListener('click', () => {
+              this.brand = this.brand === button.dataset.brand ? '' : button.dataset.brand;
+              this.brands.forEach((other) => {
+                other.setAttribute('aria-pressed', String(other.dataset.brand === this.brand));
+              });
+              this.filter();
+            });
+          });
+        }
+
+        filter() {
+          const query = this.input.value.trim().toLowerCase();
+          let visible = 0;
+
+          this.querySelectorAll('[data-sds-search]').forEach((card) => {
+            const match =
+              card.dataset.sdsSearch.includes(query) && (!this.brand || card.dataset.sdsBrand === this.brand);
+            card.hidden = !match;
+            if (match) visible++;
+          });
+
+          this.noResults.hidden = visible > 0;
+        }
+      }
+    );
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "SDS library (PB)",
+  "tag": "section",
+  "class": "pb-sds-library-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows every entry of the SDS document metaobject (Content → Metaobjects)."
+    },
+    {
+      "type": "text",
+      "id": "brand_order",
+      "label": "Brands",
+      "info": "Comma-separated, in sidebar order. Must match the metaobject's brand choices. Anything else is listed under \"Other brands label\".",
+      "default": "Permagard, CERFACE, OptiVAN, Honda Genuine Car Care, Protection Brands"
+    },
+    {
+      "type": "text",
+      "id": "other_label",
+      "label": "Other brands label",
+      "default": "Other"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_content",
+      "label": "Show page content",
+      "info": "The page's own text, above the documents.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "home_label",
+      "label": "Breadcrumb home",
+      "default": "Home"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Breadcrumb page name",
+      "info": "Used when the page has no title, e.g. in the theme editor preview.",
+      "default": "Safety Data Sheets"
+    },
+    {
+      "type": "text",
+      "id": "search_label",
+      "label": "Search placeholder",
+      "default": "Search"
+    },
+    {
+      "type": "text",
+      "id": "brands_heading",
+      "label": "Brands heading",
+      "default": "Brands"
+    },
+    {
+      "type": "text",
+      "id": "issued_label",
+      "label": "Issue date label",
+      "default": "Issued"
+    },
+    {
+      "type": "text",
+      "id": "download_label",
+      "label": "Download label (screen readers)",
+      "default": "Download PDF"
+    },
+    {
+      "type": "text",
+      "id": "no_results_text",
+      "label": "No search results text",
+      "default": "No safety data sheets match your search."
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty list text",
+      "default": "Safety data sheets will be available here soon."
+    }
+  ],
+  "presets": [
+    {
+      "name": "SDS library (PB)"
+    }
+  ]
+}
+{% endschema %}

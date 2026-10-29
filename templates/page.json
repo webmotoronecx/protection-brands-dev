@@ -20,7 +20,9 @@
         "marquee_motion": "mouse",
         "marquee_duration": 60,
         "category_source": "none",
-        "all_label": "All"
+        "all_label": "All",
+        "layout": "full",
+        "marquee_source": "title"
       }
     },
     "main": {
@@ -68,10 +70,21 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "pb_breadcrumb": {
+      "type": "pb-breadcrumb-bar",
+      "settings": {
+        "layout": "inline",
+        "home_label": "Home",
+        "shop_label": "Shop",
+        "show_product": false,
+        "marquee": false
+      }
     }
   },
   "order": [
     "pb_title_bar",
+    "pb_breadcrumb",
     "main"
   ]
 }

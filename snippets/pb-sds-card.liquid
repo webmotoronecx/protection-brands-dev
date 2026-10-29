@@ -1,0 +1,47 @@
+{%- doc -%}
+  Renders one Safety Data Sheet card for the SDS library (sections/pb-sds-library.liquid): a
+  dark tile with the SDS file icon, the product name, the issue date and a download icon. The
+  whole card links to the PDF.
+
+  @param {object} document - An `sds_document` metaobject entry
+  @param {string} brand_key - Brand handle for the sidebar filter ('other' for unlisted brands)
+  @param {object} section - The SDS library section, for its label settings
+{%- enddoc -%}
+
+{%- liquid
+  assign name = document.product_name.value
+  assign file = document.file.value
+  assign search_text = name | append: ' ' | append: document.brand.value | downcase | escape
+-%}
+
+{%- if name != blank and file != blank -%}
+  <li class="pb-sds-card" data-sds-search="{{ search_text }}" data-sds-brand="{{ brand_key }}">
+    <div class="pb-sds-card__tile">
+      <span class="pb-sds-card__icon" aria-hidden="true">{{- 'icon-sds.svg' | inline_asset_content -}}</span>
+    </div>
+    <p class="pb-sds-card__name">
+      <a
+        class="pb-sds-card__link"
+        href="{{ file.url }}"
+        target="_blank"
+        rel="noopener"
+      >
+        {{- name | escape -}}
+        <span class="visually-hidden">, {{ section.settings.download_label }}</span>
+      </a>
+    </p>
+    <div class="pb-sds-card__footer">
+      {%- if document.issue_date.value != blank -%}
+        <p class="pb-sds-card__date">
+          {{ section.settings.issued_label }}
+          {{ document.issue_date.value | date: format: 'date' }}
+        </p>
+      {%- endif -%}
+      <span class="pb-sds-card__download" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+          <path d="M10 2.5v10M5.5 8.5l4.5 4.5 4.5-4.5M3 13.5v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </div>
+  </li>
+{%- endif -%}

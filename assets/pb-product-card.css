@@ -24,6 +24,7 @@
   --pb-buy-radius: 6px;
   --pb-star-color: #c8291f;
   --pb-title-lines: 2;
+  --pb-card-image-inset: 10%;
 }
 
 .product-card .product-grid__card.product-grid__card {
@@ -39,8 +40,11 @@
   background: transparent;
 }
 
-/* Image: square, whole product visible, white photo backgrounds blend into the card. */
+/* Image: square, whole product visible, white photo backgrounds blend into the card.
+   The padding shrinks the product inside its square, leaving grey around it. */
 .product-grid__card .product-media-container.media-fit img {
+  box-sizing: border-box;
+  padding: var(--pb-card-image-inset);
   object-fit: contain;
   mix-blend-mode: multiply;
 }
@@ -370,11 +374,13 @@
   font-weight: 500;
 }
 
-/* Default collection page (templates/collection.json, main[data-template='collection']): the
-   grid and the products bar above it (sections/pb-products-bar.liquid) sit 38px from the
-   screen edge at 1440px, as in the design, instead of 10px. The cards are the same as
-   everywhere else (the homepage best sellers included). */
-[data-template='collection'] :is(.product-grid-container, .pb-products-bar) {
+/* Default collection page, brand pages and search (templates/collection.json,
+   collection.brand.json and search.json, main[data-template='collection' | 'collection.brand' |
+   'search']): the grid, the products bar above it (sections/pb-products-bar.liquid) and the
+   breadcrumb (sections/pb-breadcrumb-bar.liquid) sit 38px from the screen edge at 1440px, as in the
+   design, instead of 10px. The cards are the same as everywhere else (the homepage best
+   sellers included). */
+:is([data-template='collection'], [data-template='collection.brand'], [data-template='search']) :is(.product-grid-container, .pb-products-bar, .pb-breadcrumb-bar--inline) {
   --page-margin: clamp(16px, 2.65vw, 38px);
   --page-width: 100vw;
 }

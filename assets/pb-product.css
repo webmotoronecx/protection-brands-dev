@@ -93,10 +93,13 @@ main[data-template='product'] .product-information slideshow-controls[pagination
   width: var(--thumbnail-width);
 }
 
-/* The thumbnails column runs the photo's height and scrolls if there are more than fit. */
+/* The thumbnails column runs the photo's height and scrolls if there are more than fit.
+   It reaches 4px past the column on every side, padded back in, so the current thumbnail's
+   outline (3.5px outside it) isn't clipped by the scrolling. */
 main[data-template='product'] .product-information slideshow-controls[pagination-position='left'] .slideshow-controls__thumbnails-container {
   position: absolute;
-  inset: 0;
+  inset: -4px;
+  padding: 4px;
   max-height: none;
   overflow: hidden auto;
 }
@@ -114,10 +117,16 @@ main[data-template='product'] .product-information .slideshow-controls__thumbnai
   border-radius: 6px;
 }
 
-/* Photos fill their tiles, as in the design (cut-outs keep their own white space round the
-   product); the lightbox (assets/pb-lightbox.js) shows them whole. */
+/* Photos are shown whole, never cropped: a photo that isn't the tile's shape sits in the
+   grey tile with grey either side. */
 main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control img {
   border-radius: 0;
+  object-fit: contain;
+}
+
+/* As on the main photo: non-square photos fill their tile (data-pb-fill,
+   snippets/slideshow-controls.liquid). */
+main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control[data-pb-fill] img {
   object-fit: cover;
 }
 
@@ -136,7 +145,21 @@ main[data-template='product'] .product-information media-gallery .product-media-
 
 main[data-template='product'] .product-information media-gallery .product-media-container .product-media img {
   border-radius: 0;
+  object-fit: contain;
+}
+
+/* Square photos are the cut-outs (shown whole, above); any other shape is a full photo,
+   e.g. the product in use, and fills the tile. Horizon puts each photo's shape on its
+   wrapper (snippets/product-media.liquid: --ratio, "1.0" when square). */
+main[data-template='product'] .product-information media-gallery .product-media:not([style^='--ratio: 1.0']):not(.dialog-zoomed-gallery *) img {
   object-fit: cover;
+}
+
+/* Cut-outs get grey space round them, like the product cards, so they don't touch the tile's
+   edges. Neither rule applies in the zoom dialog, which shows every photo whole. */
+main[data-template='product'] .product-information media-gallery .product-media[style^='--ratio: 1.0']:not(.dialog-zoomed-gallery *) img {
+  box-sizing: border-box;
+  padding: 8%;
 }
 
 /* Info column, 408px at 1440px, 19px from the photo. Label, title and stars 31px apart (the

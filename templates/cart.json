@@ -20,7 +20,9 @@
         "marquee_motion": "mouse",
         "marquee_duration": 60,
         "category_source": "none",
-        "all_label": "All"
+        "all_label": "All",
+        "layout": "full",
+        "marquee_source": "title"
       }
     },
     "cart-section": {

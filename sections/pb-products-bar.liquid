@@ -3,7 +3,8 @@
   heading on the left ("24 Products", counting only the current tag's products on a tag page)
   and Sort on the right. Used by the default collection template (templates/collection.json)
   in place of Horizon's own count and sort row, which is turned off there in the product
-  grid's Filters block.
+  grid's Filters block. Also on the search page (templates/search.json): the number of
+  results, and Sort keeps the search terms.
 
   Sort is snippets/pb-collection-sort.liquid: the word "Sort" with the browser's own dropdown
   laid invisibly over it, so a click or the keyboard opens the native list of options.
@@ -17,18 +18,27 @@
     assign current = closest.collection
   endif
   assign count = current.products_count | default: 0
+  assign sortable = current
+  if request.page_type == 'search'
+    assign count = search.results_count | default: 0
+    assign sortable = search
+  endif
 -%}
 
 <div class="pb-products-bar section">
   <div class="pb-products-bar__inner">
     <h2 class="pb-products-bar__count">
       {{ count }}
-      {{ count | pluralize: 'Product', 'Products' }}
+      {%- if request.page_type == 'search' %}
+        {{ count | pluralize: 'Result', 'Results' }}
+      {%- else %}
+        {{ count | pluralize: 'Product', 'Products' }}
+      {%- endif %}
     </h2>
 
     {%- if section.settings.show_sort -%}
       {%- render 'pb-collection-sort',
-        collection: current,
+        collection: sortable,
         id: 'PBProductsSort',
         class: 'pb-products-bar__sort',
         label: section.settings.sort_label
@@ -110,7 +120,7 @@
   "tag": "section",
   "class": "pb-products-bar-section",
   "enabled_on": {
-    "templates": ["collection"]
+    "templates": ["collection", "search"]
   },
   "settings": [
     {

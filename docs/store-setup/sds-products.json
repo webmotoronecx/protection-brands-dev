@@ -1,0 +1,6 @@
+{
+  "_readme": "Products whose SDS metafield (custom.sds) upload-sds.mjs --link-products sets. sheet = PDF filename in files/SDS, product = product handle. Products already linked to another sheet are reported, not changed.",
+  "links": [
+    { "sheet": "SDS - CERFACE Shampoo 1.6.2022.pdf", "product": "cerface-shampoo-concentrate" }
+  ]
+}

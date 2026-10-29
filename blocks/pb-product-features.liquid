@@ -2,7 +2,7 @@
   Product page features (Protection Brands): a row of up to three short promises under the
   buy buttons, each a red icon over a few words in the heading font, e.g. "Dispatched within
   48 hours". The same on every product; each can link somewhere (the delivery and returns
-  page).
+  page). Each line of the text setting starts a new line on the page.
 
   Icons are the Figma design's Carbon icons (assets/pb-icon-*.svg), drawn as CSS masks so
   they take the brand red (--pb-accent) rather than the files' own #FF0000. Used on
@@ -36,7 +36,13 @@
           {%- assign icon_file = 'pb-icon-' | append: icon | append: '.svg' -%}
           <span class="pb-product-features__icon" style="--pb-icon: url('{{ icon_file | asset_url }}');" aria-hidden="true"></span>
         {%- endif -%}
-        <span class="pb-product-features__text">{{ text | escape }}</span>
+        <span class="pb-product-features__text">
+          {%- assign lines = text | newline_to_br | split: '<br />' -%}
+          {%- for line in lines -%}
+            {%- assign line_text = line | strip -%}
+            {%- if line_text != blank -%}<span class="pb-product-features__line">{{ line_text | escape }}</span>{%- endif -%}
+          {%- endfor -%}
+        </span>
         {%- if link != blank -%}</a>{%- endif -%}
       </li>
     {%- endif -%}
@@ -44,11 +50,12 @@
 </ul>
 
 {% stylesheet %}
-  /* 1440px design: 30px icons, the words 37px below them, items 39px apart. Always one row;
-     on narrow columns the words wrap instead. */
+  /* 1440px design: 30px icons, the words 37px below them, items 39px apart. Always one row,
+     each column as wide as its longest line; when the row doesn't fit, the columns share the
+     space and a long line wraps. */
   .pb-product-features {
     display: grid;
-    grid-auto-columns: minmax(0, 7.2em);
+    grid-auto-columns: minmax(0, max-content);
     grid-auto-flow: column;
     justify-content: start;
     column-gap: clamp(16px, 2.7vw, 39px);
@@ -91,6 +98,10 @@
   .pb-product-features__text {
     display: block;
   }
+
+  .pb-product-features__line {
+    display: block;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -119,10 +130,11 @@
       "default": "delivery-truck"
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "text_1",
       "label": "Text",
-      "default": "Dispatched within 48 hours"
+      "info": "One line per line on the page.",
+      "default": "Dispatched\nwithin 48\nhours"
     },
     {
       "type": "url",
@@ -146,10 +158,11 @@
       "default": "location"
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "text_2",
       "label": "Text",
-      "default": "$20 flat-rate delivery Australia-wide"
+      "info": "One line per line on the page.",
+      "default": "$20 flat-rate\ndelivery\nAustralia-wide"
     },
     {
       "type": "url",
@@ -173,10 +186,11 @@
       "default": "returns"
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "text_3",
       "label": "Text",
-      "default": "7-day change-of-mind returns"
+      "info": "One line per line on the page.",
+      "default": "7-day\nchange-of-mind\nreturns"
     },
     {
       "type": "url",

@@ -292,7 +292,8 @@
 
     position: relative;
     isolation: isolate;
-    overflow: hidden;
+    /* clip, not hidden: hidden would stop the tabs and photo sticking (below). */
+    overflow: clip;
     padding:
       clamp(48px, 7.3vw, 105px)
       clamp(20px, 9.7vw, 140px)
@@ -469,13 +470,21 @@
     margin-block-start: -27px;
   }
 
-  /* The design's 316 × 421 portrait crop, so a square cut-out shows the product large. */
+  /* The whole photo at its own shape, never cropped. */
   .pb-product-description__image img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 316 / 421;
-    object-fit: cover;
+  }
+
+  /* Long descriptions: the tabs and the photo stay in view below the compact header while the
+     text scrolls, until the band ends. Desktop and tablet; phones stack them. */
+  @media screen and (min-width: 750px) {
+    .pb-product-description__list,
+    .pb-product-description__image {
+      position: sticky;
+      top: 100px;
+    }
   }
 
   .pb-product-description__hint {
