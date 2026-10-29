@@ -4,7 +4,7 @@
   in the heading font at the bottom. Either a custom promo (image, heading, link) or a picked
   product (its image, title and URL); a product card's own image or heading override the
   product's when set. The product's own image is a packshot, so it sits whole on the right
-  instead of filling the card.
+  instead of filling the card. Markup: snippets/pb-mega-card.liquid.
 {%- endcomment -%}
 
 {%- liquid
@@ -26,34 +26,14 @@
   endif
 -%}
 
-{%- if image != blank or heading != blank -%}
-  <a
-    class="pb-mega-card{% if packshot %} pb-mega-card--packshot{% endif %}"
-    {% if url != blank %}
-      href="{{ url }}"
-    {% endif %}
-    {{ block.shopify_attributes }}
-  >
-    {%- if image != blank -%}
-      {{
-        image
-        | image_url: width: 1200
-        | image_tag:
-          class: 'pb-mega-card__image',
-          alt: '',
-          loading: 'lazy',
-          widths: '400, 600, 800, 1000, 1200',
-          sizes: '(min-width: 990px) 28vw, 1px'
-      }}
-    {%- endif -%}
-    {%- if block.settings.eyebrow != blank -%}
-      <span class="pb-mega-card__eyebrow">{{ block.settings.eyebrow | escape }}</span>
-    {%- endif -%}
-    {%- if heading != blank -%}
-      <span class="pb-mega-card__heading">{{ heading | escape }}</span>
-    {%- endif -%}
-  </a>
-{%- endif -%}
+{%- render 'pb-mega-card',
+  image: image,
+  heading: heading,
+  eyebrow: block.settings.eyebrow,
+  url: url,
+  packshot: packshot,
+  attributes: block.shopify_attributes
+-%}
 
 {% schema %}
 {

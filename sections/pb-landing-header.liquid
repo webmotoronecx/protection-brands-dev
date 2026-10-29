@@ -13,8 +13,12 @@
   # Automatic: dark over the homepage hero, over the default collection template
   # (templates/collection.json, whose title bar is full width under it) and over the default
   # product template (templates/product.json, dark page behind the product card) and over the
-  # collections list (templates/list-collections.json, full-width title bar); light on every
-  # other page, including other collection templates such as collection.brand.
+  # collections list (templates/list-collections.json, full-width title bar) and over the
+  # brand pages' banner (templates/collection.brand.json), over the SDS page's banner
+  # (templates/page.sds.json) and over the default page template's full-width title bar
+  # (templates/page.json, e.g. the privacy policy) and over the search page's banner
+  # (templates/search.json, laid out like the collection page), and over the same full-width
+  # title bar on the contact page, 404, blog, articles and cart; light on every other page.
   assign light = false
   case section.settings.style
     when 'light'
@@ -28,6 +32,18 @@
       elsif template.name == 'product' and template.suffix == blank
         assign light = false
       elsif template.name == 'list-collections'
+        assign light = false
+      elsif template.name == 'collection' and template.suffix == 'brand'
+        assign light = false
+      elsif template.name == 'page' and template.suffix == 'sds'
+        assign light = false
+      elsif template.name == 'page' and template.suffix == blank
+        assign light = false
+      elsif template.name == 'search'
+        assign light = false
+      elsif template.name == 'page' and template.suffix == 'contact'
+        assign light = false
+      elsif template.name == '404' or template.name == 'blog' or template.name == 'article' or template.name == 'cart'
         assign light = false
       endif
   endcase
@@ -155,7 +171,7 @@
     the bar's contents and reaches up to the top, so bar and panel read as one white surface.
   {%- endcomment -%}
   {%- if section.blocks.size > 0 -%}
-    <pb-mega class="pb-mega">
+    <pb-mega class="pb-mega" style="--pb-mega-card-bg: url('{{ 'bg-cat.png' | asset_url }}');">
       {%- content_for 'blocks' -%}
     </pb-mega>
   {%- endif -%}
@@ -797,16 +813,26 @@
     list-style: none;
   }
 
+  /* Links nudge forward on hover or while their products show (--pb-mega-nudge). */
   .pb-mega__links a {
+    --pb-mega-nudge: 4px;
+
+    display: inline-block;
     color: #111;
     font-size: 17px;
     font-weight: 400;
     line-height: 1.2;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition:
+      color 0.2s ease,
+      translate 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .pb-mega__links a:is(:hover, :focus-visible, [aria-current='page']) {
+  .pb-mega__links a:is(:hover, :focus-visible, .is-shown) {
+    translate: var(--pb-mega-nudge) 0;
+  }
+
+  .pb-mega__links a:is(:hover, :focus-visible, [aria-current='page'], .is-shown) {
     color: var(--pb-accent, #ca0d0d);
   }
 
@@ -817,8 +843,50 @@
     gap: 18px;
   }
 
-  .pb-mega__highlights > :nth-child(n + 3) {
+  .pb-mega__highlights:not(.pb-mega__highlights--auto) > :nth-child(n + 3) {
     display: none;
+  }
+
+  /* Automatic product cards (blocks/_pb-mega-panel.liquid): one group of two per link, the
+     hovered link's shown (assets/pb-mega.js), fading in. */
+  /* The groups share one cell, and an empty sizer holds it at the height of a row of cards
+     (two cards of 433 / 312 side by side), so a link with no products (e.g. a brand that has
+     none yet) doesn't shrink the panel and make the links jump. */
+  .pb-mega__highlights--auto {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pb-mega__highlights--auto::before {
+    content: '';
+    grid-area: 1 / 1;
+    width: 100%;
+    aspect-ratio: calc(2 * 433) / 312;
+  }
+
+  .pb-mega__group:not([hidden]) {
+    grid-area: 1 / 1;
+    align-self: start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  /* Each time a group shows, its cards slide in from the left, the second just after the
+     first. Opacity and translate only. */
+  .pb-mega__group:not([hidden]) > .pb-mega-card {
+    animation: pb-mega-card-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pb-mega__group:not([hidden]) > .pb-mega-card:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  @keyframes pb-mega-card-in {
+    from {
+      opacity: 0;
+      translate: -32px 0;
+    }
   }
 
   .pb-mega-card {
@@ -832,7 +900,10 @@
     padding: clamp(20px, 2vw, 32px);
     overflow: hidden;
     border-radius: 10px;
-    background: #111;
+    /* Studio spotlight behind the product (assets/bg-cat.png, as on the homepage category
+       tiles), over the card's dark colour; a custom promo's photo covers it. Only downloaded
+       once a card shows. */
+    background: var(--pb-mega-card-bg, none) center / cover no-repeat, #111;
     color: #fff;
     text-decoration: none;
   }
@@ -847,10 +918,12 @@
     transition: scale 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  /* Product photos are square with room around the product, so the photo takes the card's
+     full height on the right half; the product itself ends up about two-thirds as tall. */
   .pb-mega-card--packshot .pb-mega-card__image {
-    inset: 8% 4% 8% auto;
-    width: 42%;
-    height: 84%;
+    inset: 0 0 0 auto;
+    width: 50%;
+    height: 100%;
     object-fit: contain;
   }
 
@@ -881,11 +954,24 @@
   }
 
   .pb-mega-card--packshot .pb-mega-card__heading {
-    max-width: 54%;
-    font-size: clamp(22px, 2vw, 32px);
+    max-width: 52%;
+    font-size: clamp(18px, 1.6vw, 26px);
+    overflow-wrap: anywhere;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .pb-mega__group:not([hidden]) > .pb-mega-card {
+      animation: none;
+    }
+
+    .pb-mega__links a {
+      transition: color 0.2s ease;
+    }
+
+    .pb-mega__links a:is(:hover, :focus-visible, .is-shown) {
+      translate: none;
+    }
+
     .pb-landing-header:not(.pb-landing-header--light),
     .pb-mega,
     .pb-mega__panel,
@@ -1154,7 +1240,7 @@
         }
       ],
       "default": "auto",
-      "info": "Automatic is dark over the homepage hero, the default collection and product templates and the collections list, and light on every other page."
+      "info": "Automatic is dark over the homepage hero, the default collection and product templates, the collections list, brand pages, the SDS page and the default page template, and light on every other page."
     },
     {
       "type": "image_picker",

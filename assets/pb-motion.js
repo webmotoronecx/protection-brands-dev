@@ -12,8 +12,8 @@
   - The footer ([data-pb-footer]) slides down from under the page above, scrubbed to the scroll,
     with parallax on its content.
   - The homepage hero (.pb-hero-bottle) has scroll parallax as it scrolls away; see below.
-  - The full-width collection banner (.pb-collection-header--full) has the same, on its photo
-    and title.
+  - The full-width collection banner (.pb-collection-header--full) and the brand page banner
+    (.pb-brand-header) have the same, on their photo or watermark, product, title and logo.
   - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
@@ -90,6 +90,9 @@
     });
     document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => section.style.removeProperty('--pb-body-scale'));
     document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => tile.style.removeProperty('--pb-tile-shift'));
+    document.querySelectorAll('.pb-collection-header--full, .pb-brand-header').forEach((banner) => {
+      banner.style.removeProperty('--pb-collection-shift');
+    });
   };
 
   if (config.reveal && ScrollTrigger) {
@@ -199,10 +202,11 @@
         .fromTo(hero, { '--pb-hero-shift': '0px' }, { '--pb-hero-shift': () => `${hero.offsetHeight}px`, ease: 'none', duration: 1 }, 0);
     });
 
-    // Full-width collection banner (sections/pb-collection-header.liquid): the same kind of
-    // parallax as the hero, scrubbed as the banner scrolls away. Sets --pb-collection-shift (px
-    // scrolled past); the banner's CSS moves the photo and title by shares of it.
-    document.querySelectorAll('.pb-collection-header--full').forEach((banner) => {
+    // Full-width collection banner (sections/pb-collection-header.liquid) and brand banner
+    // (sections/pb-brand-header.liquid): the same kind of parallax as the hero, scrubbed as the
+    // banner scrolls away. Sets --pb-collection-shift (px scrolled past); the banner's CSS
+    // moves its layers by shares of it.
+    document.querySelectorAll('.pb-collection-header--full, .pb-brand-header').forEach((banner) => {
       gsap.fromTo(
         banner,
         { '--pb-collection-shift': '0px' },

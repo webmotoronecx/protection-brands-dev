@@ -1,0 +1,489 @@
+{%- comment -%}
+  Brand page banner (Protection Brands), on templates/collection.brand.json: a tall dark banner
+  edge to edge under the floating dark header (sections/pb-landing-header.liquid), the brand
+  name large on the left with a short red tagline under it, a product photo in the middle
+  standing on the bottom edge, the brand's logo on the right, and the brand name as the faint
+  watermark behind (snippets/pb-marquee.liquid). The white page curves up over the bottom, as
+  on the full-width collection banner (sections/pb-collection-header.liquid).
+
+  Or a full-screen photo: when the collection has a hero image, it covers the banner, with the
+  title on the left and the logo on the right over a dark fade, and no middle product.
+
+  Each brand's content is on its collection (metafields, docs/store-setup/README.md):
+  custom.brand_logo (a light logo for the dark banner), custom.tagline, custom.hero_product
+  (the middle photo; empty uses the first product), custom.hero_image (the full-screen photo)
+  and custom.watermark (the watermark word; empty uses the title). The section settings are
+  the look shared by every brand.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+  assign brand = collection | default: closest.collection
+
+  assign logo = brand.metafields.custom.brand_logo.value
+  assign tagline = brand.metafields.custom.tagline.value
+
+  assign hero_image = blank
+  if section.settings.full_image
+    assign hero_image = brand.metafields.custom.hero_image.value
+  endif
+
+  assign product_image = blank
+  if hero_image == blank
+    case section.settings.middle
+      when 'hero'
+        assign product_image = brand.metafields.custom.hero_product.value.featured_media.preview_image
+        if product_image == blank
+          assign product_image = brand.products.first.featured_media.preview_image
+        endif
+      when 'first'
+        assign product_image = brand.products.first.featured_media.preview_image
+    endcase
+  endif
+
+  assign title = brand.title | default: section.settings.fallback_title
+  assign watermark = brand.metafields.custom.watermark.value | default: title
+-%}
+
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {%- if hero_image == blank and section.settings.watermark %}
+    {{ section.settings.watermark_font | font_face: font_display: 'swap' }}
+  {%- endif %}
+</style>
+
+<div
+  class="pb-brand-header{% if hero_image != blank %} pb-brand-header--image{% endif %}"
+  style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};"
+>
+  {%- if hero_image != blank -%}
+    <div class="pb-brand-header__photo">
+      {{-
+        hero_image
+        | image_url: width: 2400
+        | image_tag:
+          alt: '',
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: '100vw',
+          widths: '750, 1100, 1500, 2000, 2400'
+      -}}
+    </div>
+  {%- elsif section.settings.watermark -%}
+    {%- render 'pb-marquee',
+      class: 'pb-brand-header__marquee',
+      file: 'label-scroling-invert.svg',
+      text: watermark,
+      static: true,
+      follow_mouse: true,
+      loading: 'eager'
+    -%}
+  {%- endif -%}
+
+  {%- if product_image != blank -%}
+    <div class="pb-brand-header__product">
+      {{-
+        product_image
+        | image_url: width: 1600
+        | image_tag:
+          alt: '',
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: '(min-width: 750px) 800px, 380px',
+          widths: '400, 600, 800, 1000, 1200, 1600'
+      -}}
+    </div>
+  {%- endif -%}
+
+  <div class="pb-brand-header__text">
+    {%- comment -%} The page's one h1 stays when the title is hidden, for screen readers. {%- endcomment -%}
+    <h1 class="pb-brand-header__title{% unless section.settings.show_title %} visually-hidden{% endunless %}">
+      {{- title | escape -}}
+    </h1>
+    {%- if section.settings.show_tagline and tagline != blank -%}
+      <p class="pb-brand-header__tagline">{{ tagline | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_logo and logo != blank -%}
+    <div class="pb-brand-header__logo">
+      {{-
+        logo
+        | image_url: width: 900
+        | image_tag: alt: title, loading: 'eager', widths: '300, 450, 600, 900', sizes: '(min-width: 750px) 25vw, 50vw'
+      -}}
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .pb-brand-header {
+    --pb-brand-pad-x: clamp(20px, 3.8vw, 55px);
+    --pb-brand-curve: 12px;
+
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    height: var(--pb-brand-h, 530px);
+    overflow: hidden;
+    padding: var(--pb-landing-header-height, 88px) var(--pb-brand-pad-x) var(--pb-brand-curve);
+    background:
+      radial-gradient(ellipse 60% 90% at 50% 70%, #1c1c1c 0%, transparent 70%),
+      linear-gradient(120deg, #111 0%, #0b0b0b 60%, #0d0d0d 100%);
+    color: #fff;
+  }
+
+  /* The white page curving up over the bottom. */
+  .pb-brand-header::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 2;
+    height: var(--pb-brand-curve);
+    border-radius: var(--pb-brand-curve) var(--pb-brand-curve) 0 0;
+    background: var(--color-background, #fff);
+  }
+
+  /* Watermark: the brand name, wider than the banner so its edges stay hidden when it drifts
+     with the mouse, behind everything, fading downwards. */
+  .pb-brand-header__marquee {
+    --pb-marquee-height: clamp(4rem, 15vw, 18rem);
+
+    position: absolute;
+    inset-inline: -80px;
+    inset-block-start: calc(var(--pb-landing-header-height, 88px) + clamp(32px, 4.5vw, 64px));
+    z-index: -1;
+  }
+
+  .pb-brand-header .pb-marquee__word {
+    font-family: var(--pb-watermark-font, inherit);
+    font-weight: var(--pb-watermark-weight, 600);
+    background-image: linear-gradient(to bottom, #fff 15%, rgb(97 97 97 / 0.02) 85%);
+  }
+
+  /* Full-screen photo, darkened on the left and right behind the title and logo. */
+  .pb-brand-header__photo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .pb-brand-header__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pb-brand-header__photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgb(0 0 0 / 0.55) 0%, transparent 40%, transparent 60%, rgb(0 0 0 / 0.55) 100%),
+      linear-gradient(180deg, rgb(0 0 0 / 0.45) 0%, transparent 30%);
+  }
+
+  /* Middle product: a cut-out standing on the bottom edge, between the title and the logo.
+     Product photos are square with room around the product, so the box is larger than the
+     banner's free height ("Product size", % of it) and it sinks a quarter of its height under
+     the white curve: the photo's empty bottom edge and the bottom of the product, as in the
+     design, so the top of the product stays clear of the header. */
+  .pb-brand-header__product {
+    --pb-brand-product-h: calc(
+      (var(--pb-brand-h, 530px) - var(--pb-landing-header-height, 88px)) * var(--pb-brand-product-size, 1.45)
+    );
+
+    position: absolute;
+    inset-block-end: calc(var(--pb-brand-product-h) * -0.25);
+    inset-inline-start: 50%;
+    z-index: 0;
+    height: var(--pb-brand-product-h);
+    aspect-ratio: 1;
+  }
+
+  .pb-brand-header__product img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+  }
+
+  /* Trial: a soft grey glow rising from the bottom centre behind the product, black elsewhere,
+     and the product casts a soft dark shadow onto it, following its cut-out shape (as in the
+     design). Delete these two rules to remove it. */
+  .pb-brand-header:not(.pb-brand-header--image) {
+    background:
+      radial-gradient(ellipse 42% 75% at 50% 100%, #353535 0%, #1f1f1f 40%, rgb(20 20 20 / 0) 75%),
+      linear-gradient(180deg, #000 0%, #0b0b0b 55%, #141414 100%);
+  }
+
+  .pb-brand-header__product img {
+    filter: drop-shadow(24px 8px 48px rgb(0 0 0 / 0.85));
+  }
+
+  /* Left of the middle product: up to 40% of the banner, and words never break. */
+  .pb-brand-header__text {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    max-width: 80%;
+    grid-column: 1;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .pb-brand-header--image .pb-brand-header__text {
+    max-width: none;
+  }
+
+  .pb-brand-header__title {
+    margin: 0;
+    color: #fff;
+    font-family: var(--pb-brand-font, inherit);
+    font-size: clamp(2.25rem, 4.45vw, 4rem);
+    font-weight: var(--pb-brand-weight, 400);
+    line-height: 0.95;
+    overflow-wrap: normal;
+    word-break: normal;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .pb-brand-header__tagline {
+    margin: 18px 0 0;
+    color: var(--pb-accent, #ca0d0d);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Logo: within the right third, sized by the max width and height settings. */
+  .pb-brand-header__logo {
+    position: relative;
+    z-index: 1;
+    grid-column: 2;
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: min(var(--pb-brand-logo-w, 260px), 30vw);
+    margin-inline-end: clamp(0px, 4vw, 64px);
+  }
+
+  .pb-brand-header__logo img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: var(--pb-brand-logo-h, 140px);
+    object-fit: contain;
+  }
+
+  /* Scroll parallax (assets/pb-motion.js sets --pb-collection-shift, px scrolled past, as the
+     banner scrolls away), as on the homepage hero: the back layer (watermark or photo) drifts
+     down most, the product a little less, and the title and logo rise a little faster than
+     the page. `translate` only, so it runs on the compositor and adds to the watermark's
+     mouse drift (a transform). Nothing is set with reduced motion or in the theme editor. */
+  .pb-brand-header :is(.pb-brand-header__marquee, .pb-brand-header__photo) {
+    translate: 0 calc(var(--pb-collection-shift, 0px) * 0.35);
+  }
+
+  .pb-brand-header__product {
+    translate: -50% calc(var(--pb-collection-shift, 0px) * 0.2);
+  }
+
+  .pb-brand-header__text {
+    translate: 0 calc(var(--pb-collection-shift, 0px) * -0.12);
+  }
+
+  .pb-brand-header__logo {
+    translate: 0 calc(var(--pb-collection-shift, 0px) * -0.08);
+  }
+
+  /* Phones: title and tagline at the top, a smaller logo under them, the product at the
+     bottom. */
+  @media screen and (max-width: 749px) {
+    .pb-brand-header {
+      --pb-brand-pad-x: 20px;
+
+      grid-template-columns: 1fr;
+      align-content: start;
+      gap: 16px;
+      height: var(--pb-brand-h-mobile, 520px);
+      padding-block-start: calc(var(--pb-landing-header-height, 72px) + 16px);
+    }
+
+    .pb-brand-header__text,
+    .pb-brand-header--image .pb-brand-header__text {
+      max-width: none;
+    }
+
+    .pb-brand-header__title {
+      font-size: clamp(2.25rem, 10vw, 3rem);
+    }
+
+    .pb-brand-header__logo {
+      grid-column: 1;
+      justify-self: start;
+      place-items: start;
+      width: min(var(--pb-brand-logo-w, 260px), 45vw);
+      margin: 0;
+    }
+
+    .pb-brand-header__logo img {
+      max-height: min(var(--pb-brand-logo-h, 140px), 56px);
+    }
+
+    .pb-brand-header__product {
+      --pb-brand-product-h: calc(var(--pb-brand-h-mobile, 520px) * 0.5 * var(--pb-brand-product-size, 1.45));
+    }
+
+    .pb-brand-header__photo::after {
+      background:
+        linear-gradient(180deg, rgb(0 0 0 / 0.6) 0%, rgb(0 0 0 / 0.25) 45%, transparent 70%);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand banner (PB)",
+  "tag": "section",
+  "class": "pb-brand-header-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Each brand's logo, tagline, hero product and full-screen image are fields on its collection (Collections → the brand → Metafields)."
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height on desktop",
+      "min": 420,
+      "max": 720,
+      "step": 10,
+      "unit": "px",
+      "default": 530
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Height on phones",
+      "min": 380,
+      "max": 680,
+      "step": 10,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tagline",
+      "label": "Show tagline",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_logo",
+      "label": "Show logo",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo max width",
+      "min": 120,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 260,
+      "visible_if": "{{ section.settings.show_logo }}"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo max height",
+      "min": 40,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "default": 140,
+      "visible_if": "{{ section.settings.show_logo }}"
+    },
+    {
+      "type": "header",
+      "content": "Middle image"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_image",
+      "label": "Full-screen image when the brand has one",
+      "info": "The collection's Hero image covers the banner instead of the middle product.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "middle",
+      "label": "Middle product",
+      "options": [
+        {
+          "value": "hero",
+          "label": "Hero product, else the first product"
+        },
+        {
+          "value": "first",
+          "label": "First product"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "hero"
+    },
+    {
+      "type": "range",
+      "id": "product_size",
+      "label": "Product size",
+      "info": "Of the banner's height under the header. Product photos have space around the product, so over 100% is normal.",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 145,
+      "visible_if": "{{ section.settings.middle != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Watermark"
+    },
+    {
+      "type": "checkbox",
+      "id": "watermark",
+      "label": "Show the brand name as a watermark",
+      "info": "Not shown over a full-screen image. The collection's Watermark field overrides the word.",
+      "default": true
+    },
+    {
+      "type": "font_picker",
+      "id": "watermark_font",
+      "label": "Watermark font",
+      "default": "barlow_n6",
+      "visible_if": "{{ section.settings.watermark }}"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Title when there is no collection",
+      "default": "Our brands"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,41 @@
+{%- doc -%}
+  A card in the PB mega menu (blocks/_pb-mega-highlight.liquid, and the automatic product cards
+  in blocks/_pb-mega-panel.liquid): a dark rounded card with a photo, a small red eyebrow at
+  the top and a large heading in the heading font at the bottom. A product packshot sits whole
+  on the right instead of filling the card. Styles: sections/pb-landing-header.liquid.
+
+  @param {object} [image] - The photo
+  @param {string} [heading] - The large text
+  @param {string} [eyebrow] - The small red text at the top
+  @param {string} [url] - Where the card links
+  @param {boolean} [packshot] - The photo is a product cut-out
+  @param {string} [attributes] - Extra attributes on the card (the block's shopify_attributes)
+{%- enddoc -%}
+{%- if image != blank or heading != blank -%}
+  <a
+    class="pb-mega-card{% if packshot %} pb-mega-card--packshot{% endif %}"
+    {% if url != blank %}
+      href="{{ url }}"
+    {% endif %}
+    {{ attributes }}
+  >
+    {%- if image != blank -%}
+      {{
+        image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'pb-mega-card__image',
+          alt: '',
+          loading: 'lazy',
+          widths: '400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 990px) 28vw, 1px'
+      }}
+    {%- endif -%}
+    {%- if eyebrow != blank -%}
+      <span class="pb-mega-card__eyebrow">{{ eyebrow | escape }}</span>
+    {%- endif -%}
+    {%- if heading != blank -%}
+      <span class="pb-mega-card__heading">{{ heading | escape }}</span>
+    {%- endif -%}
+  </a>
+{%- endif -%}

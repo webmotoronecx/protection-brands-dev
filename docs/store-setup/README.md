@@ -106,8 +106,9 @@ Existing collections keep their handles, so old links and search rankings surviv
 
 - **Permagard Car Care / CERFACE Ceramic / OptiVAN Caravan Maintenance**: leave as they are.
   They act as the brand landing pages. Set each one's **Theme template** to `brand`
-  (`templates/collection.brand.json`): the same title bar, with the brand name as the faint
-  watermark instead of the Protection Brands wordmark.
+  (`templates/collection.brand.json`): a tall banner (sections/pb-brand-header.liquid) with
+  the brand name and tagline on the left, a product in the middle, the brand logo on the
+  right and the brand name as the faint watermark; or a full-screen photo.
 - **Honda Genuine Car Care** (from 4 Nov): new automated collection, handle
   `honda-genuine-car-care`, condition *Suitable for is equal to* `Honda Genuine Car Care`,
   theme template `brand`.
@@ -119,13 +120,20 @@ Existing collections keep their handles, so old links and search rankings surviv
 - **Reapplication / Warranty Transfer**: no products are visible publicly. Publish their
   products to the Online Store sales channel, or point the menu at a page instead.
 
-Brand page banners use two collection metafield definitions
-(**Settings → Metafields and metaobjects → Collections → Add definition**, storefront access on):
+Brand page banners use five collection metafield definitions. `node setup-store.mjs --store
+<store> --only metafields --apply` creates them (or in admin: **Settings → Custom data →
+Collections → Add definition**, storefront access on):
 
 | Name | Namespace and key | Type | Use |
 |---|---|---|---|
-| Hero image | `custom.hero_image` | File (images only) | Photo across the whole banner, behind a dark gradient. Wide, at least 2400px. |
+| Brand logo | `custom.brand_logo` | File (images only) | Logo on the right of the banner. A light or white version, as the banner is dark; transparent PNG or SVG. |
+| Tagline | `custom.tagline` | Single line text | Short red line under the brand name. Empty hides it. |
+| Hero product | `custom.hero_product` | Product | The product photo in the middle. Empty uses the collection's first product. |
+| Hero image | `custom.hero_image` | File (images only) | Full-screen photo across the whole banner, in place of the middle product. Wide, at least 2400px. |
 | Watermark | `custom.watermark` | Single line text | Short faint watermark when there's no hero image, e.g. `Honda`. Without it the collection title is used. |
+
+The shared look (height, show or hide the title, tagline and logo, logo size, watermark) is in
+the theme editor: Collections → brand template → Brand banner (PB).
 
 Fill them in at the bottom of each brand collection's page in admin.
 

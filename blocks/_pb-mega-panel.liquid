@@ -6,6 +6,11 @@
 
   Links: the menu if one is picked, otherwise the collections, otherwise the default list
   (the shop's product categories, or the brand collections).
+
+  With no highlights, the right side shows two products for the link being hovered or focused
+  (the first two of its collection, or the product itself for a product link), switched by
+  assets/pb-mega.js. The groups stay hidden until the menu opens, so their photos aren't
+  downloaded with the page.
 {%- endcomment -%}
 
 {%- liquid
@@ -18,28 +23,121 @@
   endif
 -%}
 
-{%- capture links -%}
-  {%- if links_menu.links.size > 0 -%}
-    {%- for link in links_menu.links -%}
-      {%- render 'pb-menu-link', url: link.url, title: link.title -%}
-    {%- endfor -%}
-  {%- elsif picked != blank -%}
-    {%- for collection in picked -%}
-      {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
-    {%- endfor -%}
-  {%- else -%}
-    {%- for handle in fallback_handles -%}
-      {%- assign collection = collections[handle] -%}
-      {%- if collection.id != blank -%}
-        {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
-      {%- endif -%}
-    {%- endfor -%}
-  {%- endif -%}
-{%- endcapture -%}
-
 {%- capture highlights -%}
   {%- content_for 'blocks' -%}
 {%- endcapture -%}
+
+{%- liquid
+  # The links as url / title / products, from the menu, the picked collections or the defaults.
+  assign urls = ''
+  assign titles = ''
+  assign handles = ''
+  assign separator = '<!--pb-mega-->'
+  if links_menu.links.size > 0
+    for link in links_menu.links
+      assign urls = urls | append: link.url | append: separator
+      assign titles = titles | append: link.title | append: separator
+      case link.type
+        when 'collection_link'
+          assign handles = handles | append: 'c:' | append: link.object.handle | append: separator
+        when 'product_link'
+          assign handles = handles | append: 'p:' | append: link.object.handle | append: separator
+        else
+          assign handles = handles | append: '-' | append: separator
+      endcase
+    endfor
+  else
+    if picked != blank
+      assign list = picked
+    else
+      assign list = ''
+      for handle in fallback_handles
+        if collections[handle].id != blank
+          assign list = list | append: handle | append: ','
+        endif
+      endfor
+      assign list = list | split: ','
+    endif
+    for item in list
+      if item.handle
+        assign item_collection = item
+      else
+        assign item_collection = collections[item]
+      endif
+      assign urls = urls | append: item_collection.url | append: separator
+      assign titles = titles | append: item_collection.title | append: separator
+      assign handles = handles | append: 'c:' | append: item_collection.handle | append: separator
+    endfor
+  endif
+  assign url_list = urls | split: separator
+  assign title_list = titles | split: separator
+  assign handle_list = handles | split: separator
+
+  assign auto_products = false
+  if highlights == blank and block.settings.auto_products
+    assign auto_products = true
+  endif
+-%}
+
+{%- capture links -%}
+  {%- for url in url_list -%}
+    <li>
+      <a
+        href="{{ url }}"
+        {% if url == request.path %}
+          aria-current="page"
+        {% endif %}
+        {% if auto_products %}
+          data-pb-mega-item="{{ forloop.index0 }}"
+        {% endif %}
+      >
+        {{- title_list[forloop.index0] -}}
+      </a>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if auto_products -%}
+  {%- capture highlights -%}
+    {%- for key in handle_list -%}
+      {%- liquid
+        assign kind = key | slice: 0, 2
+        assign handle = key | remove_first: kind
+        assign group_products = blank
+        assign single_product = blank
+        case kind
+          when 'c:'
+            assign group_products = collections[handle].products
+          when 'p:'
+            assign single_product = all_products[handle]
+        endcase
+      -%}
+      <div class="pb-mega__group" data-pb-mega-group="{{ forloop.index0 }}" hidden>
+        {%- if single_product != blank -%}
+          {%- assign card_price = single_product.price | money -%}
+          {%- render 'pb-mega-card',
+            image: single_product.featured_media.preview_image,
+            heading: single_product.title,
+            eyebrow: card_price,
+            url: single_product.url,
+            packshot: true
+          -%}
+        {%- else -%}
+          {%- for card_product in group_products limit: 2 -%}
+            {%- assign card_price = card_product.price | money -%}
+            {%- render 'pb-mega-card',
+              image: card_product.featured_media.preview_image,
+              heading: card_product.title,
+              eyebrow: card_price,
+              url: card_product.url,
+              packshot: true
+            -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  {%- endcapture -%}
+{%- endif -%}
 
 <div
   id="PBMega-{{ block.id }}"
@@ -60,7 +158,7 @@
     </nav>
 
     {%- if highlights != blank -%}
-      <div class="pb-mega__highlights">
+      <div class="pb-mega__highlights{% if auto_products %} pb-mega__highlights--auto{% endif %}">
         {{- highlights -}}
       </div>
     {%- endif -%}
@@ -121,6 +219,13 @@
     {
       "type": "paragraph",
       "content": "Add one or two highlights. Only the first two are shown."
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_products",
+      "label": "Without highlights, show two products for the hovered link",
+      "info": "The first two products of the link's collection.",
+      "default": true
     }
   ],
   "presets": [

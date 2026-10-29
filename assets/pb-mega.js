@@ -12,6 +12,10 @@
   - Click or tap: opens its panel (Enter and taps toggle it). A header link that has a panel
     is turned into a button, so it opens the panel instead of going anywhere.
   - Theme editor: selecting a panel or one of its highlights opens that panel.
+  - Automatic product cards: in a panel without highlights, hovering or focusing a link shows
+    its group of products ([data-pb-mega-item] -> [data-pb-mega-group]); the first link's
+    group shows when the panel opens. Groups are hidden until then, so their photos only
+    load once the menu is used.
 
   While open, .is-mega-open is on the header (which turns the dark header's text dark) and
   .is-open on <pb-mega>; closed panels are inert. A 'pb:mega' event is fired on document with
@@ -46,6 +50,8 @@ class PBMega extends HTMLElement {
       'pointerover',
       (event) => {
         if (event.pointerType === 'touch' || !desktop.matches) return;
+        const item = event.target.closest('[data-pb-mega-item]');
+        if (item) this.#showGroup(item);
         const trigger = event.target.closest('[data-pb-mega-trigger]');
         if (trigger) {
           if (trigger === this.#trigger && this.#panel) return this.#cancel();
@@ -87,6 +93,8 @@ class PBMega extends HTMLElement {
       'focusin',
       (event) => {
         if (!desktop.matches) return;
+        const item = event.target.closest('[data-pb-mega-item]');
+        if (item) this.#showGroup(item);
         const trigger = event.target.closest('[data-pb-mega-trigger]');
         if (trigger && trigger.matches(':focus-visible')) this.open(trigger);
       },
@@ -178,10 +186,27 @@ class PBMega extends HTMLElement {
     this.#trigger = trigger ?? undefined;
     panel.inert = false;
     panel.classList.add('is-active');
+    if (!panel.querySelector('[data-pb-mega-group]:not([hidden])')) {
+      const first = panel.querySelector('[data-pb-mega-item]');
+      if (first) this.#showGroup(first);
+    }
     trigger?.setAttribute('aria-expanded', 'true');
     this.classList.add('is-open');
     this.header?.classList.add('is-mega-open');
     if (!wasOpen) document.dispatchEvent(new CustomEvent('pb:mega', { detail: { open: true } }));
+  }
+
+  // Shows the product group of a link in a panel without highlights, and marks the link.
+  #showGroup(item) {
+    const panel = item.closest('[data-pb-mega-panel]');
+    if (!panel) return;
+    const index = item.dataset.pbMegaItem;
+    for (const group of panel.querySelectorAll('[data-pb-mega-group]')) {
+      group.hidden = group.dataset.pbMegaGroup !== index;
+    }
+    for (const link of panel.querySelectorAll('[data-pb-mega-item]')) {
+      link.classList.toggle('is-shown', link === item);
+    }
   }
 
   /* The panels come last in the header, so Tab is steered to read them in place: from the

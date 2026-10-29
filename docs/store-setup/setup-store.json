@@ -88,6 +88,28 @@
       "key": "watermark",
       "name": "Watermark",
       "type": "single_line_text_field"
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "brand_logo",
+      "name": "Brand logo",
+      "type": "file_reference",
+      "fileTypes": ["Image"]
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "hero_product",
+      "name": "Hero product",
+      "type": "product_reference"
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "tagline",
+      "name": "Tagline",
+      "type": "single_line_text_field"
     }
   ],
 

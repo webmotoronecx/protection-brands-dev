@@ -47,6 +47,12 @@ doesn't use them, but do them close to launch day.
       chosen once the Horizon theme is in the store, so set it after step 6, or now on the
       unpublished theme.
 
+### Brand pages
+
+- [ ] Brand collection fields (README §3): create the definitions with setup-store.mjs, set each
+      brand collection's template to `brand`, and fill Brand logo (light version), Tagline,
+      Hero product and, for a full-screen banner, Hero image.
+
 ### Product page extras
 
 - [ ] Product page tabs (README §2, *Product page tabs*): create the four Tab metafield
