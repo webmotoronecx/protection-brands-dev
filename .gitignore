@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 .shopify/
+
+# Reference files for what is still to build (kept locally, not in git)
+ref/
+
+# Logs written by docs/store-setup/setup-store.mjs on each --apply run
+docs/store-setup/setup-logs/
