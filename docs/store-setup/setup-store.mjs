@@ -407,7 +407,7 @@ const menus = new Map(gql(`{ menus(first: 50) { nodes { id handle } } }`).menus.
 
 function linkKey(link) {
   const [kind, value] = link.split(/:(.*)/);
-  return ['collection', 'page', 'blog'].includes(kind) ? `${kind}:${value}` : null;
+  return ['collection', 'page', 'blog', 'product'].includes(kind) ? `${kind}:${value}` : null;
 }
 
 for (const menu of config.menus) {
@@ -418,6 +418,10 @@ for (const menu of config.menus) {
     const key = linkKey(it.link);
     if (key && !known(key)) {
       if (key.startsWith('collection:')) findCollection(key.slice('collection:'.length));
+      if (key.startsWith('product:')) {
+        const p = gql(`query($h: String!) { productByIdentifier(identifier: { handle: $h }) { id } }`, { h: key.slice('product:'.length) }).productByIdentifier;
+        if (p) ids[key] = p.id;
+      }
       if (!known(key)) unresolved.push(`${it.title} (${it.link})`);
     }
     if (it.items) walk(it.items);
