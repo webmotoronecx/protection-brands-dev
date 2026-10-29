@@ -47,6 +47,34 @@
       "type": "multi_line_text_field"
     },
     {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "tab_description",
+      "name": "Tab: Description",
+      "type": "rich_text_field"
+    },
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "tab_what_s_included",
+      "name": "Tab: What's included",
+      "type": "rich_text_field"
+    },
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "tab_key_features",
+      "name": "Tab: Key features",
+      "type": "rich_text_field"
+    },
+    {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "tab_key_specifications",
+      "name": "Tab: Key specifications",
+      "type": "rich_text_field"
+    },
+    {
       "ownerType": "COLLECTION",
       "namespace": "custom",
       "key": "hero_image",

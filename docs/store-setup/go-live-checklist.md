@@ -49,6 +49,9 @@ doesn't use them, but do them close to launch day.
 
 ### Product page extras
 
+- [ ] Product page tabs (README §2, *Product page tabs*): create the four Tab metafield
+      definitions in admin (rich text), dry-run `split-descriptions.py --store protection-brands`,
+      read the report, then run it with `--apply`. Safe before launch: Debut doesn't show them.
 - [ ] Optional product metafield **How to use** (`custom.how_to_use`, rich text or multi-line
       text). Products with it show a "How to use" row under Add to cart.
 - [ ] Check the **Delivery & returns** wording on the product page (Theme editor → Product →

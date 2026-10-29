@@ -46,6 +46,29 @@ choice list rejects the whole product.
 Products hidden from the Online Store aren't in the CSV. Give any that should go live a
 type and vendor too.
 
+### Product page tabs
+
+The product page's tabs (Description, What's included, Key features, Key specifications) come
+from four rich text product metafields, `custom.tab_description`, `custom.tab_what_s_included`,
+`custom.tab_key_features` and `custom.tab_key_specifications` (**Tab: …** on the product page in
+admin). A product with none of them set falls back to splitting its description at bold capital
+headings. The fields don't show on Debut, so they can be filled on live before launch.
+
+1. Create the definitions in admin: **Settings → Custom data → Products → Add definition**, type
+   **Rich text**, one each: *Tab: Description* (`custom.tab_description`), *Tab: What's
+   included* (`custom.tab_what_s_included`), *Tab: Key features* (`custom.tab_key_features`),
+   *Tab: Key specifications* (`custom.tab_key_specifications`). setup-store.mjs can't create
+   `custom` definitions (the CLI's access is denied), but its plan then reports them as ok.
+2. Dry run: `python3 split-descriptions.py --store <store>`. It splits each description at its
+   headings (DESCRIPTION, INCLUSIONS / WHATS INCLUDED, KEY FEATURES, KEY SPECIFICATIONS /
+   PRODUCT SIZE) and writes `setup-logs/split-descriptions-<store>.html`: each product's
+   original next to its four parts. Read it; any unrecognised heading is listed.
+3. `python3 split-descriptions.py --store <store> --apply` fills the empty fields (add
+   `--overwrite` to replace ones already set, `--only <handle>,<handle>` for a few products).
+   The descriptions themselves are not changed.
+
+After that, edit the Tab fields in admin; the script is only for the first fill.
+
 ## 3. Collections
 
 **Products → Collections.** New collections are automated, with *all conditions* matched.

@@ -5,11 +5,19 @@
   (desktop only), and the Protection Brands wordmark behind, cut off by the white page that
   curves up over the bottom (::after, as on the full-width collection banner).
 
-  The tabs come from the product description itself. The store's descriptions are written as
-  parts, each opened by a short paragraph in bold capitals ("DESCRIPTION", "KEY FEATURES",
-  "INCLUSIONS", "WHATS INCLUDED:"): each such paragraph starts a new tab named after it, and
-  anything before the first one goes under "Description". Then, when set, a "How to use" tab
-  (custom.how_to_use metafield) and a "Safety data sheet" tab with the PDF (custom.sds).
+  The tabs come from four rich text product metafields, in this order, each left out when
+  empty: Description (custom.tab_description, or the product description when that is empty),
+  What's included (custom.tab_what_s_included), Key features (custom.tab_key_features) and Key
+  specifications (custom.tab_key_specifications). docs/store-setup/split-descriptions.py
+  filled them from the old descriptions.
+
+  A product with none of the four set falls back to splitting its description: parts opened
+  by a short paragraph in bold capitals ("DESCRIPTION", "KEY FEATURES", "INCLUSIONS", "WHATS
+  INCLUDED:") each become a tab named after it, and anything before the first one goes under
+  "Description".
+
+  Either way, then, when set, a "How to use" tab (custom.how_to_use metafield) and a "Safety
+  data sheet" tab with the PDF (custom.sds).
 
   <pb-tabs> (below) switches the panels. Without JavaScript the tab row is hidden and every
   part shows one after another under its own heading.
@@ -24,10 +32,52 @@
   assign labels = ''
   assign panels = ''
 
+  assign tab_description = product.metafields.custom.tab_description
+  assign tab_what_s_included = product.metafields.custom.tab_what_s_included
+  assign tab_key_features = product.metafields.custom.tab_key_features
+  assign tab_key_specifications = product.metafields.custom.tab_key_specifications
+  assign structured = false
+  if tab_description != blank or tab_what_s_included != blank or tab_key_features != blank or tab_key_specifications != blank
+    assign structured = true
+  endif
+
+  if structured
+    if tab_description != blank
+      assign tab_html = tab_description | metafield_tag
+    else
+      assign tab_html = product.description
+    endif
+    assign tab_text = tab_html | strip_html | strip
+    if tab_text != blank
+      assign labels = labels | append: section.settings.description_label | append: separator
+      assign panels = panels | append: tab_html | append: separator
+    endif
+    if tab_what_s_included != blank and section.settings.whats_included_label != blank
+      assign labels = labels | append: section.settings.whats_included_label | append: separator
+      assign tab_html = tab_what_s_included | metafield_tag
+      assign panels = panels | append: tab_html | append: separator
+    endif
+    if tab_key_features != blank and section.settings.key_features_label != blank
+      assign labels = labels | append: section.settings.key_features_label | append: separator
+      assign tab_html = tab_key_features | metafield_tag
+      assign panels = panels | append: tab_html | append: separator
+    endif
+    if tab_key_specifications != blank and section.settings.key_specifications_label != blank
+      assign labels = labels | append: section.settings.key_specifications_label | append: separator
+      assign tab_html = tab_key_specifications | metafield_tag
+      assign panels = panels | append: tab_html | append: separator
+    endif
+  endif
+
   assign part_label = section.settings.description_label
   assign part_html = ''
 
-  assign pieces = product.description | split: '<p'
+  # Fallback: split the description (see above).
+  if structured
+    assign pieces = '' | split: ','
+  else
+    assign pieces = product.description | split: '<p'
+  endif
   for piece in pieces
     if forloop.first
       assign chunk = piece
@@ -502,9 +552,30 @@
     {
       "type": "text",
       "id": "description_label",
-      "label": "First tab label",
-      "info": "For text before the description's first heading.",
+      "label": "Description tab label",
+      "info": "The Tab: Description field, or text before the description's first heading.",
       "default": "Description"
+    },
+    {
+      "type": "text",
+      "id": "whats_included_label",
+      "label": "What's included tab label",
+      "info": "Tab: What's included field. Empty hides the tab.",
+      "default": "What's included"
+    },
+    {
+      "type": "text",
+      "id": "key_features_label",
+      "label": "Key features tab label",
+      "info": "Tab: Key features field. Empty hides the tab.",
+      "default": "Key features"
+    },
+    {
+      "type": "text",
+      "id": "key_specifications_label",
+      "label": "Key specifications tab label",
+      "info": "Tab: Key specifications field. Empty hides the tab.",
+      "default": "Key specifications"
     },
     {
       "type": "text",
