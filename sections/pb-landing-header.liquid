@@ -63,8 +63,10 @@
   </a>
 
   {%- comment -%}
-    Desktop links: the Header links menu if one is picked, otherwise these defaults. Shop By
-    Category opens the floating menu, which lists the categories.
+    Desktop links: the Header links menu if one is picked, otherwise these defaults. A link
+    whose text matches a mega menu panel's Header link opens that panel on hover (matched by
+    assets/pb-mega.js). Without a panel, Shop By Category opens the floating menu, which lists
+    the categories.
   {%- endcomment -%}
   <nav class="pb-landing-header__nav" aria-label="Main">
     <ul class="pb-landing-header__links">
@@ -143,6 +145,17 @@
       {%- endif -%}
     </a>
   </div>
+
+  {%- comment -%}
+    Desktop mega menu (990px and up): the panels (blocks/_pb-mega-panel.liquid), opened on hover
+    from the matching header links by <pb-mega> (assets/pb-mega.js). Its white sheet sits behind
+    the bar's contents and reaches up to the top, so bar and panel read as one white surface.
+  {%- endcomment -%}
+  {%- if section.blocks.size > 0 -%}
+    <pb-mega class="pb-mega">
+      {%- content_for 'blocks' -%}
+    </pb-mega>
+  {%- endif -%}
 </header>
 
 {%- assign menu = section.settings.menu -%}
@@ -156,8 +169,6 @@
     <div class="pb-menu__body">
       {%- liquid
         # Categories: the ones picked in the section, otherwise the shop's product categories.
-        # The homepage renders this section on its own (layout/pb-landing.liquid), outside the
-        # header group, so it usually has nothing picked.
         assign categories = section.settings.categories
         if categories == blank
           assign category_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
@@ -252,6 +263,9 @@
 
 <script type="module" src="{{ 'pb-menu.js' | asset_url }}"></script>
 <script type="module" src="{{ 'pb-header.js' | asset_url }}"></script>
+{%- if section.blocks.size > 0 -%}
+  <script type="module" src="{{ 'pb-mega.js' | asset_url }}"></script>
+{%- endif -%}
 
 {% stylesheet %}
   /* Height of the dark header. Set here so it is there in both layouts; the homepage hero and
@@ -655,6 +669,233 @@
     text-align: center;
   }
 
+  /* Mega menu (desktop) ------------------------------------------------------------------ */
+
+  /* The white sheet: from the very top of the header down past the bar, so the bar and the
+     panel read as one surface. It sits behind the bar's contents (z-index -1, painted after
+     the bar's own ::before) and its top padding follows the bar's current height. Only
+     opacity and transforms animate. */
+  .pb-mega {
+    display: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-landing-header {
+      --pb-mega-top: var(--pb-landing-header-height);
+    }
+
+    .pb-landing-header.is-past-hero {
+      --pb-mega-top: var(--pb-header-compact);
+    }
+
+    .pb-landing-header--light {
+      --pb-mega-top: calc(var(--pb-header-h) * 1px);
+    }
+
+    .pb-landing-header--light.is-scrolled {
+      --pb-mega-top: calc(var(--pb-header-h-compact) * 1px);
+    }
+
+    .pb-mega {
+      position: absolute;
+      inset: 0 0 auto;
+      z-index: -1;
+      display: grid;
+      padding-block-start: var(--pb-mega-top);
+      border-radius: 0 0 var(--pb-header-radius, 12px) var(--pb-header-radius, 12px);
+      background: #fff;
+      box-shadow: 0 1px 0 rgb(0 0 0 / 0.08);
+      color: #111;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Closed: no hover target. Beats the scrolled light header's `> * { pointer-events: auto }`. */
+    .pb-landing-header .pb-mega:not(.is-open) {
+      pointer-events: none;
+    }
+
+    /* Dims the page under the open panel. Not a hover target, so moving onto it closes. */
+    .pb-mega::after {
+      content: '';
+      position: absolute;
+      inset: 100% 0 auto;
+      height: 100vh;
+      background: rgb(0 0 0 / 0.2);
+      pointer-events: none;
+    }
+
+    .pb-mega.is-open {
+      opacity: 1;
+    }
+
+    /* Over the dark header: the text and the default logo's wordmark turn dark with the sheet. */
+    .pb-landing-header.is-mega-open {
+      color: #111;
+    }
+
+    .pb-landing-header:not(.pb-landing-header--light) {
+      transition:
+        translate 0.35s var(--pb-header-ease),
+        color 0.25s ease;
+    }
+
+    .pb-landing-header.is-mega-open:not(.pb-landing-header--light)::after {
+      opacity: 0;
+    }
+  }
+
+  /* Panels share one cell, so switching between them cross-fades without a resize jump. */
+  .pb-mega__panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-mega__panel.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .pb-mega__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    padding: 40px var(--page-margin, 24px) 48px;
+    translate: 0 -8px;
+    transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-mega.is-open .pb-mega__panel.is-active .pb-mega__inner {
+    translate: 0 0;
+  }
+
+  .pb-mega__nav {
+    align-self: center;
+    padding-inline-start: clamp(0px, 1.5vw, 24px);
+  }
+
+  .pb-mega__heading {
+    margin: 0 0 18px;
+    line-height: 1.5;
+    color: #6b6b6b;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-mega__links {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-mega__links a {
+    color: #111;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .pb-mega__links a:is(:hover, :focus-visible, [aria-current='page']) {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  /* Up to two cards side by side; one keeps the same width. A third is not shown. */
+  .pb-mega__highlights {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .pb-mega__highlights > :nth-child(n + 3) {
+    display: none;
+  }
+
+  .pb-mega-card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    aspect-ratio: 433 / 312;
+    padding: clamp(20px, 2vw, 32px);
+    overflow: hidden;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .pb-mega-card__image {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pb-mega-card--packshot .pb-mega-card__image {
+    inset: 8% 4% 8% auto;
+    width: 42%;
+    height: 84%;
+    object-fit: contain;
+  }
+
+  .pb-mega-card[href]:is(:hover, :focus-visible) .pb-mega-card__image {
+    scale: 1.04;
+  }
+
+  .pb-mega-card__eyebrow {
+    color: var(--pb-accent, #ca0d0d);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .pb-mega-card__heading {
+    max-width: 60%;
+    margin-block-start: auto;
+    font-family: var(--font-heading--family);
+    font-size: clamp(26px, 2.6vw, 42px);
+    font-weight: var(--pb-heading-medium-weight, 500);
+    line-height: 1.05;
+    text-transform: uppercase;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .pb-mega-card--packshot .pb-mega-card__heading {
+    max-width: 54%;
+    font-size: clamp(22px, 2vw, 32px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header:not(.pb-landing-header--light),
+    .pb-mega,
+    .pb-mega__panel,
+    .pb-mega__inner,
+    .pb-mega-card__image {
+      transition: none;
+    }
+
+    .pb-mega__inner {
+      translate: none;
+    }
+  }
+
   /* Floating menu ------------------------------------------------------------------------ */
 
   html[data-pb-menu-open] {
@@ -885,6 +1126,11 @@
   "name": "Header (PB)",
   "tag": "div",
   "class": "pb-landing-header-section",
+  "blocks": [
+    {
+      "type": "_pb-mega-panel"
+    }
+  ],
   "settings": [
     {
       "type": "select",
@@ -911,7 +1157,7 @@
       "type": "image_picker",
       "id": "logo",
       "label": "Logo",
-      "info": "Empty uses the Protection Brands logo: white text on Dark, black text on Light."
+      "info": "Empty uses the Protection Brands logo: white text on Dark, black text on Light. The default logo also turns black when the mega menu opens over the dark header; an uploaded one stays as it is."
     },
     {
       "type": "link_list",

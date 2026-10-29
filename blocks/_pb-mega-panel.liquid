@@ -1,0 +1,132 @@
+{%- comment -%}
+  One panel of the PB header's desktop mega menu (sections/pb-landing-header.liquid): a list of
+  links on the left, up to two highlight cards (blocks/_pb-mega-highlight.liquid) on the right.
+  It opens on hover from the header link whose text matches Header link; assets/pb-mega.js
+  shows and hides it. Closed panels are inert, so keyboard focus skips them.
+
+  Links: the menu if one is picked, otherwise the collections, otherwise the default list
+  (the shop's product categories, or the brand collections).
+{%- endcomment -%}
+
+{%- liquid
+  assign links_menu = block.settings.menu
+  assign picked = block.settings.collections
+  if block.settings.fallback == 'brands'
+    assign fallback_handles = 'permagard-car-care,cerface-ceramic,optivan-caravan-maintenance,honda-genuine-car-care' | split: ','
+  else
+    assign fallback_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
+  endif
+-%}
+
+{%- capture links -%}
+  {%- if links_menu.links.size > 0 -%}
+    {%- for link in links_menu.links -%}
+      {%- render 'pb-menu-link', url: link.url, title: link.title -%}
+    {%- endfor -%}
+  {%- elsif picked != blank -%}
+    {%- for collection in picked -%}
+      {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for handle in fallback_handles -%}
+      {%- assign collection = collections[handle] -%}
+      {%- if collection.id != blank -%}
+        {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture highlights -%}
+  {%- content_for 'blocks' -%}
+{%- endcapture -%}
+
+<div
+  id="PBMega-{{ block.id }}"
+  class="pb-mega__panel"
+  data-pb-mega-panel
+  data-label="{{ block.settings.label | strip | downcase | escape }}"
+  inert
+  {{ block.shopify_attributes }}
+>
+  <div class="pb-mega__inner">
+    <nav class="pb-mega__nav" aria-label="{{ block.settings.label | escape }}">
+      {%- if block.settings.heading != blank -%}
+        <h2 class="pb-mega__heading">{{ block.settings.heading | escape }}</h2>
+      {%- endif -%}
+      <ul class="pb-mega__links">
+        {{- links -}}
+      </ul>
+    </nav>
+
+    {%- if highlights != blank -%}
+      <div class="pb-mega__highlights">
+        {{- highlights -}}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Mega menu panel",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_pb-mega-highlight"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Header link",
+      "default": "Shop By Category",
+      "info": "The header link that opens this panel on hover, written as it appears (capitals don't matter). Desktop only."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Links menu",
+      "info": "Top-level links only. Empty uses Collections below."
+    },
+    {
+      "type": "collection_list",
+      "id": "collections",
+      "label": "Collections",
+      "limit": 12,
+      "info": "Used when no menu is picked."
+    },
+    {
+      "type": "select",
+      "id": "fallback",
+      "label": "When both are empty",
+      "options": [
+        {
+          "value": "categories",
+          "label": "Product categories"
+        },
+        {
+          "value": "brands",
+          "label": "Brand collections"
+        }
+      ],
+      "default": "categories"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add one or two highlights. Only the first two are shown."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega menu panel"
+    }
+  ]
+}
+{% endschema %}

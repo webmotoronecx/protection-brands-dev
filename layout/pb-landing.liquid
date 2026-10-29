@@ -77,7 +77,12 @@
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
 
     <div class="page-wrapper">
-      {% section 'pb-landing-header' %}
+      {%- comment -%}
+        The header group, as on every other page, so the PB header and its mega menu are set up
+        once. Its Automatic style is dark here; Horizon's own header and announcement bar in
+        the group are disabled.
+      {%- endcomment -%}
+      {% sections 'header-group' %}
 
       <main
         id="MainContent"

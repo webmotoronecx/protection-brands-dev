@@ -20,7 +20,32 @@
         "newsletter": true,
         "newsletter_heading": "Subscribe to our newsletter",
         "newsletter_text": "New products, offers and car care tips."
-      }
+      },
+      "blocks": {
+        "mega_categories": {
+          "type": "_pb-mega-panel",
+          "settings": {
+            "label": "Shop By Category",
+            "heading": "",
+            "fallback": "categories"
+          },
+          "blocks": {}
+        },
+        "mega_brands": {
+          "type": "_pb-mega-panel",
+          "settings": {
+            "label": "Brands",
+            "heading": "",
+            "menu": "footer-brands",
+            "fallback": "brands"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "mega_categories",
+        "mega_brands"
+      ]
     },
     "header_announcements_9jGBFp": {
       "type": "header-announcements",
