@@ -275,7 +275,7 @@
               "settings": {
                 "how_to_use_title": "How to use",
                 "delivery_title": "Delivery & returns",
-                "delivery_text": "<p>Delivery Australia-wide. See our <a href=\"/pages/delivery\">delivery and returns policy</a> for times and costs.</p>",
+                "delivery_text": "<p>Delivery Australia-wide. See our <a href=\"/pages/delivery-returns\">delivery and returns policy</a> for times and costs.</p>",
                 "sds_title": "Safety data sheet"
               }
             }

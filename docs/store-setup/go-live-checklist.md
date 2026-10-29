@@ -52,7 +52,7 @@ doesn't use them, but do them close to launch day.
 - [ ] Optional product metafield **How to use** (`custom.how_to_use`, rich text or multi-line
       text). Products with it show a "How to use" row under Add to cart.
 - [ ] Check the **Delivery & returns** wording on the product page (Theme editor → Product →
-      Product info rows (PB)); its link points to `/pages/delivery`.
+      Product info rows (PB)); its link points to `/pages/delivery-returns`.
 
 ## 5. Navigation (README §5)
 
@@ -105,6 +105,9 @@ Placeholders from stock Horizon that must be replaced:
       (it's in the page content). Only the Debut banner image goes, so check each page looks right.
 - [ ] **Contact** (`contact-page`): template `page.contact`. Send a test message.
 - [ ] **About Us**: updated copy (brief §6).
+- [ ] **Refer a friend** (`refer-a-friend`): default page template; check it reads right.
+- The six live pages (handles above plus `delivery-returns`) are copied into `setup-store.json`
+  for the dev store. On live they already exist and the script leaves them alone.
 - [ ] **Safety Data Sheets**: template `page.sds` (step 4).
 
 ## 9. Apps and tracking
