@@ -13,12 +13,42 @@
     "pb_hero_bottle": {
       "type": "pb-hero-bottle",
       "blocks": {
-        "perk_1": { "type": "perk", "settings": { "icon": "icon-truck", "text": "Dispatched\nwithin 48 hours" } },
-        "perk_2": { "type": "perk", "settings": { "icon": "icon-pin", "text": "$20 flat-rate delivery\nAustralia-wide" } },
-        "perk_3": { "type": "perk", "settings": { "icon": "icon-undo", "text": "7-day change-of-mind\nreturns" } },
-        "perk_4": { "type": "perk", "settings": { "icon": "icon-support", "text": "Questions?\nContact us", "link": "/pages/contact" } }
+        "perk_1": {
+          "type": "perk",
+          "settings": {
+            "icon": "icon-truck",
+            "text": "Dispatched\nwithin 48 hours"
+          }
+        },
+        "perk_2": {
+          "type": "perk",
+          "settings": {
+            "icon": "icon-pin",
+            "text": "$20 flat-rate delivery\nAustralia-wide"
+          }
+        },
+        "perk_3": {
+          "type": "perk",
+          "settings": {
+            "icon": "icon-undo",
+            "text": "7-day change-of-mind\nreturns"
+          }
+        },
+        "perk_4": {
+          "type": "perk",
+          "settings": {
+            "icon": "icon-support",
+            "text": "Questions?\nContact us",
+            "link": "/pages/contact"
+          }
+        }
       },
-      "block_order": ["perk_1", "perk_2", "perk_3", "perk_4"],
+      "block_order": [
+        "perk_1",
+        "perk_2",
+        "perk_3",
+        "perk_4"
+      ],
       "settings": {
         "start_line_1": "Professional",
         "start_line_2": "Products",
@@ -148,7 +178,7 @@
       ],
       "settings": {
         "heading": "Our brands",
-        "logo_height": 70,
+        "logo_height": 80,
         "greyscale": false,
         "heading_position": "beside",
         "background": "#ffffff",

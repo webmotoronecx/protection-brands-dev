@@ -15,6 +15,8 @@
   - The full-width collection banner (.pb-collection-header--full) and the brand page banner
     (.pb-brand-header) have the same, on their photo or watermark, product, title and logo.
   - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
+  - The brand banner's middle product (.pb-brand-header__product) drifts slowly towards the
+    mouse; see Mouse follow below.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
     as they scroll in. Cards on screen at load get the CSS intro instead (assets/pb-intro.css).
   Nothing above the fold is hidden, so first paint and LCP are untouched. Elements are only
@@ -76,6 +78,43 @@
     });
 
     squeeze.addEventListener('change', startLenis);
+  }
+
+  /* Mouse follow ----------------------------------------------------------------- */
+
+  // Brand banner (sections/pb-brand-header.liquid): the middle product drifts slowly towards
+  // the mouse while it is over the banner, trailing behind (quickTo eases over FOLLOW_EASE
+  // seconds), and back to rest when it leaves. GSAP's ticker runs it, only while the product
+  // is still moving. It moves the photo inside the product box, with `transform` only: GSAP
+  // would take over the box's own `translate` (its centring and the scroll parallax) if it
+  // moved the box. Mouse only; nothing with reduced motion or in the theme editor (above).
+  const FOLLOW_X = 22; // px at the banner's edge
+  const FOLLOW_Y = 10;
+  const FOLLOW_EASE = 1.8;
+  if (finePointer) {
+    document.querySelectorAll('.pb-brand-header__product').forEach((product) => {
+      const banner = product.closest('.pb-brand-header');
+      const photo = product.querySelector('img');
+      if (!banner || !photo) return;
+      const toX = gsap.quickTo(photo, 'x', { duration: FOLLOW_EASE, ease: 'power3.out' });
+      const toY = gsap.quickTo(photo, 'y', { duration: FOLLOW_EASE, ease: 'power3.out' });
+      let box = null;
+      banner.addEventListener('pointerenter', () => (box = banner.getBoundingClientRect()), { passive: true });
+      banner.addEventListener(
+        'pointermove',
+        (event) => {
+          box ??= banner.getBoundingClientRect();
+          toX(((event.clientX - box.left) / box.width - 0.5) * 2 * FOLLOW_X);
+          toY(((event.clientY - box.top) / box.height - 0.5) * 2 * FOLLOW_Y);
+        },
+        { passive: true }
+      );
+      banner.addEventListener('pointerleave', () => {
+        box = null;
+        toX(0);
+        toY(0);
+      });
+    });
   }
 
   /* Reveals ---------------------------------------------------------------------- */

@@ -14,7 +14,7 @@
   - Theme editor: selecting a panel or one of its highlights opens that panel.
   - Automatic product cards: in a panel without highlights, hovering or focusing a link shows
     its group of products ([data-pb-mega-item] -> [data-pb-mega-group]); the first link's
-    group shows when the panel opens. Groups are hidden until then, so their photos only
+    group shows when the panel opens (the link is not marked until one is hovered). Groups are hidden until then, so their photos only
     load once the menu is used.
 
   While open, .is-mega-open is on the header (which turns the dark header's text dark) and
@@ -166,6 +166,7 @@ class PBMega extends HTMLElement {
     this.#cancel();
     if (!this.#panel) return;
     this.#panel.classList.remove('is-active');
+    for (const link of this.#panel.querySelectorAll('.is-shown')) link.classList.remove('is-shown');
     this.#panel.inert = true;
     this.#trigger?.setAttribute('aria-expanded', 'false');
     this.#panel = undefined;
@@ -179,6 +180,7 @@ class PBMega extends HTMLElement {
     const wasOpen = Boolean(this.#panel);
     if (this.#panel && this.#panel !== panel) {
       this.#panel.classList.remove('is-active');
+      for (const link of this.#panel.querySelectorAll('.is-shown')) link.classList.remove('is-shown');
       this.#panel.inert = true;
       this.#trigger?.setAttribute('aria-expanded', 'false');
     }
@@ -188,7 +190,7 @@ class PBMega extends HTMLElement {
     panel.classList.add('is-active');
     if (!panel.querySelector('[data-pb-mega-group]:not([hidden])')) {
       const first = panel.querySelector('[data-pb-mega-item]');
-      if (first) this.#showGroup(first);
+      if (first) this.#showGroup(first, false);
     }
     trigger?.setAttribute('aria-expanded', 'true');
     this.classList.add('is-open');
@@ -196,8 +198,10 @@ class PBMega extends HTMLElement {
     if (!wasOpen) document.dispatchEvent(new CustomEvent('pb:mega', { detail: { open: true } }));
   }
 
-  // Shows the product group of a link in a panel without highlights, and marks the link.
-  #showGroup(item) {
+  /* Shows the product group of a link in a panel without highlights, and marks the link (red),
+     unless mark is false: the first link's group shows when the panel opens, but the link is
+     only marked once a link is hovered or focused. */
+  #showGroup(item, mark = true) {
     const panel = item.closest('[data-pb-mega-panel]');
     if (!panel) return;
     const index = item.dataset.pbMegaItem;
@@ -205,7 +209,7 @@ class PBMega extends HTMLElement {
       group.hidden = group.dataset.pbMegaGroup !== index;
     }
     for (const link of panel.querySelectorAll('[data-pb-mega-item]')) {
-      link.classList.toggle('is-shown', link === item);
+      link.classList.toggle('is-shown', mark && link === item);
     }
   }
 

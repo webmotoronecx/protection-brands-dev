@@ -268,13 +268,13 @@
     "pb_brand_header": {
       "type": "pb-brand-header",
       "settings": {
-        "height": 530,
+        "height": 580,
         "height_mobile": 520,
         "show_title": true,
         "show_tagline": true,
         "show_logo": true,
-        "logo_width": 260,
-        "logo_height": 140,
+        "logo_width": 340,
+        "logo_height": 200,
         "full_image": true,
         "middle": "hero",
         "watermark": true,
@@ -330,7 +330,7 @@
       ],
       "settings": {
         "heading": "Our brands",
-        "logo_height": 70,
+        "logo_height": 80,
         "greyscale": false,
         "heading_position": "beside",
         "background": "#ffffff",

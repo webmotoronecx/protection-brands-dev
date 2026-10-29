@@ -18,7 +18,7 @@
   # (templates/page.sds.json) and over the default page template's full-width title bar
   # (templates/page.json, e.g. the privacy policy) and over the search page's banner
   # (templates/search.json, laid out like the collection page), and over the same full-width
-  # title bar on the contact page, 404, blog, articles and cart; light on every other page.
+  # title bar on the contact and about pages, 404, blog, articles and cart; light on every other page.
   assign light = false
   case section.settings.style
     when 'light'
@@ -42,6 +42,8 @@
       elsif template.name == 'search'
         assign light = false
       elsif template.name == 'page' and template.suffix == 'contact'
+        assign light = false
+      elsif template.name == 'page' and template.suffix == 'about'
         assign light = false
       elsif template.name == '404' or template.name == 'blog' or template.name == 'article' or template.name == 'cart'
         assign light = false
@@ -836,7 +838,8 @@
     color: var(--pb-accent, #ca0d0d);
   }
 
-  /* Up to two cards side by side; one keeps the same width. A third is not shown. */
+  /* Up to two cards side by side; one keeps the same width, on the right. A third is not
+     shown. */
   .pb-mega__highlights {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -845,6 +848,11 @@
 
   .pb-mega__highlights:not(.pb-mega__highlights--auto) > :nth-child(n + 3) {
     display: none;
+  }
+
+  /* A single card sits in the right-hand column, against the panel's edge. */
+  :is(.pb-mega__highlights:not(.pb-mega__highlights--auto), .pb-mega__group) > .pb-mega-card:only-child {
+    grid-column: 2;
   }
 
   /* Automatic product cards (blocks/_pb-mega-panel.liquid): one group of two per link, the

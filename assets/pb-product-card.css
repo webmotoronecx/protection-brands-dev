@@ -384,3 +384,9 @@
   --page-margin: clamp(16px, 2.65vw, 38px);
   --page-width: 100vw;
 }
+
+/* Empty grid ("No products found.", snippets/product-grid.liquid): uppercase, like the other
+   PB headings. Specific enough to beat Horizon's `.h2.h2`, which sets the heading case. */
+.main-collection-grid__empty .main-collection-grid__empty-title.h2 {
+  text-transform: uppercase;
+}

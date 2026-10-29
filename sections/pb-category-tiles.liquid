@@ -530,6 +530,9 @@
     /* Scroll parallax: assets/pb-motion.js sets --pb-tile-shift on the tile. */
     translate: 0 var(--pb-tile-shift, 0%);
     transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Offset shadow under the cut-out, as on the brand banner (sections/pb-brand-header.liquid),
+       a little tighter and darker so it shows on the near-black tile. */
+    filter: drop-shadow(32px 12px 22px rgb(0 0 0 / 0.95));
   }
 
   .pb-category-tiles__label {

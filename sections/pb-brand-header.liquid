@@ -110,7 +110,7 @@
       {{-
         logo
         | image_url: width: 900
-        | image_tag: alt: title, loading: 'eager', widths: '300, 450, 600, 900', sizes: '(min-width: 750px) 25vw, 50vw'
+        | image_tag: alt: title, loading: 'eager', widths: '300, 450, 600, 900', sizes: '(min-width: 750px) 340px, 45vw'
       -}}
     </div>
   {%- endif -%}
@@ -147,6 +147,18 @@
     background: var(--color-background, #fff);
   }
 
+  /* The page's shadow on the product: a dark band just above the white edge, over the
+     product, so the product looks tucked underneath the page. */
+  .pb-brand-header::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 var(--pb-brand-curve);
+    z-index: 1;
+    height: 90px;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.3) 45%, transparent);
+    pointer-events: none;
+  }
+
   /* Watermark: the brand name, wider than the banner so its edges stay hidden when it drifts
      with the mouse, behind everything, fading downwards. */
   .pb-brand-header__marquee {
@@ -161,6 +173,7 @@
   .pb-brand-header .pb-marquee__word {
     font-family: var(--pb-watermark-font, inherit);
     font-weight: var(--pb-watermark-weight, 600);
+    letter-spacing: -1.2rem;
     background-image: linear-gradient(to bottom, #fff 15%, rgb(97 97 97 / 0.02) 85%);
   }
 
@@ -251,6 +264,8 @@
     word-break: normal;
     letter-spacing: 0;
     text-transform: uppercase;
+    /* Even lines when the name wraps: "Honda Genuine / Car Care", not "… Car / Care". */
+    text-wrap: balance;
   }
 
   .pb-brand-header__tagline {
@@ -273,11 +288,11 @@
     margin-inline-end: clamp(0px, 4vw, 64px);
   }
 
+  /* The logo fills the box set by Logo max width and height, scaled to fit whatever the
+     file's own size (upload one at least twice the box for retina screens). */
   .pb-brand-header__logo img {
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    max-height: var(--pb-brand-logo-h, 140px);
+    width: 100%;
+    height: var(--pb-brand-logo-h, 140px);
     object-fit: contain;
   }
 
@@ -333,7 +348,8 @@
     }
 
     .pb-brand-header__logo img {
-      max-height: min(var(--pb-brand-logo-h, 140px), 56px);
+      height: min(var(--pb-brand-logo-h, 140px), 56px);
+      object-position: left center;
     }
 
     .pb-brand-header__product {
