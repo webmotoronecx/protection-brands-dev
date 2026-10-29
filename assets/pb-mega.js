@@ -9,8 +9,8 @@
     plain link, closes it after a short delay.
   - Keyboard: focusing a trigger opens its panel, Tab moves into it, Esc closes it and returns
     focus to the trigger, and focus leaving the header closes it.
-  - Click or tap: a button trigger opens its panel (Enter and taps toggle it); a link trigger
-    opens it on the first tap by touch, and follows the link otherwise.
+  - Click or tap: opens its panel (Enter and taps toggle it). A header link that has a panel
+    is turned into a button, so it opens the panel instead of going anywhere.
   - Theme editor: selecting a panel or one of its highlights opens that panel.
 
   While open, .is-mega-open is on the header (which turns the dark header's text dark) and
@@ -74,16 +74,11 @@ class PBMega extends HTMLElement {
       (event) => {
         const trigger = event.target.closest('[data-pb-mega-trigger]');
         if (!trigger || !desktop.matches) return;
-        if (trigger.tagName === 'BUTTON') {
-          // A mouse click lands on a panel hover has usually just opened: keep it open.
-          // Keyboard (detail 0) and touch toggle.
-          const toggles = event.detail === 0 || this.#pointerType === 'touch';
-          if (toggles && this.#trigger === trigger) this.close();
-          else this.open(trigger);
-        } else if (this.#pointerType === 'touch' && this.#trigger !== trigger) {
-          event.preventDefault();
-          this.open(trigger);
-        }
+        // A mouse click lands on a panel hover has usually just opened: keep it open.
+        // Keyboard (detail 0) and touch toggle.
+        const toggles = event.detail === 0 || this.#pointerType === 'touch';
+        if (toggles && this.#trigger === trigger) this.close();
+        else this.open(trigger);
       },
       { signal }
     );
@@ -213,15 +208,25 @@ class PBMega extends HTMLElement {
 
   /* Turns each header link whose text matches a panel's Header link (data-label, ignoring case)
      into its trigger. Done here because the section can't read its theme blocks' settings.
-     Shop By Category stops opening the floating menu once it has a panel. */
+     A link (Brands) becomes a button, so it only opens the panel; without a panel, or without
+     JavaScript, it stays a link. Shop By Category stops opening the floating menu once it has
+     a panel. */
   #wire(header) {
     const panels = new Map();
     for (const panel of this.querySelectorAll('[data-pb-mega-panel]')) {
       if (panel.dataset.label && !panels.has(panel.dataset.label)) panels.set(panel.dataset.label, panel);
     }
-    for (const link of header.querySelectorAll('.pb-landing-header__link')) {
+    for (let link of header.querySelectorAll('.pb-landing-header__link')) {
       const panel = panels.get(link.textContent.trim().toLowerCase());
       if (!panel) continue;
+      if (link.tagName === 'A') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = link.className;
+        button.textContent = link.textContent.trim();
+        link.replaceWith(button);
+        link = button;
+      }
       link.removeAttribute('data-pb-menu-toggle');
       link.removeAttribute('aria-haspopup');
       link.setAttribute('aria-controls', panel.id);
