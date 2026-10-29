@@ -20,7 +20,8 @@
         "marquee_motion": "mouse",
         "marquee_duration": 60,
         "category_source": "none",
-        "all_label": "All"
+        "all_label": "All",
+        "layout": "full"
       }
     },
     "collection_list_Wfgh3m": {
@@ -175,11 +176,70 @@
         "gap": 12,
         "padding-block-start": 48,
         "padding-block-end": 48
+      },
+      "disabled": true
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
+        }
+      },
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_oridon"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 70,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#ffffff",
+        "text_color": "#111111",
+        "bottom_border": true
+      }
+    },
+    "pb_collection_grid": {
+      "type": "pb-collection-grid",
+      "settings": {
+        "heading": "",
+        "columns": "4",
+        "show_count": true
       }
     }
   },
   "order": [
     "pb_title_bar",
+    "pb_brand_logos",
+    "pb_collection_grid",
     "collection_list_Wfgh3m"
   ]
 }

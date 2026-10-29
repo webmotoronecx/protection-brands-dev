@@ -12,8 +12,9 @@
 {%- liquid
   # Automatic: dark over the homepage hero, over the default collection template
   # (templates/collection.json, whose title bar is full width under it) and over the default
-  # product template (templates/product.json, dark page behind the product card); light on
-  # every other page, including other collection templates such as collection.brand.
+  # product template (templates/product.json, dark page behind the product card) and over the
+  # collections list (templates/list-collections.json, full-width title bar); light on every
+  # other page, including other collection templates such as collection.brand.
   assign light = false
   case section.settings.style
     when 'light'
@@ -25,6 +26,8 @@
       elsif template.name == 'collection' and template.suffix == blank
         assign light = false
       elsif template.name == 'product' and template.suffix == blank
+        assign light = false
+      elsif template.name == 'list-collections'
         assign light = false
       endif
   endcase
@@ -1151,7 +1154,7 @@
         }
       ],
       "default": "auto",
-      "info": "Automatic is dark over the homepage hero and the default collection and product templates, and light on every other page."
+      "info": "Automatic is dark over the homepage hero, the default collection and product templates and the collections list, and light on every other page."
     },
     {
       "type": "image_picker",
