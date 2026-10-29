@@ -122,11 +122,12 @@
                   if media.presentation.focal_point != blank
                     assign focal_point_style = 'object-position: ' | append: media.presentation.focal_point | append: ';'
                   endif
+                  # PB: srcset up to 480px, as assets/pb-product.css shows thumbnails up to 203px wide.
                 %}
                 {{
                   media.preview_image
-                  | image_url: width: 144
-                  | image_tag: loading: 'lazy', alt: media.alt, style: focal_point_style
+                  | image_url: width: 480
+                  | image_tag: loading: 'lazy', alt: media.alt, style: focal_point_style, widths: '144, 240, 320, 480', sizes: '(min-width: 750px) 203px, 72px'
                   | escape
                 }}
 
