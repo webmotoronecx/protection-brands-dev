@@ -2,16 +2,18 @@
   Protection Brands header. Desktop (990px and up): logo on the left, a row of links beside
   it, search, account and cart on the right. Smaller screens: menu button on the left, logo in the middle,
   search, account and cart on the right.
-  Dark style floats over the homepage hero (layout/pb-landing.liquid) and over the default
-  collection template's full-width title bar (sections/pb-collection-header.liquid); light
-  style is the white inner-page header (header group in layout/theme.liquid).
+  Dark style floats over the homepage hero (layout/pb-landing.liquid), over the default
+  collection template's full-width title bar (sections/pb-collection-header.liquid) and over
+  the product page's dark background (assets/pb-product.css); light style is the white
+  inner-page header (header group in layout/theme.liquid).
   The menu button opens the floating menu (<pb-menu>, assets/pb-menu.js) below.
 {%- endcomment -%}
 
 {%- liquid
-  # Automatic: dark over the homepage hero and over the default collection template
-  # (templates/collection.json, whose title bar is full width under it); light on every other
-  # page, including other collection templates such as collection.brand.
+  # Automatic: dark over the homepage hero, over the default collection template
+  # (templates/collection.json, whose title bar is full width under it) and over the default
+  # product template (templates/product.json, dark page behind the product card); light on
+  # every other page, including other collection templates such as collection.brand.
   assign light = false
   case section.settings.style
     when 'light'
@@ -21,6 +23,8 @@
       if template.name == 'index'
         assign light = false
       elsif template.name == 'collection' and template.suffix == blank
+        assign light = false
+      elsif template.name == 'product' and template.suffix == blank
         assign light = false
       endif
   endcase
@@ -901,7 +905,7 @@
         }
       ],
       "default": "auto",
-      "info": "Automatic is dark over the homepage hero and the default collection template, and light on every other page."
+      "info": "Automatic is dark over the homepage hero and the default collection and product templates, and light on every other page."
     },
     {
       "type": "image_picker",

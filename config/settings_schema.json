@@ -2139,5 +2139,17 @@
         "default": true
       }
     ]
+  },
+  {
+    "name": "Products (Protection Brands)",
+    "settings": [
+      {
+        "type": "text",
+        "id": "pb_category_tags",
+        "label": "Category tags",
+        "info": "Product tags that name a top-level category, separated by commas. The product page shows the first one a product has above its title and in the breadcrumb (linking to all products with that tag).",
+        "default": "Car Care, Professional"
+      }
+    ]
   }
 ]

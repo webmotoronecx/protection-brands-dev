@@ -1,0 +1,38 @@
+{%- doc -%}
+  A product's top-level category: the first tag in the "Category tags" theme setting
+  (Products (Protection Brands), config/settings_schema.json, e.g. "Car Care, Professional")
+  that the product has. Without one, its product type, unless fallback is false. Outputs the
+  escaped name, or nothing; callers capture it.
+
+  Used by blocks/pb-product-heading.liquid (the red label above the title) and
+  sections/pb-breadcrumb-bar.liquid (the middle crumb, linking to the tag page).
+
+  @param {product} product - The product.
+  @param {boolean} [fallback] - Fall back to the product type. Defaults to true.
+{%- enddoc -%}
+
+{%- liquid
+  assign category = blank
+  assign category_tags = settings.pb_category_tags | split: ','
+
+  # Setting order decides between several matches, so "Car Care" wins over "Professional".
+  for candidate in category_tags
+    assign candidate_handle = candidate | strip | handle
+    for tag in product.tags
+      assign tag_handle = tag | handle
+      if tag_handle == candidate_handle
+        assign category = tag
+        break
+      endif
+    endfor
+    if category != blank
+      break
+    endif
+  endfor
+
+  if category == blank and fallback != false
+    assign category = product.type
+  endif
+
+  echo category | escape
+-%}

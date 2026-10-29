@@ -1,0 +1,544 @@
+{%- comment -%}
+  Product description (Protection Brands): the dark band under the product card on
+  templates/product.json. Tabs down the left (the current one white with a red bar, the
+  others faded), the chosen tab's text in the middle, the product's first photo on the right
+  (desktop only), and the Protection Brands wordmark behind, cut off by the white page that
+  curves up over the bottom (::after, as on the full-width collection banner).
+
+  The tabs come from the product description itself. The store's descriptions are written as
+  parts, each opened by a short paragraph in bold capitals ("DESCRIPTION", "KEY FEATURES",
+  "INCLUSIONS", "WHATS INCLUDED:"): each such paragraph starts a new tab named after it, and
+  anything before the first one goes under "Description". Then, when set, a "How to use" tab
+  (custom.how_to_use metafield) and a "Safety data sheet" tab with the PDF (custom.sds).
+
+  <pb-tabs> (below) switches the panels. Without JavaScript the tab row is hidden and every
+  part shows one after another under its own heading.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+  assign heading_font = settings.type_heading_font
+
+  # Tabs are collected as two lists joined by a separator that can't occur in the content.
+  assign separator = '<!--pb-tab-->'
+  assign labels = ''
+  assign panels = ''
+
+  assign part_label = section.settings.description_label
+  assign part_html = ''
+
+  assign pieces = product.description | split: '<p'
+  for piece in pieces
+    if forloop.first
+      assign chunk = piece
+    else
+      assign chunk = '<p' | append: piece
+    endif
+
+    # A heading paragraph: short, in bold, all capitals (so "20L Drum of..." is not one).
+    assign is_heading = false
+    unless forloop.first
+      assign opening = chunk | split: '</p>' | first
+      assign text = opening | strip_html | replace: '&amp;', '&' | replace: '&nbsp;', ' ' | strip
+      assign text_upper = text | upcase
+      assign text_lower = text | downcase
+      if text != blank and text.size <= 40 and text == text_upper and text != text_lower
+        if opening contains '<strong' or opening contains '<b>' or opening contains '<b '
+          assign is_heading = true
+        endif
+      endif
+    endunless
+
+    if is_heading
+      assign part_text = part_html | strip_html | strip
+      if part_text != blank or part_html contains '<img'
+        assign labels = labels | append: part_label | append: separator
+        assign panels = panels | append: part_html | append: separator
+      endif
+      assign part_label = text | remove: ':' | strip | downcase | capitalize | escape
+      assign closing = opening | append: '</p>'
+      assign part_html = chunk | remove_first: closing
+    else
+      assign part_html = part_html | append: chunk
+    endif
+  endfor
+
+  assign part_text = part_html | strip_html | strip
+  if part_text != blank or part_html contains '<img'
+    assign labels = labels | append: part_label | append: separator
+    assign panels = panels | append: part_html | append: separator
+  endif
+
+  assign how_to_use = product.metafields.custom.how_to_use
+  if how_to_use != blank and section.settings.how_to_use_label != blank
+    if how_to_use.type == 'rich_text_field'
+      assign how_to_use_html = how_to_use | metafield_tag
+    else
+      assign how_to_use_html = how_to_use.value | escape | newline_to_br | prepend: '<p>' | append: '</p>'
+    endif
+    assign labels = labels | append: section.settings.how_to_use_label | append: separator
+    assign panels = panels | append: how_to_use_html | append: separator
+  endif
+
+  assign sds_file = product.metafields.custom.sds.value.file.value
+  if sds_file != blank and section.settings.sds_label != blank
+    capture sds_html
+      echo '<p><a class="pb-product-description__download" href="' | append: sds_file.url | append: '" target="_blank" rel="noopener">'
+      echo section.settings.sds_link_label | escape
+      echo ' (PDF)</a></p>'
+    endcapture
+    assign labels = labels | append: section.settings.sds_label | append: separator
+    assign panels = panels | append: sds_html | append: separator
+  endif
+
+  assign label_list = labels | split: separator
+  assign panel_list = panels | split: separator
+
+  assign image = blank
+  if section.settings.show_image
+    assign image = product.featured_media.preview_image
+  endif
+-%}
+
+{%- if label_list.size > 0 or request.design_mode -%}
+  <style>
+    {{ heading_font | font_face: font_display: 'swap' }}
+  </style>
+
+  <div
+    class="pb-product-description"
+    style="--pb-desc-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-desc-weight: {{ heading_font.weight }};"
+  >
+    {%- if section.settings.marquee -%}
+      {%- render 'pb-marquee',
+        class: 'pb-product-description__marquee',
+        static: true,
+        follow_mouse: true
+      -%}
+    {%- endif -%}
+
+    <div class="pb-product-description__inner{% if image == blank %} pb-product-description__inner--no-image{% endif %}">
+      {%- if label_list.size > 0 -%}
+        <pb-tabs class="pb-product-description__tabs">
+          <div class="pb-product-description__list" role="tablist" aria-label="{{ product.title | escape }}" aria-orientation="vertical">
+            {%- for label in label_list -%}
+              <button
+                type="button"
+                role="tab"
+                class="pb-product-description__tab"
+                id="PBDescTab-{{ section.id }}-{{ forloop.index }}"
+                aria-controls="PBDescPanel-{{ section.id }}-{{ forloop.index }}"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                {% unless forloop.first %}
+                  tabindex="-1"
+                {% endunless %}
+              >
+                {{- label -}}
+              </button>
+            {%- endfor -%}
+          </div>
+
+          <div class="pb-product-description__panels">
+            {%- for panel in panel_list -%}
+              <div
+                class="pb-product-description__panel rte"
+                role="tabpanel"
+                id="PBDescPanel-{{ section.id }}-{{ forloop.index }}"
+                aria-labelledby="PBDescTab-{{ section.id }}-{{ forloop.index }}"
+                tabindex="0"
+              >
+                <h2 class="pb-product-description__panel-title">{{ label_list[forloop.index0] }}</h2>
+                {{ panel }}
+              </div>
+            {%- endfor -%}
+          </div>
+        </pb-tabs>
+      {%- else -%}
+        <p class="pb-product-description__hint">This product has no description yet.</p>
+      {%- endif -%}
+
+      {%- if image != blank -%}
+        <div class="pb-product-description__image">
+          {{-
+            image
+            | image_url: width: 900
+            | image_tag:
+              alt: '',
+              loading: 'lazy',
+              sizes: '(min-width: 990px) 22vw, 0px',
+              widths: '400, 600, 900'
+          -}}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  /*
+    <pb-tabs>: the product description tabs (sections/pb-product-description.liquid). Shows
+    one panel at a time; click a tab, or move along the tabs with the arrow keys, Home and End
+    (WAI-ARIA tabs pattern, automatic activation). Until it runs every panel shows.
+  */
+  if (!customElements.get('pb-tabs')) {
+    customElements.define(
+      'pb-tabs',
+      class extends HTMLElement {
+        connectedCallback() {
+          this.tabs = [...this.querySelectorAll('[role="tab"]')];
+          if (this.tabs.length === 0) return;
+
+          this.onClick = (event) => {
+            const tab = event.target.closest('[role="tab"]');
+            if (tab) this.select(tab);
+          };
+          this.onKeydown = (event) => {
+            const index = this.tabs.indexOf(event.target);
+            if (index === -1) return;
+            const last = this.tabs.length - 1;
+            const next = {
+              ArrowDown: index === last ? 0 : index + 1,
+              ArrowRight: index === last ? 0 : index + 1,
+              ArrowUp: index === 0 ? last : index - 1,
+              ArrowLeft: index === 0 ? last : index - 1,
+              Home: 0,
+              End: last,
+            }[event.key];
+            if (next === undefined) return;
+            event.preventDefault();
+            this.select(this.tabs[next]);
+            this.tabs[next].focus();
+          };
+
+          this.addEventListener('click', this.onClick);
+          this.addEventListener('keydown', this.onKeydown);
+          this.select(this.tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? this.tabs[0]);
+        }
+
+        disconnectedCallback() {
+          this.removeEventListener('click', this.onClick);
+          this.removeEventListener('keydown', this.onKeydown);
+        }
+
+        select(selected) {
+          this.tabs.forEach((tab) => {
+            const isSelected = tab === selected;
+            tab.setAttribute('aria-selected', String(isSelected));
+            tab.tabIndex = isSelected ? 0 : -1;
+            const panel = document.getElementById(tab.getAttribute('aria-controls'));
+            if (panel) panel.hidden = !isSelected;
+          });
+        }
+      }
+    );
+  }
+{% endjavascript %}
+
+{% stylesheet %}
+  /* Sizes follow the 1440px design: tabs from 140px in, text 501px wide from 385px, photo
+     316px wide ending 138px from the right, about 105px under the card. */
+  .pb-product-description {
+    --pb-desc-curve: 12px;
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding:
+      clamp(48px, 7.3vw, 105px)
+      clamp(20px, 9.7vw, 140px)
+      calc(clamp(56px, 6.5vw, 94px) + var(--pb-desc-curve));
+    color: #fff;
+  }
+
+  /* The white page curving up over the bottom, over the wordmark. */
+  .pb-product-description::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--pb-desc-curve);
+    border-radius: var(--pb-desc-curve) var(--pb-desc-curve) 0 0;
+    background: var(--color-background, #fff);
+  }
+
+  /* Wordmark along the bottom, wider than the band (it drifts with the mouse, pb-marquee.js)
+     and cut off by the white curve. */
+  .pb-product-description__marquee {
+    --pb-marquee-height: clamp(5rem, 19vw, 18rem);
+
+    position: absolute;
+    inset-inline: -80px;
+    inset-block-end: calc(var(--pb-marquee-height) * -0.32);
+    z-index: -1;
+  }
+
+  .pb-product-description__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 245fr) minmax(0, 501fr) minmax(0, 416fr);
+    align-items: start;
+  }
+
+  .pb-product-description__inner--no-image {
+    grid-template-columns: minmax(0, 245fr) minmax(0, 917fr);
+  }
+
+  /* The tabs and panels sit straight in the grid's first two columns. */
+  .pb-product-description__tabs {
+    display: contents;
+  }
+
+  .pb-product-description__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 36px;
+    padding-block-start: 5px;
+  }
+
+  .pb-product-description__tab {
+    position: relative;
+    padding: 0 0 0 20px;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-family: var(--pb-desc-font, inherit);
+    font-size: 20px;
+    font-weight: var(--pb-heading-medium-weight, var(--pb-desc-weight, 400));
+    line-height: 22px;
+    text-align: start;
+    text-transform: uppercase;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-product-description__tab::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 3px;
+    inset-inline-start: 0;
+    width: 5px;
+    height: 18px;
+    background: var(--pb-accent, #ca0d0d);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-product-description__tab:is(:hover, :focus-visible) {
+    opacity: 0.75;
+  }
+
+  .pb-product-description__tab:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+  }
+
+  .pb-product-description__tab[aria-selected='true'] {
+    opacity: 1;
+  }
+
+  .pb-product-description__tab[aria-selected='true']::before {
+    opacity: 1;
+  }
+
+  .pb-product-description__panel {
+    color: #fff;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  .pb-product-description__panel:focus-visible {
+    outline: 2px solid rgb(255 255 255 / 0.5);
+    outline-offset: 8px;
+  }
+
+  .pb-product-description__panel :is(p, ul, ol) {
+    margin: 0 0 21px;
+  }
+
+  .pb-product-description__panel > :last-child {
+    margin-block-end: 0;
+  }
+
+  .pb-product-description__panel :is(span, strong, li, p) {
+    color: inherit;
+  }
+
+  .pb-product-description__panel :is(ul, ol) {
+    padding-inline-start: 1.2em;
+  }
+
+  .pb-product-description__panel a {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+    text-underline-offset: 3px;
+  }
+
+  .pb-product-description__panel img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .pb-product-description__download {
+    font-weight: 600;
+  }
+
+  /* The heading inside each panel only shows without JavaScript, when the tab row is hidden. */
+  .pb-product-description__panel-title {
+    margin: 0 0 12px;
+    color: #fff;
+    font-family: var(--pb-desc-font, inherit);
+    font-size: 20px;
+    font-weight: var(--pb-heading-medium-weight, var(--pb-desc-weight, 400));
+    text-transform: uppercase;
+  }
+
+  .pb-product-description__panel + .pb-product-description__panel {
+    margin-block-start: 40px;
+  }
+
+  pb-tabs:not(:defined) .pb-product-description__list {
+    display: none;
+  }
+
+  pb-tabs:defined .pb-product-description__panel-title {
+    display: none;
+  }
+
+  pb-tabs:defined .pb-product-description__panel + .pb-product-description__panel {
+    margin-block-start: 0;
+  }
+
+  pb-tabs:not(:defined) .pb-product-description__panels {
+    grid-column: 1 / 3;
+  }
+
+  .pb-product-description__image {
+    justify-self: end;
+    width: min(316px, 100%);
+    margin-block-start: -27px;
+  }
+
+  /* The design's 316 × 421 portrait crop, so a square cut-out shows the product large. */
+  .pb-product-description__image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 316 / 421;
+    object-fit: cover;
+  }
+
+  .pb-product-description__hint {
+    margin: 0;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  /* Tablets: no photo (the gallery above has it). */
+  @media screen and (max-width: 989px) {
+    .pb-product-description__inner,
+    .pb-product-description__inner--no-image {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr);
+      column-gap: 24px;
+    }
+
+    .pb-product-description__image {
+      display: none;
+    }
+  }
+
+  /* Phones: the tabs in a row above the text, scrolling sideways if they don't fit. */
+  @media screen and (max-width: 749px) {
+    .pb-product-description__inner,
+    .pb-product-description__inner--no-image {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 28px;
+    }
+
+    .pb-product-description__list {
+      flex-direction: row;
+      gap: 24px;
+      margin-inline: -20px;
+      padding: 4px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .pb-product-description__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pb-product-description__tab {
+      flex: none;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    pb-tabs:not(:defined) .pb-product-description__panels {
+      grid-column: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-product-description__tab,
+    .pb-product-description__tab::before {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product description (PB)",
+  "tag": "section",
+  "class": "pb-product-description-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The tabs come from the product description: each short paragraph in bold capitals (e.g. \"KEY FEATURES\") starts a new tab named after it."
+    },
+    {
+      "type": "text",
+      "id": "description_label",
+      "label": "First tab label",
+      "info": "For text before the description's first heading.",
+      "default": "Description"
+    },
+    {
+      "type": "text",
+      "id": "how_to_use_label",
+      "label": "How to use tab",
+      "info": "From the product's custom.how_to_use metafield. Shown when set.",
+      "default": "How to use"
+    },
+    {
+      "type": "text",
+      "id": "sds_label",
+      "label": "Safety data sheet tab",
+      "info": "From the product's custom.sds metafield. Shown when set.",
+      "default": "Safety data sheet"
+    },
+    {
+      "type": "text",
+      "id": "sds_link_label",
+      "label": "Safety data sheet link",
+      "default": "Download the safety data sheet"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show the product photo",
+      "info": "The product's first photo, on the right (desktop).",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Show wordmark behind",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
