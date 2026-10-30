@@ -130,3 +130,58 @@ class PBHeroWatch extends HTMLElement {
 }
 
 if (!customElements.get('pb-hero-watch')) customElements.define('pb-hero-watch', PBHeroWatch);
+
+/*
+  <pb-cart-count>, the red count on the header's cart icon. Server-rendered, then kept up to
+  date from Shopify's cart event (as Horizon's own cart icon, assets/cart-icon.js), since with
+  the cart drawer items are added without a page load. The cart icon's label follows it.
+  The event name is imported on demand, so the header's scroll watchers above don't depend
+  on Shopify's events script loading.
+*/
+class PBCartCount extends HTMLElement {
+  /** @type {string | undefined} */
+  #eventName;
+
+  async connectedCallback() {
+    const { StandardEvents } = await import('@shopify/events');
+    if (!this.isConnected) return;
+    this.#eventName = StandardEvents.cartLinesUpdate;
+    document.addEventListener(this.#eventName, this.#onCartUpdate);
+  }
+
+  disconnectedCallback() {
+    if (this.#eventName) document.removeEventListener(this.#eventName, this.#onCartUpdate);
+  }
+
+  #onCartUpdate = (event) => {
+    event.promise
+      ?.then(({ cart, detail }) => this.#render(cart?.totalQuantity ?? detail?.itemCount ?? 0))
+      .catch((error) => {
+        if (error?.name !== 'AbortError') console.warn('[pb-cart-count] Cart update failed:', error);
+      });
+  };
+
+  /** @param {number} count */
+  #render(count) {
+    this.textContent = count > 99 ? '99+' : String(count);
+    this.hidden = count === 0;
+    this.closest('.pb-landing-header__cart')?.setAttribute(
+      'aria-label',
+      `Cart, ${count} ${count === 1 ? 'item' : 'items'}`
+    );
+  }
+}
+
+if (!customElements.get('pb-cart-count')) customElements.define('pb-cart-count', PBCartCount);
+
+/*
+  From 990px the floating cart drawer dims the page behind it (#cart-drawer::before,
+  assets/pb-cart.css). A click on the dimmed page lands on the <theme-drawer> itself and
+  closes the cart, as the backdrop does below 990px.
+*/
+document.addEventListener('click', (event) => {
+  const drawer = event.target;
+  if (drawer instanceof HTMLElement && drawer.id === 'cart-drawer' && drawer.hasAttribute('open')) {
+    /** @type {HTMLElement & { close?: () => void }} */ (drawer).close?.();
+  }
+});

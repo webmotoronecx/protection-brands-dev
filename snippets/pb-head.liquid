@@ -1,5 +1,5 @@
 {%- doc -%}
-  Protection Brands additions to <head>: product card styles, the product page's styles,
+  Protection Brands additions to <head>: product card and cart styles, the product page's styles,
   scripts and medium heading weight, and the motion scripts. Rendered once from
   layout/theme.liquid and layout/pb-landing.liquid. Motion scripts load only when a Motion
   theme setting is on, and never in the theme editor.
@@ -7,6 +7,7 @@
 
 {{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
 {{ 'pb-search.css' | asset_url | stylesheet_tag }}
+{{ 'pb-cart.css' | asset_url | stylesheet_tag }}
 {%- if template.name == 'product' -%}
   {{ 'pb-product.css' | asset_url | stylesheet_tag }}
   <script type="module" src="{{ 'pb-lightbox.js' | asset_url }}"></script>

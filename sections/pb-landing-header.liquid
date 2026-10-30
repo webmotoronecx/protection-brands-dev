@@ -150,21 +150,41 @@
       </a>
     {%- endif -%}
 
-    <a
-      class="pb-landing-header__icon pb-landing-header__cart"
-      href="{{ routes.cart_url }}"
-      aria-label="Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}"
-    >
+    {%- comment -%}
+      Cart type "Drawer" (Theme settings → Cart): opens Horizon's cart drawer
+      (snippets/cart-drawer.liquid, in the layout), as Horizon's own header does. "Page", and on
+      the cart page itself: a link to /cart. <pb-cart-count> (assets/pb-header.js) keeps the
+      count up to date when items are added without a page load.
+    {%- endcomment -%}
+    {%- capture cart_icon -%}
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
         <path d="M5.5 8h13l-1 12h-11l-1-12Z"/>
         <path d="M9 10V6.5a3 3 0 0 1 6 0V10"/>
       </svg>
-      {%- if cart.item_count > 0 -%}
-        <span class="pb-landing-header__count" aria-hidden="true">
-          {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
-        </span>
-      {%- endif -%}
-    </a>
+      <pb-cart-count class="pb-landing-header__count" aria-hidden="true"{% if cart.item_count == 0 %} hidden{% endif %}>
+        {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
+      </pb-cart-count>
+    {%- endcapture -%}
+    {%- capture cart_label -%}
+      Cart, {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}
+    {%- endcapture -%}
+    {%- if settings.cart_type == 'drawer' and template.name != 'cart' -%}
+      <button
+        type="button"
+        class="pb-landing-header__icon pb-landing-header__cart"
+        on:click="#cart-drawer/toggle"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="cart-drawer"
+        aria-label="{{ cart_label | strip }}"
+      >
+        {{- cart_icon -}}
+      </button>
+    {%- else -%}
+      <a class="pb-landing-header__icon pb-landing-header__cart" href="{{ routes.cart_url }}" aria-label="{{ cart_label | strip }}">
+        {{- cart_icon -}}
+      </a>
+    {%- endif -%}
   </div>
 
   {%- comment -%}
@@ -398,6 +418,22 @@
   @media screen and (max-width: 989px) {
     .pb-landing-header:not(.pb-landing-header--light) {
       position: fixed;
+    }
+  }
+
+  /* From 990px Horizon's drawers open beside the page and narrow .page-wrapper by their width
+     (the chat drawer; the cart floats over the page instead, assets/pb-cart.css). The dark
+     header is placed against the window, not the page, so it is narrowed by the same width
+     at the same pace, rather than staying full width over the drawer. */
+  @media screen and (min-width: 990px) {
+    .pb-landing-header:not(.pb-landing-header--light) {
+      transition:
+        translate 0.35s var(--pb-header-ease),
+        inset-inline-end var(--animation-speed, 0.2s) var(--animation-timing-fade-out, ease);
+    }
+
+    body:not(:has(#cart-drawer[open])) .page-wrapper--drawer-open .pb-landing-header:not(.pb-landing-header--light) {
+      inset-inline-end: var(--theme-drawer-width, var(--sidebar-width));
     }
   }
 
@@ -779,9 +815,10 @@
     pointer-events: auto;
   }
 
+  /* Links on the left, the product cards on the right, about two thirds (34 / 66). */
   .pb-mega__inner {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 34fr) minmax(0, 66fr);
     gap: 40px;
     padding: 40px var(--page-margin, 24px) 48px;
     translate: 0 -8px;
@@ -858,7 +895,7 @@
   /* Automatic product cards (blocks/_pb-mega-panel.liquid): one group of two per link, the
      hovered link's shown (assets/pb-mega.js), fading in. */
   /* The groups share one cell, and an empty sizer holds it at the height of a row of cards
-     (two cards of 433 / 312 side by side), so a link with no products (e.g. a brand that has
+     (two cards of 433 / 260 side by side), so a link with no products (e.g. a brand that has
      none yet) doesn't shrink the panel and make the links jump. */
   .pb-mega__highlights--auto {
     display: grid;
@@ -869,7 +906,7 @@
     content: '';
     grid-area: 1 / 1;
     width: 100%;
-    aspect-ratio: calc(2 * 433) / 312;
+    aspect-ratio: calc(2 * 433) / 260;
   }
 
   .pb-mega__group:not([hidden]) {
@@ -904,7 +941,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 16px;
-    aspect-ratio: 433 / 312;
+    aspect-ratio: 433 / 260;
     padding: clamp(20px, 2vw, 32px);
     overflow: hidden;
     border-radius: 10px;

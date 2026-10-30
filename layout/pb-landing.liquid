@@ -99,6 +99,8 @@
     </div>
 
     {% render 'cart-drawer', render_wrapper: true %}
+    {%- comment -%} Horizon's drawer set-up, as in layout/theme.liquid (drawer state and the page squeeze for the chat drawer). {%- endcomment -%}
+    {% render 'theme-drawer' %}
     {% render 'search-modal' %}
   </body>
 </html>

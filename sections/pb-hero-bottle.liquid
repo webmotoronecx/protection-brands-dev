@@ -552,8 +552,9 @@
      so on wide screens the text scales and moves in with them instead of drifting off to
      the edges. */
   .pb-hero-bottle--intro {
-    --pb-hero-zone: min(100vw, 216svh);
-    --pb-hero-side: calc((100vw - var(--pb-hero-zone)) / 2);
+    --pb-hero-w: 100vw;
+    --pb-hero-zone: min(var(--pb-hero-w), 216svh);
+    --pb-hero-side: calc((var(--pb-hero-w) - var(--pb-hero-zone)) / 2);
 
     /* Equal columns either side of a fixed gap for the bottles, so the heading and the note
        sit the same distance from the centre and the layout looks balanced. */
@@ -561,6 +562,13 @@
     grid-template-rows: 1fr auto;
     row-gap: 32px;
     padding-inline: max(24px, calc(var(--pb-hero-side) + var(--pb-hero-zone) * 0.02));
+  }
+
+  /* From 990px an open drawer beside the page takes its width off it (Horizon's .page-wrapper
+     squeeze; not the cart, which floats over the page, assets/pb-cart.css), so the content box
+     narrows with it rather than running under the drawer. */
+  body:not(:has(#cart-drawer[open])) .page-wrapper--drawer-open .pb-hero-bottle--intro {
+    --pb-hero-w: calc(100vw - var(--theme-drawer-width, var(--sidebar-width)));
   }
 
   .pb-hero-bottle__intro,

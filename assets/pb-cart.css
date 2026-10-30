@@ -1,0 +1,80 @@
+/*
+  Protection Brands cart: the cart drawer (snippets/cart-drawer.liquid) and the line items on
+  the cart page and in the drawer (snippets/cart-products.liquid). Overrides only; Horizon's
+  own files are unchanged.
+*/
+
+/* Line thumbnails: the whole product shows inside the box, as on the product cards, instead
+   of Horizon's crop to fill it. */
+.cart-items__media-container .cart-items__media-image {
+  object-fit: contain;
+}
+
+/* Floating drawer: a rounded card inset from the screen edges, with a shadow, instead of a
+   full-height panel against the edge. It sits above the PB header (whose z-index is above
+   Horizon's drawer layer). Only the cart drawer; Horizon's chat drawer is unchanged. */
+#cart-drawer {
+  --pb-cart-gap: 16px;
+}
+
+#cart-drawer .theme-drawer__dialog {
+  z-index: calc(var(--layer-temporary, 20) + 2 + var(--drawer-stack-order, 0));
+  inset-block-start: var(--pb-cart-gap);
+  max-width: calc(100% - 2 * var(--pb-cart-gap));
+  height: calc(100dvh - 2 * var(--pb-cart-gap));
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 64px rgb(0 0 0 / 0.28),
+    0 4px 14px rgb(0 0 0 / 0.12);
+}
+
+#cart-drawer .theme-drawer__dialog[open] {
+  inset-inline-end: var(--pb-cart-gap);
+}
+
+@media screen and (max-width: 749px) {
+  #cart-drawer {
+    --pb-cart-gap: 10px;
+  }
+
+  #cart-drawer .theme-drawer__dialog {
+    border-radius: 14px;
+  }
+}
+
+/* From 990px Horizon opens the drawer beside the page and narrows the page to make room
+   (.page-wrapper--drawer-open). The floating cart lies over the page instead: the page keeps
+   its width and is dimmed, and a click on the dimmed page closes the cart (assets/pb-header.js).
+   Below 990px Horizon already opens it over the page with its own dimmed backdrop. */
+@media screen and (min-width: 990px) {
+  body:has(#cart-drawer[open]) .page-wrapper--drawer-open {
+    margin-inline-end: 0;
+  }
+
+  body:has(#cart-drawer[open]) .page-wrapper--drawer-open shopify-account::part(dialog) {
+    translate: none;
+  }
+
+  #cart-drawer[open]::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--layer-temporary, 20) + 1);
+    background: rgb(0 0 0 / 0.4);
+    animation: pb-cart-dim var(--animation-speed, 0.2s) ease both;
+  }
+}
+
+@keyframes pb-cart-dim {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cart-drawer[open]::before {
+    animation: none;
+  }
+}
