@@ -7,10 +7,15 @@
   - Story (About Us): on desktop the first paragraph large in the heading font on the left (it
     stays in view while the rest scrolls), the other paragraphs on the right, and the last
     paragraph (the "find your dealer" line) as a dark card.
-  - Document (longer pages): on desktop the page title large on the left, staying in view,
-    and the text on the right.
-  - Contact (templates/page.contact.json): the page title and the page's text on the left, and
+  - Document (longer pages): on desktop the heading large on the left, staying in view, and the
+    text on the right.
+  - Contact (templates/page.contact.json): the heading and the page's text on the left, and
     the section's blocks (the contact form) on the right.
+
+  The heading is the page's custom.heading metafield ("Page heading", e.g. "Who we are"), else
+  the section's "Heading" setting ("Get in touch" on the contact template). The title bar above
+  already shows the page title, so without either there's no heading and a document page's
+  text runs in one column.
 
   On mobile both are one column, in the same order. Admin's wrappers (<blockquote>, <div>) lose
   their own indent, rule and italics, so the text lines up with the breadcrumb.
@@ -19,6 +24,7 @@
 {%- liquid
   assign heading_font = settings.type_heading_font
   assign title = page.title | default: section.settings.fallback_title
+  assign heading = page.metafields.custom.heading.value | default: section.settings.heading
 -%}
 
 <div
@@ -35,8 +41,9 @@
   {%- if section.settings.layout == 'contact' -%}
     <div class="pb-page-story__layout">
       <div class="pb-page-story__intro">
-        {%- comment -%} The title bar's h1 already names the page for screen readers. {%- endcomment -%}
-        <p class="pb-page-story__aside" aria-hidden="true">{{ title }}</p>
+        {%- if heading != blank -%}
+          <h2 class="pb-page-story__aside">{{ heading | escape }}</h2>
+        {%- endif -%}
         {%- if page.content != blank -%}
           <div class="pb-page-story__body">{{ page.content }}</div>
         {%- endif -%}
@@ -45,9 +52,8 @@
     </div>
   {%- elsif page.content != blank -%}
     <div class="pb-page-story__layout">
-      {%- if section.settings.layout == 'document' -%}
-        {%- comment -%} The title bar's h1 already names the page for screen readers. {%- endcomment -%}
-        <p class="pb-page-story__aside" aria-hidden="true">{{ title }}</p>
+      {%- if section.settings.layout == 'document' and heading != blank -%}
+        <h2 class="pb-page-story__aside">{{ heading | escape }}</h2>
       {%- endif -%}
       <div class="pb-page-story__body">{{ page.content }}</div>
     </div>
@@ -175,7 +181,7 @@
     color: var(--pb-accent, #ca0d0d);
   }
 
-  /* Document: the page title large on the left. */
+  /* Document: the heading large on the left. */
   .pb-page-story__aside {
     display: none;
     margin: 0;
@@ -282,6 +288,13 @@
       position: sticky;
       inset-block-start: calc(var(--pb-landing-header-height, 88px) + 32px);
     }
+
+    /* No heading: the text alone, centred on the page, at the width it has beside one. */
+    .pb-page-story--document .pb-page-story__layout:not(:has(.pb-page-story__aside)) {
+      display: block;
+      max-width: 52rem;
+      margin-inline: auto;
+    }
   }
 {% endstylesheet %}
 
@@ -300,13 +313,20 @@
       "type": "select",
       "id": "layout",
       "label": "Layout",
-      "info": "Story: the opening line large on the left, the last line as a dark card. Document: the page title on the left, the text on the right. Contact: the title and text on the left, the blocks (the contact form) on the right.",
+      "info": "Story: the opening line large on the left, the last line as a dark card. Document: the heading on the left, the text on the right. Contact: the heading and text on the left, the blocks (the contact form) on the right.",
       "options": [
         { "value": "story", "label": "Story" },
         { "value": "document", "label": "Document" },
         { "value": "contact", "label": "Contact" }
       ],
       "default": "document"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Document and Contact layouts. A page's own \"Page heading\" metafield replaces it. Leave both empty for no heading (the title bar already shows the page title).",
+      "visible_if": "{{ section.settings.layout != 'story' }}"
     },
     {
       "type": "text",

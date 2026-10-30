@@ -138,6 +138,12 @@ the theme editor: Collections → brand template → Brand banner (PB).
 
 Fill them in at the bottom of each brand collection's page in admin.
 
+Pages have one metafield, **Page heading** (`custom.heading`, single line text), also created by
+`--only metafields`. It's the large heading beside the page text (Contact and the text pages).
+The title bar above already shows the page title, so use a different line, e.g. *Who we are*.
+Empty: the template's heading (Contact: *Get in touch*), or no heading on text pages. Fill it
+in at the bottom of the page in admin (**Online Store → Pages**).
+
 Give each new collection an image and a one-line description; the home page cards show both.
 
 ## 4. Filters

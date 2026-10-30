@@ -165,6 +165,7 @@ for (const def of config.metafieldDefinitions) {
         metafieldDefinitionCreate(definition: $d) { createdDefinition { id } userErrors { field message code } }
       }`, { d: {
         name: def.name, namespace: def.namespace, key: def.key, ownerType: def.ownerType, type: def.type,
+        ...(def.description && { description: def.description }),
         access: { storefront: 'PUBLIC_READ' },
         ...(validations.length && { validations }),
         ...(def.collectionCondition && { capabilities: { smartCollectionCondition: { enabled: true } } }),

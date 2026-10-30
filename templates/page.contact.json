@@ -64,7 +64,8 @@
       "settings": {
         "layout": "contact",
         "home_label": "Home",
-        "fallback_title": "Contact us"
+        "fallback_title": "Contact us",
+        "heading": "Get in touch"
       }
     },
     "pb_brand_logos": {

@@ -75,6 +75,14 @@
       "type": "rich_text_field"
     },
     {
+      "ownerType": "PAGE",
+      "namespace": "custom",
+      "key": "heading",
+      "name": "Page heading",
+      "type": "single_line_text_field",
+      "description": "Large heading beside the text (Document and Contact layouts). Empty: the template's heading, if any."
+    },
+    {
       "ownerType": "COLLECTION",
       "namespace": "custom",
       "key": "hero_image",
