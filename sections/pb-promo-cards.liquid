@@ -74,7 +74,7 @@
   .pb-promo-cards {
     /* Side padding as Best sellers and Shop by category, so the edges line up. No top
        padding: the section above (Best sellers) already ends with its own space. */
-    padding: 0 clamp(16px, 2.5vw, 40px) clamp(40px, 5vw, 72px);
+    padding: 0 calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px)) clamp(40px, 5vw, 72px);
     background: var(--pb-promo-bg, #fff);
   }
 

@@ -298,7 +298,7 @@
 
 {% stylesheet %}
   .pb-category-tiles {
-    --pb-tiles-gutter: clamp(16px, 2.5vw, 40px);
+    --pb-tiles-gutter: calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px));
 
     padding: clamp(40px, 5vw, 72px) var(--pb-tiles-gutter);
     background: var(--pb-tiles-bg, transparent);

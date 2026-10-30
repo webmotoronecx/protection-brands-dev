@@ -278,7 +278,7 @@
    builds the results layout from --page-margin and caps it at --page-width, so both are
    changed here, for the results only. */
 .product-grid-container {
-  --page-margin: 10px;
+  --page-margin: calc(10px + var(--pb-wide-inset, 0px));
   --page-width: 100vw;
 }
 
@@ -287,9 +287,11 @@
     --page-margin: 8px;
   }
 
-  /* Horizon adds its own side padding on phones; the 8px margin replaces it. */
+  /* Horizon adds its own side padding on phones; the page margin replaces it. The grid spans
+     the full width on phones, so the margin has to be its padding (with 0 the cards touched
+     the screen edges). */
   .product-grid-container .main-collection-grid {
-    padding-inline: 0;
+    padding-inline: var(--page-margin);
   }
 }
 
@@ -328,7 +330,7 @@
    line up with the title bar and footer cards, 10px from the screen edge (8px on phones),
    the same as the collection grid. Horizon lays these out from --page-margin/--page-width. */
 .shopify-section:has(> product-recommendations, .section-resource-list) {
-  --page-margin: 10px;
+  --page-margin: calc(10px + var(--pb-wide-inset, 0px));
   --page-width: 100vw;
 }
 
@@ -381,7 +383,7 @@
    design, instead of 10px. The cards are the same as everywhere else (the homepage best
    sellers included). */
 :is([data-template='collection'], [data-template='collection.brand'], [data-template='search']) :is(.product-grid-container, .pb-products-bar, .pb-breadcrumb-bar--inline) {
-  --page-margin: clamp(16px, 2.65vw, 38px);
+  --page-margin: calc(clamp(16px, 2.65vw, 38px) + var(--pb-wide-inset, 0px));
   --page-width: 100vw;
 }
 

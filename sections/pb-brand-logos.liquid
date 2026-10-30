@@ -101,7 +101,7 @@
 
 {% stylesheet %}
   .pb-brand-logos {
-    padding: 22px 10px;
+    padding: 22px calc(10px + var(--pb-wide-inset, 0px));
     background: var(--pb-logos-bg, transparent);
     color: var(--pb-logos-text, inherit);
   }
@@ -208,7 +208,7 @@
       display: flex;
       align-items: center;
       gap: clamp(24px, 2.5vw, 40px);
-      padding-inline: clamp(24px, 4.5vw, 72px);
+      padding-inline: calc(clamp(24px, 4.5vw, 72px) + var(--pb-wide-inset, 0px));
     }
 
     .pb-brand-logos--heading-beside .pb-brand-logos__heading {

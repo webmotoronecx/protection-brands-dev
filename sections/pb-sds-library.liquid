@@ -130,7 +130,7 @@
      the rest with 10px gaps. */
   .pb-sds-library {
     display: block;
-    padding: 24px clamp(20px, 3vw, 44px) clamp(56px, 8vw, 120px);
+    padding: 24px calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px)) clamp(56px, 8vw, 120px);
   }
 
   .pb-sds-library__crumbs ol {

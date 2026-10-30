@@ -174,7 +174,7 @@
   .pb-footer__panel {
     position: relative;
     overflow: hidden;
-    padding: calc(clamp(48px, 7vw, 120px) + var(--pb-footer-curve)) clamp(24px, 5vw, 84px) 0;
+    padding: calc(clamp(48px, 7vw, 120px) + var(--pb-footer-curve)) calc(clamp(24px, 5vw, 84px) + var(--pb-wide-inset, 0px)) 0;
   }
 
   /* The page above curves down into the footer: a strip of page background along the top
@@ -365,7 +365,9 @@
     --pb-marquee-height: clamp(4rem, 15vw, 20rem);
 
     margin-block: clamp(24px, 3vw, 48px) clamp(12px, 1.5vw, 24px);
-    margin-inline: calc(clamp(24px, 5vw, 84px) * -1);
+    /* Cancels the footer's side padding (wide-screen inset included), so the wordmark runs
+       to the screen edges. */
+    margin-inline: calc((clamp(24px, 5vw, 84px) + var(--pb-wide-inset, 0px)) * -1);
   }
 
   @media screen and (max-width: 989px) {

@@ -269,7 +269,7 @@
 
 {% stylesheet %}
   .pb-collection-header {
-    --pb-collection-pad-x: clamp(24px, 4.5vw, 64px);
+    --pb-collection-pad-x: calc(clamp(24px, 4.5vw, 64px) + var(--pb-wide-inset, 0px));
 
     position: relative;
     isolation: isolate;
@@ -329,7 +329,7 @@
      the bottom of the photo (::after, the page background with rounded top corners). Sizes
      follow the 1440px design: title top at 175px, photo 347px tall. */
   .pb-collection-header--full {
-    --pb-collection-pad-x: clamp(20px, 3.8vw, 55px);
+    --pb-collection-pad-x: calc(clamp(20px, 3.8vw, 55px) + var(--pb-wide-inset, 0px));
     --pb-collection-curve: 12px;
 
     justify-content: flex-start;

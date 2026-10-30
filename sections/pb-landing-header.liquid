@@ -309,7 +309,7 @@
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     height: var(--pb-landing-header-height);
-    padding-inline: var(--page-margin, 24px);
+    padding-inline: calc(var(--page-margin, 24px) + var(--pb-wide-inset, 0px));
     color: #fff;
   }
 
@@ -783,7 +783,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 40px;
-    padding: 40px var(--page-margin, 24px) 48px;
+    padding: 40px calc(var(--page-margin, 24px) + var(--pb-wide-inset, 0px)) 48px;
     translate: 0 -8px;
     transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }

@@ -46,6 +46,15 @@
     --button-font-family-secondary: var(--font-heading--family);
   }
 
+  /* Very wide screens (2560px monitors and up): page content stays at most 1920px wide
+     (Horizon's "normal" page width) and centred, while backgrounds, banners and wordmarks
+     still run to the screen edges. PB sections add --pb-wide-inset to their side padding;
+     it is 0 up to 1920px, so nothing changes below that. */
+  :root {
+    --pb-content-max: 1920px;
+    --pb-wide-inset: max(0px, (100vw - var(--pb-content-max)) / 2);
+  }
+
   .pb-hero-bottle .pb-hero-bottle__button {
     font-family: var(--font-heading--family);
     font-weight: var(--font-heading--weight);

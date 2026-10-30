@@ -294,9 +294,11 @@
     isolation: isolate;
     /* clip, not hidden: hidden would stop the tabs and photo sticking (below). */
     overflow: clip;
+    /* Side padding grows by --pb-pdp-inset (assets/pb-product.css) on very wide screens, so
+       the band lines up with the product card and its lines stay a readable length. */
     padding:
       clamp(48px, 7.3vw, 105px)
-      clamp(20px, 9.7vw, 140px)
+      calc(clamp(20px, 9.7vw, 140px) + var(--pb-pdp-inset, 0px))
       calc(clamp(56px, 6.5vw, 94px) + var(--pb-desc-curve));
     color: #fff;
   }
