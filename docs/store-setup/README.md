@@ -131,6 +131,7 @@ Collections → Add definition**, storefront access on):
 | Hero product | `custom.hero_product` | Product | The product photo in the middle. Empty uses the collection's first product. |
 | Hero image | `custom.hero_image` | File (images only) | Full-screen photo across the whole banner, in place of the middle product. Wide, at least 2400px. |
 | Watermark | `custom.watermark` | Single line text | Short faint watermark when there's no hero image, e.g. `Honda`. Without it the collection title is used. |
+| Hide banner title | `custom.hide_title` | True or false | Hides the name in the banner on that brand or collection page, e.g. when the photo already shows it. Screen readers still get it. |
 
 The shared look (height, show or hide the title, tagline and logo, logo size, watermark) is in
 the theme editor: Collections → brand template → Brand banner (PB).

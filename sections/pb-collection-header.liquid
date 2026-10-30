@@ -71,6 +71,13 @@
     assign title = section.settings.fallback_title
   endif
 
+  # A collection's custom.hide_title hides its name in the bar (e.g. when the photo already
+  # shows it); the h1 stays for screen readers.
+  assign title_class = 'pb-collection-header__title'
+  if request.page_type == 'collection' and current.metafields.custom.hide_title.value == true
+    assign title_class = 'pb-collection-header__title visually-hidden'
+  endif
+
   # Category row from product tags, like the old site: the current collection's tags, or all
   # products' tags on pages without a collection (search, cart, 404...).
   assign tag_collection = current
@@ -187,7 +194,7 @@
     {%- if request.page_type == 'collection' and section.settings.show_sort -%}
       {%- comment -%} Item count and sort (snippets/pb-collection-sort.liquid) beside the title. {%- endcomment -%}
       <div class="pb-collection-header__row">
-        <h1 class="pb-collection-header__title">{{ title }}</h1>
+        <h1 class="{{ title_class }}">{{ title }}</h1>
         <div class="pb-collection-header__tools">
           <p class="pb-collection-header__count">
             {{ current.products_count }}
@@ -197,7 +204,7 @@
         </div>
       </div>
     {%- else -%}
-      <h1 class="pb-collection-header__title">{{ title }}</h1>
+      <h1 class="{{ title_class }}">{{ title }}</h1>
     {%- endif -%}
 
     {%- if request.page_type == 'cart' and cart.item_count > 0 -%}
@@ -411,6 +418,7 @@
 
   .pb-collection-header__tools {
     display: flex;
+    margin-inline-start: auto;
     align-items: center;
     gap: 16px;
   }

@@ -970,6 +970,10 @@
     width: 50%;
     height: 100%;
     object-fit: contain;
+    /* A shadow cast down and to the right, following the cut-out (as on the homepage category
+       tiles, sections/pb-category-tiles.liquid, scaled to the smaller card). Static; only the
+       hover scale animates. */
+    filter: drop-shadow(16px 8px 14px rgb(0 0 0 / 0.9));
   }
 
   .pb-mega-card[href]:is(:hover, :focus-visible) .pb-mega-card__image {

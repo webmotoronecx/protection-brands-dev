@@ -110,6 +110,13 @@
       "key": "tagline",
       "name": "Tagline",
       "type": "single_line_text_field"
+    },
+    {
+      "ownerType": "COLLECTION",
+      "namespace": "custom",
+      "key": "hide_title",
+      "name": "Hide banner title",
+      "type": "boolean"
     }
   ],
 

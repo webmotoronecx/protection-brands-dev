@@ -43,6 +43,13 @@
 
   assign title = brand.title | default: section.settings.fallback_title
   assign watermark = brand.metafields.custom.watermark.value | default: title
+
+  # Hidden by the section setting, or per brand by custom.hide_title (e.g. when the photo
+  # already shows the name).
+  assign show_title = section.settings.show_title
+  if brand.metafields.custom.hide_title.value == true
+    assign show_title = false
+  endif
 -%}
 
 <style>
@@ -97,7 +104,7 @@
 
   <div class="pb-brand-header__text">
     {%- comment -%} The page's one h1 stays when the title is hidden, for screen readers. {%- endcomment -%}
-    <h1 class="pb-brand-header__title{% unless section.settings.show_title %} visually-hidden{% endunless %}">
+    <h1 class="pb-brand-header__title{% unless show_title %} visually-hidden{% endunless %}">
       {{- title | escape -}}
     </h1>
     {%- if section.settings.show_tagline and tagline != blank -%}
@@ -397,6 +404,7 @@
       "type": "checkbox",
       "id": "show_title",
       "label": "Show title",
+      "info": "For every brand. To hide one brand's title only, tick \"Hide banner title\" on its collection in admin.",
       "default": true
     },
     {
