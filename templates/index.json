@@ -17,21 +17,24 @@
           "type": "perk",
           "settings": {
             "icon": "icon-truck",
-            "text": "Dispatched\nwithin 48 hours"
+            "text": "Dispatched\nwithin 48 hours",
+            "link": ""
           }
         },
         "perk_2": {
           "type": "perk",
           "settings": {
             "icon": "icon-pin",
-            "text": "$20 flat-rate delivery\nAustralia-wide"
+            "text": "$20 flat-rate delivery\nAustralia-wide",
+            "link": ""
           }
         },
         "perk_3": {
           "type": "perk",
           "settings": {
             "icon": "icon-undo",
-            "text": "7-day change-of-mind\nreturns"
+            "text": "7-day change-of-mind\nreturns",
+            "link": ""
           }
         },
         "perk_4": {
@@ -50,6 +53,11 @@
         "perk_4"
       ],
       "settings": {
+        "layout": "intro",
+        "intro_heading": "Welcome to the\nProtection Brands\nonline shop",
+        "intro_button": "Shop now",
+        "intro_link": "/collections/all",
+        "intro_note": "Permagard, CERFACE & OptiVAN: everything you need to look after your vehicle.",
         "start_line_1": "Professional",
         "start_line_2": "Products",
         "start_link": "/collections/all/professional",
@@ -74,68 +82,12 @@
         "rim_color": "#ffffff",
         "shadow": 35,
         "shadow_blur": 50,
-        "background": "#0b0b0b",
         "background_style": "scroll",
         "scroll_duration": 60,
         "background_text": "Protection",
-        "layout": "intro",
-        "intro_heading": "Welcome to the\nProtection Brands\nonline shop",
-        "intro_button": "Shop now",
-        "intro_link": "/collections/all",
-        "intro_note": "Permagard, CERFACE & OptiVAN: everything you need to look after your vehicle."
-      }
-    },
-    "pb_category_tiles": {
-      "type": "pb-category-tiles",
-      "blocks": {
-        "tile_1": {
-          "type": "tile",
-          "settings": {
-            "collection": "wash-shampoo"
-          }
-        },
-        "tile_2": {
-          "type": "tile",
-          "settings": {
-            "collection": "cleaners-sprays"
-          }
-        },
-        "tile_3": {
-          "type": "tile",
-          "settings": {
-            "collection": "microfibre-drying"
-          }
-        },
-        "tile_4": {
-          "type": "tile",
-          "settings": {
-            "collection": "kits-packs"
-          }
-        },
-        "tile_5": {
-          "type": "tile",
-          "settings": {
-            "collection": "power-emergency"
-          }
-        }
-      },
-      "block_order": [
-        "tile_1",
-        "tile_2",
-        "tile_3",
-        "tile_4",
-        "tile_5"
-      ],
-      "settings": {
-        "heading": "Shop by category",
-        "columns": "4",
-        "ratio": "tall",
-        "heading_alignment": "left",
-        "label_alignment": "center",
-        "link_label": "All categories",
-        "link": "/collections",
-        "background": "#f2f2f2",
-        "text_color": "#111111"
+        "background": "#0b0b0b",
+        "bottom_curve": true,
+        "background_texture": true
       }
     },
     "pb_brand_logos": {
@@ -178,12 +130,70 @@
       ],
       "settings": {
         "heading": "Our brands",
+        "heading_position": "beside",
         "logo_height": 80,
         "greyscale": false,
-        "heading_position": "beside",
         "background": "#ffffff",
         "text_color": "#111111",
         "bottom_border": true
+      }
+    },
+    "pb_category_tiles": {
+      "type": "pb-category-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "wash-shampoo",
+            "label": ""
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "cleaners-sprays",
+            "label": ""
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "microfibre-drying",
+            "label": ""
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "kits-packs",
+            "label": ""
+          }
+        },
+        "tile_5": {
+          "type": "tile",
+          "settings": {
+            "collection": "power-emergency",
+            "label": ""
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4",
+        "tile_5"
+      ],
+      "settings": {
+        "heading": "Shop by category",
+        "columns": "4",
+        "ratio": "tall",
+        "heading_alignment": "left",
+        "label_alignment": "center",
+        "link_label": "All categories",
+        "link": "/collections",
+        "background": "#f2f2f2",
+        "text_color": "#111111"
       }
     },
     "pb_best_sellers": {
@@ -194,9 +204,11 @@
           "static": true,
           "settings": {
             "product_card_gap": 4,
+            "background_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -211,6 +223,7 @@
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
+                "border_color": "",
                 "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -233,6 +246,7 @@
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -240,6 +254,18 @@
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "pb_review": {
+              "type": "review",
+              "settings": {
+                "stars_style": "shaded",
+                "show_number": true,
+                "text_color": "",
+                "type_preset": "paragraph",
+                "width": "100%",
+                "alignment": "left"
               },
               "blocks": {}
             },
@@ -257,6 +283,7 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
+                "text_color": "",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -269,20 +296,12 @@
               "name": "t:names.swatches",
               "settings": {
                 "product_swatches_alignment": "flex-start",
+                "product_swatches_alignment_mobile": "flex-start",
+                "hide_padding": false,
                 "product_swatches_padding_top": 4,
                 "product_swatches_padding_bottom": 0,
                 "product_swatches_padding_left": 0,
                 "product_swatches_padding_right": 0
-              }
-            },
-            "pb_review": {
-              "type": "review",
-              "settings": {
-                "stars_style": "shaded",
-                "show_number": true,
-                "type_preset": "paragraph",
-                "width": "100%",
-                "alignment": "left"
               },
               "blocks": {}
             },
@@ -304,6 +323,8 @@
       },
       "settings": {
         "heading": "Best sellers",
+        "collection": "",
+        "product_collection": false,
         "max_products": 8,
         "link_label": "View all",
         "link": "",
@@ -317,12 +338,14 @@
         "card_1": {
           "type": "card",
           "settings": {
+            "image": "shopify://shop_images/promo-hydrophobic-1_8ab4c600-eb61-42dc-8cad-2fa766bbb1e7.png",
             "link": "shopify://products/hydrophobic-detailing-finishing-spray"
           }
         },
         "card_2": {
           "type": "card",
           "settings": {
+            "image": "shopify://shop_images/promo-detailer-pack-1.png",
             "link": "shopify://products/hydrophobic-detailing-finishing-spray"
           }
         }
