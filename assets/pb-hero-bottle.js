@@ -35,13 +35,19 @@ const LIQUID = [
   [0, 0.04], [0.58, 0.04], [0.85, 0.08], [0.94, 0.14], [0.97, 0.27], [0.97, 5.2],
   [0.93, 5.26], [0.86, 5.3], [0, 5.3],
 ];
-const CAP = [[0, 5.62], [0.455, 5.62], [0.455, 6.18], [0.42, 6.24], [0.28, 6.27], [0, 6.27]];
-const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43 };
+// Side wall rows just outside and inside the ribbed band (CAP_RIBS), so the ribs have
+// vertices to push: a smooth lip at the bottom and top, ribbed in between.
+const CAP = [
+  [0, 5.62], [0.455, 5.62], [0.455, 5.64], [0.455, 5.68], [0.455, 6.12], [0.455, 6.16],
+  [0.455, 6.18], [0.42, 6.24], [0.28, 6.27], [0, 6.27],
+];
+// Rounded ribs with narrow grooves, the same size as the Permagard cap's.
+const CAP_RIBS = { bottom: 5.66, top: 6.14, radius: 0.43, count: 60, depth: 0.08, round: true };
 const LABEL = { bottom: 0.52, top: 4.98 };
 
 /* Permagard Car Wash Shampoo (236 ml), measured from its product photo the same way (body
    483 px wide, 1,612 px from base to cap top): opaque white plastic, a glossy black label
-   from just above the base to the shoulder, and a ribbed white flat-top cap. Scaled to the
+   from just above the base to the shoulder, and a ribbed black flat-top cap. Scaled to the
    Detailing Spray's height so the two balance in the hero. */
 const PERMAGARD = {
   shell: [
@@ -49,11 +55,17 @@ const PERMAGARD = {
     [0.98, 0.27], [0.995, 0.35], [1, 0.45], [1, 5.55], [0.994, 5.64], [0.983, 5.72],
     [0.961, 5.76], [0.882, 5.81], [0.716, 5.85], [0.542, 5.89], [0.53, 5.95],
   ],
-  cap: [[0, 5.93], [0.522, 5.93], [0.522, 6.6], [0.49, 6.64], [0.4, 6.665], [0, 6.675]],
-  capRibs: { bottom: 6.02, top: 6.58, radius: 0.5, count: 90 },
+  // Side wall rows just outside and inside the ribbed band (capRibs), so the ribs have
+  // vertices to push: a smooth lip at the bottom and top, ribbed in between.
+  cap: [
+    [0, 5.93], [0.522, 5.93], [0.522, 6.0], [0.522, 6.04], [0.522, 6.56], [0.522, 6.6],
+    [0.49, 6.64], [0.4, 6.665], [0, 6.675],
+  ],
+  // Rounded ribs with narrow grooves, deep enough to show in shading on the satin black cap.
+  capRibs: { bottom: 6.02, top: 6.58, radius: 0.5, count: 70, depth: 0.08, round: true },
   // turn: radians the artwork is turned round the bottle, to centre it in the hero's pose.
   label: { bottom: 0.36, top: 5.54, radius: 1.004, turn: -0.1 },
-  capColor: 0xf2f2f2,
+  capColor: 0x141414,
   height: 6.675,
 };
 
@@ -79,7 +91,7 @@ const MODELS = {
     shell: SHELL,
     liquid: LIQUID,
     cap: CAP,
-    capRibs: { ...CAP_RIBS, count: 45 },
+    capRibs: CAP_RIBS,
     label: { ...LABEL, radius: 1.006 },
     height: HEIGHT,
     clear: true,
@@ -644,8 +656,8 @@ class PBHeroBottle extends HTMLElement {
       const spring = held ? GRAB.hold : GRAB.release;
       const targetX = held ? (pointer.clientX - grab.x) * grab.unitsPerPx : 0;
       const targetY = held ? -(pointer.clientY - grab.y) * grab.unitsPerPx : 0;
-      drag.vx += (spring.stiffness * (targetX - drag.x) - spring.damping * drag.vx) * dt;
-      drag.vy += (spring.stiffness * (targetY - drag.y) - spring.damping * drag.vy) * dt;
+      drag.vx += (SLOSH.stiffness * (targetX - drag.x) - SLOSH.damping * drag.vx) * dt;
+      drag.vy += (SLOSH.stiffness * (targetY - drag.y) - SLOSH.damping * drag.vy) * dt;
       drag.x += drag.vx * dt;
       drag.y += drag.vy * dt;
       const tip = Math.min(Math.max(drag.vx * GRAB.tilt, -GRAB.maxTilt), GRAB.maxTilt);
@@ -725,15 +737,21 @@ function bottleGeometries(THREE, model) {
   if (model.liquid) parts.liquid = lathe(THREE, model.liquid, 96);
 
   // Cap with vertical grip ribs: push the side wall in and out around the circumference.
+  // Square ribs by default; round ones are broad crowns between narrow grooves (more segments
+  // per rib so each crown is curved and catches its own highlight).
   const ribs = model.capRibs;
-  const cap = lathe(THREE, model.cap, ribs.count * 4);
+  const depth = ribs.depth ?? 0.025;
+  const cap = lathe(THREE, model.cap, ribs.count * (ribs.round ? 10 : 4));
   const position = cap.attributes.position;
   for (let i = 0; i < position.count; i++) {
     const x = position.getX(i);
     const y = position.getY(i);
     const z = position.getZ(i);
     if (y > ribs.bottom && y < ribs.top && Math.hypot(x, z) > ribs.radius) {
-      const scale = 1 + 0.025 * Math.sign(Math.cos(Math.atan2(x, z) * ribs.count));
+      const wave = Math.cos(Math.atan2(x, z) * ribs.count);
+      const scale = ribs.round
+        ? 1 + depth * (Math.sqrt((1 + wave) / 2) - 0.5)
+        : 1 + depth * Math.sign(wave);
       position.setXYZ(i, x * scale, y, z * scale);
     }
   }
@@ -869,13 +887,15 @@ function addLiquidSurface(THREE, material, colour, tint = 0.25, rim = 0) {
 /* Liquid looks. Gel: a little see-through, glass-smooth clear coat, bright highlights, a
    faint iridescent shimmer, and edges that glow (rim) the way light catches gelatin. */
 const LIQUID_FINISHES = {
+  // Golden amber like the product photos: mostly solid with a hint of see-through, glowing
+  // as if lit through, a slightly lighter top and edges.
   liquid: {
-    opacity: 0.92,
-    emissiveIntensity: 0.28,
-    roughness: 0.08,
-    clearcoatRoughness: 0.04,
-    surfaceTint: 0.25,
-    rim: 0,
+    opacity: 0.82,
+    emissiveIntensity: 0.3,
+    roughness: 0.04,
+    clearcoatRoughness: 0.02,
+    surfaceTint: 0.2,
+    rim: 0.25,
   },
   gel: {
     opacity: 0.8,
@@ -929,7 +949,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
 }
 
 /* An opaque bottle (Permagard): glossy white plastic, a high-gloss black label wrap and a
-   satin cap in the model's capColor (white for Permagard). No liquid. */
+   satin cap in the model's capColor (black for Permagard). No liquid. */
 function opaqueBottleMaterials(THREE, labelTexture, gloss, capColor = 0x141414) {
   return {
     shell: new THREE.MeshPhysicalMaterial({
