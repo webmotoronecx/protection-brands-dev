@@ -12,8 +12,13 @@
 */
 
 :root {
-  /* Card: 31px from the screen edge and 40px inside at 1440px. */
-  --pb-pdp-margin: clamp(8px, 2.15vw, 31px);
+  /* Card: 31px from the screen edge and 40px inside at 1440px. On screens wider than
+     --pb-pdp-max it stops growing and centres (--pb-pdp-inset), so the photo, sized by the
+     card's width, stays within the screen's height; the description band below
+     (sections/pb-product-description.liquid) uses the same inset. */
+  --pb-pdp-max: 1600px;
+  --pb-pdp-inset: max(0px, (100vw - var(--pb-pdp-max)) / 2);
+  --pb-pdp-margin: calc(clamp(8px, 2.15vw, 31px) + var(--pb-pdp-inset));
   --pb-pdp-pad: clamp(16px, 2.8vw, 40px);
 }
 
@@ -62,7 +67,7 @@ main[data-template='product'] .shopify-section:has(> .product-information) {
    (.shopify-section:not(.header-section) :is(.section, ...)). */
 main[data-template='product'] .product-information.section.section {
   --page-margin: var(--pb-pdp-pad);
-  --sidebar-width: clamp(300px, 29vw, 418px);
+  --sidebar-width: clamp(300px, 29vw, 464px);
   --height-buy-buttons: 39px;
 
   padding-block-end: var(--pb-pdp-pad);

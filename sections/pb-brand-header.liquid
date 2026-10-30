@@ -118,7 +118,7 @@
 
 {% stylesheet %}
   .pb-brand-header {
-    --pb-brand-pad-x: clamp(20px, 3.8vw, 55px);
+    --pb-brand-pad-x: calc(clamp(20px, 3.8vw, 55px) + var(--pb-wide-inset, 0px));
     --pb-brand-curve: 12px;
 
     position: relative;
