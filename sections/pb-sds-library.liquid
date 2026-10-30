@@ -5,6 +5,10 @@
   one per entry of the `sds_document` metaobject (fields: product_name, file, brand,
   issue_date; see docs/store-setup/sds.md).
 
+  The card shows the brand's logo (the custom.brand_logo metafield of the "Brand collections"
+  collection whose title starts with the brand, e.g. CERFACE → "CERFACE Ceramic"), or the SDS
+  icon for brands without one.
+
   Search matches the product name and brand; a brand button shows only that brand's sheets
   (press it again for all). The two combine. Brands come from the "Brand order" setting,
   anything else counts as "Other"; brands without documents aren't listed.
@@ -115,7 +119,21 @@
                   assign brand_handle = 'other'
                 endif
               -%}
-              {% render 'pb-sds-card', document: document, brand_key: brand_handle, section: section %}
+              {%- liquid
+                assign logo = blank
+                assign brand_name = document.brand.value | downcase
+                assign brand_size = brand_name | size
+                if brand_size > 0
+                  for brand_collection in section.settings.brand_collections
+                    assign title_start = brand_collection.title | downcase | slice: 0, brand_size
+                    if title_start == brand_name
+                      assign logo = brand_collection.metafields.custom.brand_logo.value
+                      break
+                    endif
+                  endfor
+                endif
+              -%}
+              {% render 'pb-sds-card', document: document, brand_key: brand_handle, section: section, logo: logo %}
             {%- endfor -%}
           </ul>
           <p class="pb-sds-library__empty" hidden ref="noResults">{{ section.settings.no_results_text }}</p>
@@ -190,7 +208,7 @@
 
   .pb-sds-library__search {
     position: relative;
-    border-bottom: 1px solid #b3b3b3;
+    border-bottom: 1px solid #d9d9d9;
   }
 
   .pb-sds-library__input {
@@ -209,7 +227,7 @@
   }
 
   .pb-sds-library__input::placeholder {
-    color: #000;
+    color: #a6a6a6;
     opacity: 1;
     text-transform: uppercase;
   }
@@ -219,7 +237,7 @@
   }
 
   .pb-sds-library__search:focus-within {
-    border-bottom-color: #000;
+    border-bottom-color: #737373;
   }
 
   .pb-sds-library__input::-webkit-search-cancel-button {
@@ -228,6 +246,7 @@
 
   .pb-sds-library__search-icon {
     position: absolute;
+    color: #a6a6a6;
     inset: 0 0 14px auto;
     display: flex;
     align-items: center;
@@ -320,6 +339,14 @@
       radial-gradient(ellipse 70% 120% at 10% 0%, #3a3a3a 0%, transparent 60%),
       linear-gradient(120deg, #1a1a1a 0%, #050505 70%, #000 100%);
     color: #fff;
+  }
+
+  /* Brand logo: fits a box about half the tile's width and height, so wide (Honda) and tall
+     (OptiVAN) logos look about the same size. */
+  .pb-sds-card__logo {
+    width: 46%;
+    height: 58%;
+    object-fit: contain;
   }
 
   .pb-sds-card__icon {
@@ -472,6 +499,13 @@
       "label": "Brands",
       "info": "Comma-separated, in sidebar order. Must match the metaobject's brand choices. Anything else is listed under \"Other brands label\".",
       "default": "Permagard, CERFACE, OptiVAN, Honda Genuine Car Care, Protection Brands"
+    },
+    {
+      "type": "collection_list",
+      "id": "brand_collections",
+      "label": "Brand collections",
+      "info": "Cards show the logo (Brand logo metafield) of the collection whose title starts with the sheet's brand, e.g. CERFACE → CERFACE Ceramic. Brands without one show the SDS icon.",
+      "limit": 10
     },
     {
       "type": "text",

@@ -6,8 +6,7 @@
   grid's Filters block. Also on the search page (templates/search.json): the number of
   results, and Sort keeps the search terms.
 
-  Sort is snippets/pb-collection-sort.liquid: the word "Sort" with the browser's own dropdown
-  laid invisibly over it, so a click or the keyboard opens the native list of options.
+  Sort is snippets/pb-sort-menu.liquid: "Sort: Best selling", opening a panel of the options.
   Lined up with the product grid by Horizon's page-width grid (.section); the margins for both
   are set together in assets/pb-product-card.css.
 {%- endcomment -%}
@@ -37,12 +36,7 @@
     </h2>
 
     {%- if section.settings.show_sort -%}
-      {%- render 'pb-collection-sort',
-        collection: sortable,
-        id: 'PBProductsSort',
-        class: 'pb-products-bar__sort',
-        label: section.settings.sort_label
-      -%}
+      {%- render 'pb-sort-menu', collection: sortable, label: section.settings.sort_label -%}
     {%- endif -%}
   </div>
 </div>
@@ -54,6 +48,7 @@
 
   .pb-products-bar__inner {
     display: flex;
+    color: #000;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
@@ -68,49 +63,6 @@
     line-height: 1.1;
     letter-spacing: 0;
     text-transform: uppercase;
-  }
-
-  /* "Sort" in small bold capitals with a chevron. The select covers it, transparent, so it
-     takes the click and the focus; the ring shows on the whole control. */
-  .pb-products-bar__sort {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #000;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .pb-products-bar__sort::after {
-    content: '';
-    width: 7px;
-    height: 7px;
-    margin-block-start: -3px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    rotate: 45deg;
-  }
-
-  .pb-products-bar__sort select {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-  }
-
-  .pb-products-bar__sort:has(select:focus-visible) {
-    outline: 2px solid var(--pb-accent, #ca0d0d);
-    outline-offset: 6px;
-    border-radius: 2px;
-  }
-
-  .pb-products-bar__sort-label {
-    cursor: pointer;
   }
 {% endstylesheet %}
 

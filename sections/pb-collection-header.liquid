@@ -192,7 +192,7 @@
     </form>
   {%- else -%}
     {%- if request.page_type == 'collection' and section.settings.show_sort -%}
-      {%- comment -%} Item count and sort (snippets/pb-collection-sort.liquid) beside the title. {%- endcomment -%}
+      {%- comment -%} Item count and sort (snippets/pb-sort-menu.liquid) beside the title. {%- endcomment -%}
       <div class="pb-collection-header__row">
         <h1 class="{{ title_class }}">{{ title }}</h1>
         <div class="pb-collection-header__tools">
@@ -200,7 +200,7 @@
             {{ current.products_count }}
             {{ current.products_count | pluralize: 'item', 'items' }}
           </p>
-          {%- render 'pb-collection-sort', collection: current, id: 'PBSortBy', class: 'pb-collection-header__sort' -%}
+          {%- render 'pb-sort-menu', collection: current -%}
         </div>
       </div>
     {%- else -%}
@@ -428,29 +428,6 @@
     color: #bdbdbd;
     font-size: 15px;
     white-space: nowrap;
-  }
-
-  .pb-collection-header__sort select {
-    padding: 9px 34px 9px 14px;
-    border: 1px solid rgb(255 255 255 / 0.25);
-    border-radius: 6px;
-    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.5 6 4.5 4.5L12.5 6'/%3E%3C/svg%3E") no-repeat right 12px center / 12px;
-    color: #fff;
-    font: inherit;
-    font-size: 14px;
-    appearance: none;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-  }
-
-  .pb-collection-header__sort select:is(:hover, :focus-visible) {
-    border-color: rgb(255 255 255 / 0.6);
-    outline: none;
-  }
-
-  .pb-collection-header__sort option {
-    background: #111;
-    color: #fff;
   }
 
   .pb-collection-header__title {

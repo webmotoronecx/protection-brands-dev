@@ -27,7 +27,14 @@
     },
     "sds_library": {
       "type": "pb-sds-library",
-      "settings": {}
+      "settings": {
+        "brand_collections": [
+          "permagard-car-care",
+          "cerface-ceramic",
+          "optivan-caravan-maintenance",
+          "honda-genuine-car-care"
+        ]
+      }
     },
     "pb_promo_cards": {
       "type": "pb-promo-cards",

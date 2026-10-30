@@ -5,8 +5,7 @@
   CSS alone. Two layouts:
 
   - Story (About Us): on desktop the first paragraph large in the heading font on the left (it
-    stays in view while the rest scrolls), the other paragraphs on the right, and the last
-    paragraph (the "find your dealer" line) as a dark card.
+    stays in view while the rest scrolls), the other paragraphs on the right.
   - Document (longer pages): on desktop the heading large on the left, staying in view, and the
     text on the right.
   - Contact (templates/page.contact.json): the heading and the page's text on the left, and
@@ -216,17 +215,6 @@
     font-weight: inherit;
   }
 
-  /* Story: the "find your dealer" line as a dark card. */
-  .pb-page-story--story .pb-page-story__body p:last-of-type:not(:first-of-type) {
-    margin-block-start: 2em;
-    padding: clamp(22px, 2.4vw, 32px) clamp(22px, 2.6vw, 36px);
-    border-inline-start: 4px solid var(--pb-accent, #ca0d0d);
-    border-radius: 12px;
-    background: #111;
-    color: #fff;
-    font-size: 16px;
-  }
-
   /* Contact: the title shows on mobile too, above the intro, since the form follows. */
   .pb-page-story--contact .pb-page-story__aside {
     display: block;
@@ -313,7 +301,7 @@
       "type": "select",
       "id": "layout",
       "label": "Layout",
-      "info": "Story: the opening line large on the left, the last line as a dark card. Document: the heading on the left, the text on the right. Contact: the heading and text on the left, the blocks (the contact form) on the right.",
+      "info": "Story: the opening line large on the left, the rest on the right. Document: the heading on the left, the text on the right. Contact: the heading and text on the left, the blocks (the contact form) on the right.",
       "options": [
         { "value": "story", "label": "Story" },
         { "value": "document", "label": "Document" },

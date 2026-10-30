@@ -1,0 +1,189 @@
+{%- doc -%}
+  Sort menu for a collection or the search results: "Sort: Best selling" with a chevron, opening
+  a white panel of the sort options, the current one in red with a tick. Each option is a link
+  to the page with ?sort_by= (on search, keeping the search terms), so it works without
+  JavaScript. A <details> opens and closes it; assets/pb-sort-menu.js closes it on Esc, a click
+  outside or focus leaving it.
+
+  The one sort on the site: above the grid (sections/pb-products-bar.liquid on collections,
+  brand pages and search), and beside the banner title if that is turned on
+  (sections/pb-collection-header.liquid).
+
+  @param {object} collection - The collection being sorted, or the search object.
+  @param {string} [label] - Text before the current option, e.g. "Sort".
+{%- enddoc -%}
+
+{%- if collection.sort_options.size > 0 -%}
+  {%- liquid
+    assign sort_by = collection.sort_by | default: collection.default_sort_by
+    assign current_name = ''
+    for option in collection.sort_options
+      if option.value == sort_by
+        assign current_name = option.name
+      endif
+    endfor
+
+    assign base = request.path | append: '?'
+    if request.page_type == 'search'
+      assign terms = search.terms | url_encode
+      assign base = base | append: 'q=' | append: terms | append: '&options%5Bprefix%5D=last&'
+    endif
+  -%}
+
+  <pb-sort-menu class="pb-sort-menu">
+    <details>
+      <summary class="pb-sort-menu__toggle">
+        {%- if label != blank -%}
+          <span class="pb-sort-menu__label">{{ label }}:</span>
+        {%- endif -%}
+        <span class="pb-sort-menu__current">{{ current_name | default: 'Featured' }}</span>
+        <svg aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m2.5 4.5 3.5 3.5 3.5-3.5"/>
+        </svg>
+      </summary>
+      <ul class="pb-sort-menu__list" role="list">
+        {%- for option in collection.sort_options -%}
+          <li>
+            <a
+              class="pb-sort-menu__option"
+              href="{{ base }}sort_by={{ option.value }}"
+              {% if option.value == sort_by %}
+                aria-current="true"
+              {% endif %}
+            >
+              {{- option.name -}}
+              <svg aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m2.5 6.2 2.3 2.3 4.7-5"/>
+              </svg>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  </pb-sort-menu>
+  <script type="module" src="{{ 'pb-sort-menu.js' | asset_url }}"></script>
+{%- endif -%}
+
+{% stylesheet %}
+  /* "Sort:" in small bold capitals (in the surrounding text colour), then the current option
+     and a chevron that turns while the panel is open. */
+  .pb-sort-menu {
+    position: relative;
+    display: block;
+  }
+
+  .pb-sort-menu__toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-block: 6px;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .pb-sort-menu__toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .pb-sort-menu__current {
+    font-weight: 500;
+  }
+
+  .pb-sort-menu__toggle svg {
+    width: 12px;
+    height: 12px;
+    transition: rotate 0.25s ease;
+  }
+
+  .pb-sort-menu details[open] .pb-sort-menu__toggle svg {
+    rotate: 180deg;
+  }
+
+  .pb-sort-menu__toggle:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* The panel: white, rounded, a soft shadow, right-aligned under the toggle, above the grid.
+     Fades and drops in (opacity and translate only). */
+  .pb-sort-menu__list {
+    position: absolute;
+    inset-block-start: calc(100% + 8px);
+    inset-inline-end: 0;
+    z-index: 5;
+    min-width: 220px;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.06),
+      0 12px 32px rgb(0 0 0 / 0.14);
+    animation: pb-sort-menu-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes pb-sort-menu-in {
+    from {
+      opacity: 0;
+      translate: 0 -6px;
+    }
+  }
+
+  .pb-sort-menu__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: #111;
+    font-size: 14px;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .pb-sort-menu__option:is(:hover, :focus-visible) {
+    background: var(--pb-card-bg, #f4f4f4);
+  }
+
+  .pb-sort-menu__option:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: -2px;
+  }
+
+  .pb-sort-menu__option svg {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    visibility: hidden;
+  }
+
+  .pb-sort-menu__option[aria-current] {
+    color: var(--pb-accent, #ca0d0d);
+    font-weight: 600;
+  }
+
+  .pb-sort-menu__option[aria-current] svg {
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-sort-menu__list {
+      animation: none;
+    }
+
+    .pb-sort-menu__toggle svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

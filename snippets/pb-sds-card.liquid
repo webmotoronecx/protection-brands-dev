@@ -6,6 +6,7 @@
   @param {object} document - An `sds_document` metaobject entry
   @param {string} brand_key - Brand handle for the sidebar filter ('other' for unlisted brands)
   @param {object} section - The SDS library section, for its label settings
+  @param {object} [logo] - The brand's logo image (its collection's custom.brand_logo); the SDS icon without one
 {%- enddoc -%}
 
 {%- liquid
@@ -17,7 +18,20 @@
 {%- if name != blank and file != blank -%}
   <li class="pb-sds-card" data-sds-search="{{ search_text }}" data-sds-brand="{{ brand_key }}">
     <div class="pb-sds-card__tile">
-      <span class="pb-sds-card__icon" aria-hidden="true">{{- 'icon-sds.svg' | inline_asset_content -}}</span>
+      {%- if logo != blank -%}
+        {{-
+          logo
+          | image_url: width: 480
+          | image_tag:
+            class: 'pb-sds-card__logo',
+            alt: '',
+            loading: 'lazy',
+            widths: '160, 240, 320, 480',
+            sizes: '(min-width: 1200px) 140px, 30vw'
+        -}}
+      {%- else -%}
+        <span class="pb-sds-card__icon" aria-hidden="true">{{- 'icon-sds.svg' | inline_asset_content -}}</span>
+      {%- endif -%}
     </div>
     <p class="pb-sds-card__name">
       <a

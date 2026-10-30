@@ -63,6 +63,13 @@ main[data-template='product'] .shopify-section:has(> .product-information) {
   padding-inline: var(--pb-pdp-margin);
 }
 
+/* No description band after the card (a product without one): a strip of the dark page still
+   shows under the card before the white sections. */
+main[data-template='product']
+  .shopify-section:has(> .product-information):not(:has(+ .shopify-section .pb-product-description)) {
+  padding-block-end: clamp(32px, 4vw, 56px);
+}
+
 /* .section doubled to beat Horizon's transparent section background
    (.shopify-section:not(.header-section) :is(.section, ...)). */
 main[data-template='product'] .product-information.section.section {
