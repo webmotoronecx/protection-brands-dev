@@ -39,11 +39,51 @@
       {%- render 'pb-sort-menu', collection: sortable, label: section.settings.sort_label -%}
     {%- endif -%}
   </div>
+
+  {%- comment -%}
+    Phones: the sort pills in a row that scrolls sideways, in place of the sort
+    menu (snippets/pb-facet-pills.liquid); the Filter button below opens the rest. Desktop has
+    them in the filter row instead (blocks/filters.liquid).
+  {%- endcomment -%}
+  {%- if section.settings.show_sort -%}
+    <div class="pb-products-bar__pills pb-facet-pills">
+      {%- render 'pb-facet-pills', sort: true, results: sortable -%}
+    </div>
+  {%- endif -%}
 </div>
 
 {% stylesheet %}
   .pb-products-bar {
     padding-block: clamp(28px, 2.9vw, 42px) clamp(16px, 1.9vw, 27px);
+  }
+
+  .pb-products-bar__pills {
+    display: none;
+  }
+
+  /* Phones on a page with the filter pills: the pills row replaces the sort menu. */
+  @media screen and (max-width: 749px) {
+    body:has(.pb-facet-pills .pb-pill-group--sort) .pb-products-bar pb-sort-menu {
+      display: none;
+    }
+
+    .pb-products-bar__pills {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin: 16px calc(-1 * var(--page-margin, 16px)) 0;
+      padding-inline: var(--page-margin, 16px);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .pb-products-bar__pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pb-products-bar__pills .pb-pill-group {
+      flex-wrap: nowrap;
+    }
   }
 
   .pb-products-bar__inner {

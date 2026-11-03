@@ -199,6 +199,19 @@
 
             {% if block_settings.enable_filtering %}
               {% assign total_active_values = 0 %}
+              {%- comment -%}
+                PB: with Horizon's sorting off (the PB row, see the count heading below),
+                the sort pills sit beside the count (in place of a sort menu), and the availability
+                and price filters are left out of the row
+                (snippets/pb-facet-pills.liquid; styles in assets/pb-product-card.css, changes
+                applied by assets/pb-sort-menu.js). Other filters stay as dropdowns.
+              {%- endcomment -%}
+              {%- liquid
+                assign pb_pills = false
+                if block_settings.filter_style == 'horizontal' and block_settings.enable_sorting == false
+                  assign pb_pills = true
+                endif
+              -%}
 
               {% capture rendered_filters %}
                 {%- for filter in filters -%}
@@ -216,6 +229,10 @@
                           assign should_render_clear = false
                         endif
 
+                        # PB row: no price filter (the sort pills cover price); the phone drawer keeps it.
+                        if pb_pills
+                          continue
+                        endif
                         render 'price-filter', filter: filter, filter_style: block_settings.filter_style, should_render_clear: should_render_clear, id_prefix: 'horizontal'
                       -%}
                     {% else %}
@@ -231,12 +248,21 @@
                         else
                           assign should_render_clear = false
                         endif
+                        # PB row: no availability filter (hidden for now; the phone drawer keeps it).
+                        if pb_pills and filter.param_name == 'filter.v.availability'
+                          continue
+                        endif
                         render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
                       %}
                   {% endcase %}
                 {%- endfor -%}
               {% endcapture %}
 
+              {%- if pb_pills -%}
+                <div class="pb-facet-pills">
+                  {%- render 'pb-facet-pills', sort: true, results: results -%}
+                </div>
+              {%- endif -%}
               <div class="facets__filters-wrapper">
                 {% if block_settings.filter_style == 'horizontal' %}
                   {% liquid
@@ -277,6 +303,23 @@
               {% endif %}
             {% endif %}
             {% if block_settings.filter_style == 'horizontal' %}
+              {%- comment -%}
+                PB: with Horizon's sorting off, the row also carries the PB count heading ("24
+                Products"), in place of the products bar above on desktop
+                (sections/pb-products-bar.liquid; layout in assets/pb-product-card.css). Inside this
+                block it's re-rendered with each filter change, so the count follows. Sorting is the
+                sort pills on the second row.
+              {%- endcomment -%}
+              {%- unless block_settings.enable_sorting -%}
+                <h2 class="pb-facets-count">
+                  {{ products_count }}
+                  {% if request.page_type == 'search' -%}
+                    {{ products_count | pluralize: 'Result', 'Results' }}
+                  {%- else -%}
+                    {{ products_count | pluralize: 'Product', 'Products' }}
+                  {%- endif %}
+                </h2>
+              {%- endunless -%}
               <div
                 class="products-count-wrapper"
                 data-testid="products-count"

@@ -120,8 +120,8 @@
           "type": "filters",
           "static": true,
           "settings": {
-            "enable_filtering": false,
-            "filter_style": "vertical",
+            "enable_filtering": true,
+            "filter_style": "horizontal",
             "filter_width": "centered",
             "text_label_case": "default",
             "show_swatch_label": false,
@@ -307,7 +307,7 @@
         "logo_height": 80,
         "greyscale": false,
         "heading_position": "beside",
-        "background": "#f5f5f5",
+        "background": "#ffffff",
         "text_color": "#111111",
         "bottom_border": true
       },

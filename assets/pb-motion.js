@@ -117,7 +117,8 @@
     });
   }
 
-  // Bento tiles (sections/pb-bento.liquid) and category tiles (sections/pb-category-tiles.liquid):
+  // Bento tiles (sections/pb-bento.liquid), category tiles (sections/pb-category-tiles.liquid) and
+  // the collections grid (sections/pb-collection-grid.liquid):
   // magnetic photos. While the mouse is over a tile, the photo inside is pulled a few px towards
   // it, trailing behind (quickTo eases over MAGNET_EASE seconds), and settles back when it
   // leaves; the tile itself stays still. The bento photo is 16px bigger than its tile on each
@@ -129,6 +130,7 @@
   const magnets = [
     ['.pb-bento__tile', '.pb-bento__image', 12],
     ['.pb-category-tiles__tile', '.pb-category-tiles__image', 14],
+    ['.pb-collection-grid__card', '.pb-collection-grid__image', 14],
   ];
   if (finePointer) {
     magnets.forEach(([tileSelector, photoSelector, MAGNET]) => document.querySelectorAll(tileSelector).forEach((tile) => {

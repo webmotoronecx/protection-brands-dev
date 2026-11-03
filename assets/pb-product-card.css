@@ -1,6 +1,6 @@
 /*
   Protection Brands product cards.
-  White card, square contained image, two-line title, review stars, bold price with the
+  Light grey card, square contained image, two-line title, review stars, bold price with the
   compare-at price struck through underneath, and a black quantity + Add To Cart bar
   pinned to the bottom (blocks/pb-card-buy.liquid). Every card in a row is the same height.
 
@@ -11,7 +11,7 @@
 */
 
 :root {
-  --pb-card-bg: #ffffff;
+  --pb-card-bg: #f5f5f5;
   --pb-accent: #ca0d0d;
   --pb-accent-hover: #a30a0a;
   --pb-on-accent: #ffffff;
@@ -413,5 +413,183 @@
 /* Empty grid ("No products found.", snippets/product-grid.liquid): uppercase, like the other
    PB headings. Specific enough to beat Horizon's `.h2.h2`, which sets the heading case. */
 .main-collection-grid__empty .main-collection-grid__empty-title.h2 {
+  text-transform: uppercase;
+}
+
+/* Horizontal filters (collection, brand and search pages). Desktop: one row, the count on the
+   left ("24 Products"), then the filters and Sort on the right (blocks/filters.liquid renders
+   the PB count and sort into Horizon's filter row), in place of the products bar
+   (sections/pb-products-bar.liquid), which shows only on phones. Horizon's own count is hidden;
+   the filter names and the phone Filter button use the label font (Barlow), like the sort. */
+@media screen and (min-width: 750px) {
+  body:has(.facets-block-wrapper--horizontal .pb-facets-count) .pb-products-bar {
+    display: none;
+  }
+
+  .facets-block-wrapper--horizontal:has(.pb-facets-count) {
+    padding-block: clamp(20px, 2.1vw, 34px) clamp(8px, 1vw, 16px);
+  }
+
+  .facets--horizontal .facets__form:has(.pb-facets-count) {
+    align-items: center;
+    gap: clamp(16px, 2vw, 32px);
+  }
+
+  .facets__form .pb-facets-count {
+    order: -1;
+    margin: 0 auto 0 0;
+    color: #000;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+    font-weight: var(--font-heading--weight);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .facets__form:has(.pb-facets-count) .facets__filters-wrapper {
+    margin-inline-end: 0;
+  }
+
+  /* One row: the count on the left, the sort pills on the right; any other filters and Clear
+     all wrap below if they're added. */
+  .facets--horizontal .facets__form:has(.pb-facet-pills) {
+    flex-wrap: wrap;
+    row-gap: clamp(16px, 1.6vw, 24px);
+  }
+
+  .facets__form:has(.pb-facet-pills) .pb-facets-count {
+    order: 1;
+  }
+
+  .facets__form .pb-facet-pills {
+    order: 2;
+    margin-inline-start: auto;
+  }
+
+  .facets__form:has(.pb-facet-pills) :is(.facets__filters-wrapper, .facets-horizontal-remove) {
+    order: 3;
+  }
+
+  /* Empty (no other filters, nothing to clear): out of the row, so their gaps don't push the
+     pills in from the edge. */
+  .facets__form:has(.pb-facet-pills) .facets__filters-wrapper:not(:has(details)),
+  .facets__form:has(.pb-facet-pills) .facets-horizontal-remove:not(.facets-horizontal-remove--active) {
+    display: none;
+  }
+}
+
+/* Sort pills (snippets/pb-facet-pills.liquid), one click each; on, they turn black. Barlow,
+   like the other labels. */
+.pb-facet-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px clamp(20px, 2.4vw, 36px);
+}
+
+.pb-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* "Sort" before the sort pills, like the old menu's label. */
+.pb-pill-group__label {
+  margin-inline-end: 4px;
+  color: #6b6b6b;
+  font-family: var(--pb-button-font, inherit);
+  font-size: 13px;
+  font-weight: var(--pb-button-weight, 500);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pb-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid #d4d4d4;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-family: var(--pb-button-font, inherit);
+  font-size: 13px;
+  font-weight: var(--pb-button-weight, 500);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.pb-pill {
+  cursor: pointer;
+}
+
+.pb-pill input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pb-pill:hover {
+  border-color: #111;
+}
+
+.pb-pill:has(:checked),
+.pb-pill[aria-current] {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.pb-pill:has(:focus-visible),
+.pb-pill:focus-visible {
+  outline: 2px solid var(--pb-accent, #ca0d0d);
+  outline-offset: 2px;
+}
+
+.pb-pill--disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.pb-pill--disabled:hover {
+  border-color: #d4d4d4;
+}
+/* Phones: the filter row isn't shown (the Filter button opens the drawer); its count heading
+   still updates with each filter, and assets/pb-sort-menu.js copies it to the products bar. */
+@media screen and (max-width: 749px) {
+  .facets__form .pb-facets-count {
+    display: none;
+  }
+}
+.facets__form .products-count-wrapper.products-count-wrapper {
+  display: none !important;
+}
+
+:is(.facets__summary, .facets-toggle__button) {
+  font-family: var(--pb-button-font, inherit);
+  font-size: clamp(13px, 0.95vw, 15px);
+  font-weight: var(--pb-button-weight, 500);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Clear all, after the pills: the label font, red, like the other text links. */
+.facets__form:has(.pb-facet-pills) .facets__clear-all-link {
+  color: var(--pb-accent, #ca0d0d);
+  font-family: var(--pb-button-font, inherit);
+  font-size: 13px;
+  font-weight: var(--pb-button-weight, 500);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }

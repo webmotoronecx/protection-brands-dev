@@ -1,7 +1,8 @@
 {%- comment -%}
   Shop by category (Protection Brands): a row of photo tiles, each linking to a collection.
-  A tile takes its collection's image and title; the tile's own image and label replace
-  them. Label bottom-left over a dark fade, a » arrow bottom-right that turns red on hover.
+  A tile takes its collection's Hero product photo (custom.hero_product, as on the brand
+  banner and the collections grid) or else its image, and its title; the tile's own image and
+  label replace them. Label bottom-left over a dark fade, a » arrow bottom-right that turns red on hover.
   When there are more tiles than columns, the row scrolls sideways with the next tile peeking
   in. Previous/next buttons underneath, and with a mouse, dragging scrolls it
   (<pb-drag-scroll> below); a plain click still opens the tile.
@@ -71,7 +72,13 @@
         if tile_collection == blank and request.design_mode == false
           continue
         endif
-        assign tile_image = block.settings.image | default: tile_collection.featured_image
+        assign tile_image = block.settings.image
+        if tile_image == blank
+          assign tile_image = tile_collection.metafields.custom.hero_product.value.featured_media.preview_image
+        endif
+        if tile_image == blank
+          assign tile_image = tile_collection.featured_image
+        endif
         assign tile_label = block.settings.label | default: tile_collection.title
       -%}
       <li {{ block.shopify_attributes }}>
@@ -467,7 +474,7 @@
     padding: 0;
     border: 0;
     border-radius: 6px;
-    background: #fff;
+    background: var(--pb-card-bg, #f5f5f5);
     color: #111;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;

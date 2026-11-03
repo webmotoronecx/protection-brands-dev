@@ -1,12 +1,14 @@
 {%- comment -%}
   Collection grid (Protection Brands): every collection as a tile, styled like the homepage
   category tiles (sections/pb-category-tiles.liquid): a dark square on the studio spotlight
-  (assets/bg-cat.png), the photo whole and a little smaller than the tile, a dark fade at the
+  (assets/bg-cat.jpg), the photo whole and a little smaller than the tile, lifted clear of the
+  name, with a shadow, drifting towards the mouse (assets/pb-motion.js), a dark fade at the
   bottom with the name in the heading font and the number of products under it. Used by templates/list-collections.json (/collections).
 
   Collections: the ones picked, otherwise every collection with products, A to Z (without the
-  shop's automatic "all" and "frontpage"). A tile shows its collection's image, or the first
-  product's when it has none.
+  shop's automatic "all" and "frontpage"). A tile shows the collection's Hero product
+  (custom.hero_product, as on the brand banner) if one is picked, otherwise the collection's
+  image, otherwise its first product.
 {%- endcomment -%}
 
 {%- liquid
@@ -30,7 +32,7 @@
 
 <div
   class="pb-collection-grid"
-  style="--pb-tile-bg: url('{{ 'bg-cat.png' | asset_url }}'); --pb-grid-columns: {{ section.settings.columns }}; --pb-grid-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-grid-weight: {{ heading_font.weight }};"
+  style="--pb-tile-bg: url('{{ 'bg-cat.jpg' | asset_url }}'); --pb-grid-columns: {{ section.settings.columns }}; --pb-grid-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-grid-weight: {{ heading_font.weight }};"
 >
   {%- if section.settings.heading != blank -%}
     <h2 class="pb-collection-grid__heading">{{ section.settings.heading | escape }}</h2>
@@ -44,7 +46,10 @@
             continue
           endif
         endif
-        assign image = collection.featured_image
+        assign image = collection.metafields.custom.hero_product.value.featured_media.preview_image
+        if image == blank
+          assign image = collection.featured_image
+        endif
         if image == blank
           assign image = collection.products.first.featured_media.preview_image
         endif
@@ -142,10 +147,11 @@
     background: linear-gradient(0deg, rgb(0 0 0 / 0.7) 0%, transparent 55%);
   }
 
-  /* The whole photo, a little smaller than the tile, centred a little above the name. */
+  /* The whole photo, a little smaller than the tile, lifted by 6% of the tile so it sits clear
+     of the name, with the category tiles' shadow (sections/pb-category-tiles.liquid). */
   .pb-collection-grid__image {
     position: absolute;
-    inset: 0;
+    inset: -6% 0 6%;
     z-index: -2;
     width: 100%;
     height: 100%;
@@ -154,6 +160,7 @@
     transform: scale(0.78);
     transform-origin: 50% 40%;
     transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    filter: drop-shadow(32px 12px 22px rgb(0 0 0 / 0.95));
   }
 
   .pb-collection-grid__card:is(:hover, :focus-visible) .pb-collection-grid__image {
@@ -176,7 +183,7 @@
     display: -webkit-box;
     overflow: hidden;
     font-family: var(--pb-grid-font);
-    font-size: clamp(1rem, 1.5vw, 1.5rem);
+    font-size: clamp(0.9375rem, 1.2vw, 1.25rem);
     font-weight: var(--pb-grid-weight, 400);
     line-height: 1.05;
     -webkit-box-orient: vertical;

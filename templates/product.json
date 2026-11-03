@@ -632,7 +632,7 @@
         "max_products": 8,
         "link_label": "View all",
         "link": "",
-        "background": "#f5f5f5",
+        "background": "#ffffff",
         "text_color": "#111111",
         "product_collection": true
       }

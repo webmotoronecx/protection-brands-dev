@@ -321,9 +321,10 @@
     flex-direction: column;
     padding: 12px;
     border-radius: 6px;
-    background: #f4f4f4;
+    /* Light grey on the white page, like the product cards. */
+    background: var(--pb-card-bg, #f5f5f5);
     color: #000;
-    transition: background-color 0.2s ease;
+    transition: box-shadow 0.2s ease;
   }
 
   .pb-sds-card[hidden] {
@@ -331,7 +332,7 @@
   }
 
   .pb-sds-card:hover {
-    background: #ebebeb;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.08);
   }
 
   .pb-sds-card__tile {

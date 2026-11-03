@@ -111,14 +111,15 @@
     --pb-wide-inset: max(0px, (100vw - var(--pb-content-max)) / 2);
   }
 
-  /* Inner pages: light grey behind the content, as on the homepage (layout/pb-landing.liquid
-     sets its own), so the white product cards stand out. Only the page's main content: the
+  /* Inner pages: white behind the content, as on the homepage (layout/pb-landing.liquid sets
+     its own); the product cards are light grey (assets/pb-product-card.css). Only the page's
+     main content: the
      header, footer, drawers and inputs keep the palette's white. Banner curves and sections
      that use the page colour follow it. The product page keeps its dark backdrop behind the
      card and description band (assets/pb-product.css); its sections below set their own. */
   body:not(.pb-landing) .content-for-layout {
-    --color-background: #f5f5f5;
-    --color-background-rgb: 245 245 245;
+    --color-background: #ffffff;
+    --color-background-rgb: 255 255 255;
   }
 
   body:not(.pb-landing) .content-for-layout:not([data-template^='product']) {
@@ -126,9 +127,9 @@
   }
 
   /* The footer's curved top edge is a strip of the page colour (sections/pb-footer.liquid);
-     outside the content, so it's told the grey here. */
+     outside the content, so it's told the page colour here. */
   body:not(.pb-landing) {
-    --pb-page-bg: #f5f5f5;
+    --pb-page-bg: #ffffff;
   }
 
   .pb-hero-bottle .pb-hero-bottle__button {

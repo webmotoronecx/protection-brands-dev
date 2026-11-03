@@ -67,7 +67,7 @@
         "logo_height": 80,
         "greyscale": false,
         "heading_position": "beside",
-        "background": "#f5f5f5",
+        "background": "#ffffff",
         "text_color": "#111111",
         "bottom_border": false
       }

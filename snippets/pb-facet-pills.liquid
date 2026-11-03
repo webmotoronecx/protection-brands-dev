@@ -1,0 +1,94 @@
+{%- doc -%}
+  PB filter and sort pills, one tap each, on collection, brand and search pages. Styles:
+  assets/pb-product-card.css; behaviour: assets/pb-sort-menu.js.
+
+  Desktop, inside Horizon's filters form (blocks/filters.liquid, second row):
+  - list_filter (availability): an "In stock" pill, a checkbox sent with the form, so it
+    applies in place.
+  - sort: the sort pills (Best selling, Newest, A–Z, Price low to high, Price high to low), links that
+    keep the filters; a second tap goes back to the default order (Featured on collections,
+    Most relevant on search).
+
+  Phones, in the products bar (sections/pb-products-bar.liquid), with links: pass
+  links: true and results; "In stock" is a link that turns the filter on or off.
+
+  @param {object} [list_filter] - The availability filter
+  @param {boolean} [sort] - Show the sort pills
+  @param {boolean} [links] - Link pills only (the phone row)
+  @param {object} [results] - The collection or search, for the sort options and filters
+{%- enddoc -%}
+
+{%- liquid
+  # Sort pills, in this order, each shown only if the page offers it.
+  assign sort_values = 'best-selling,created-descending,title-ascending,price-ascending,price-descending' | split: ','
+  assign sort_labels = 'Best selling,Newest,A–Z,Price: low to high,Price: high to low' | split: ','
+  assign sort_by = results.sort_by | default: results.default_sort_by
+  assign offered = results.sort_options | map: 'value'
+-%}
+
+{%- if links -%}
+  {%- liquid
+    for filter in results.filters
+      if filter.param_name == 'filter.v.availability'
+        assign list_filter = filter
+      endif
+    endfor
+  -%}
+{%- endif -%}
+
+{%- if list_filter != blank -%}
+  {%- for value in list_filter.values -%}
+    {%- if value.value != '1' -%}
+      {%- continue -%}
+    {%- endif -%}
+    <div class="pb-pill-group">
+      {%- if links -%}
+        <a
+          class="pb-pill"
+          href="?{{ value.param_name }}={{ value.value }}"
+          data-pb-param="{{ value.param_name }}"
+          data-pb-value="{{ value.value }}"
+          {% if value.active %}
+            aria-current="true"
+          {% endif %}
+        >
+          {{- value.label | escape -}}
+        </a>
+      {%- else -%}
+        <label class="pb-pill">
+          <input
+            type="checkbox"
+            name="{{ value.param_name }}"
+            value="{{ value.value }}"
+            {% if value.active %}
+              checked
+            {% endif %}
+          >
+          <span>{{ value.label | escape }}</span>
+        </label>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+{%- endif -%}
+
+{%- if sort -%}
+  <div class="pb-pill-group pb-pill-group--sort" role="group" aria-labelledby="PbSortPills-{{ links }}">
+    <span class="pb-pill-group__label" id="PbSortPills-{{ links }}">Sort</span>
+    {%- for value in sort_values -%}
+      {%- unless offered contains value -%}
+        {%- continue -%}
+      {%- endunless -%}
+      <a
+        class="pb-pill"
+        href="?sort_by={{ value }}"
+        data-pb-param="sort_by"
+        data-pb-value="{{ value }}"
+        {% if sort_by == value %}
+          aria-current="true"
+        {% endif %}
+      >
+        {{- sort_labels[forloop.index0] -}}
+      </a>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
