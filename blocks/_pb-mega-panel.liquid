@@ -17,7 +17,7 @@
   assign links_menu = block.settings.menu
   assign picked = block.settings.collections
   if block.settings.fallback == 'brands'
-    assign fallback_handles = 'permagard-car-care,cerface-ceramic,optivan-caravan-maintenance,honda-genuine-car-care' | split: ','
+    assign fallback_handles = 'protection-brands,permagard-car-care,cerface-ceramic,optivan-caravan-maintenance,honda-genuine-car-care' | split: ','
   else
     assign fallback_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
   endif
@@ -118,7 +118,8 @@
           {%- render 'pb-mega-card',
             image: single_product.featured_media.preview_image,
             heading: single_product.title,
-            eyebrow: card_price,
+            eyebrow: single_product.vendor,
+            price: card_price,
             url: single_product.url,
             packshot: true
           -%}
@@ -128,7 +129,8 @@
             {%- render 'pb-mega-card',
               image: card_product.featured_media.preview_image,
               heading: card_product.title,
-              eyebrow: card_price,
+              eyebrow: card_product.vendor,
+              price: card_price,
               url: card_product.url,
               packshot: true
             -%}

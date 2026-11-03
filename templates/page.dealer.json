@@ -1,0 +1,112 @@
+{
+  "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Locate Dealership",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60,
+        "category_source": "none",
+        "all_label": "All",
+        "layout": "full",
+        "marquee_source": "title"
+      }
+    },
+    "page_text": {
+      "type": "pb-page-story",
+      "blocks": {
+        "dealer_form": {
+          "type": "pb-dealer-form",
+          "settings": {
+            "brands": "Permagard, CERFACE, OptiVAN, Honda Genuine Car Care",
+            "vehicle_types": "Car, 4WD / SUV, Caravan / RV, Motorbike, Other",
+            "success_message": "Thanks, we'll be in touch with your nearest dealer shortly.",
+            "form_name": "Locate Dealership"
+          },
+          "blocks": {
+            "submit-button": {
+              "type": "contact-form-submit-button",
+              "static": true,
+              "settings": {
+                "label": "Find my dealer",
+                "style_class": "button",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": []
+        }
+      },
+      "block_order": [
+        "dealer_form"
+      ],
+      "settings": {
+        "layout": "contact",
+        "home_label": "Home",
+        "fallback_title": "Locate Dealership",
+        "heading": "Find your nearest dealer"
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_oridon": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
+            "alt": "Oridon"
+          }
+        }
+      },
+      "block_order": [
+        "logo_permagard",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_oridon"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 80,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#f5f5f5",
+        "text_color": "#111111",
+        "bottom_border": false
+      }
+    }
+  },
+  "order": [
+    "pb_title_bar",
+    "page_text",
+    "pb_brand_logos"
+  ]
+}

@@ -117,6 +117,44 @@
     });
   }
 
+  // Bento tiles (sections/pb-bento.liquid) and category tiles (sections/pb-category-tiles.liquid):
+  // magnetic photos. While the mouse is over a tile, the photo inside is pulled a few px towards
+  // it, trailing behind (quickTo eases over MAGNET_EASE seconds), and settles back when it
+  // leaves; the tile itself stays still. The bento photo is 16px bigger than its tile on each
+  // side, so its pull must stay under that; the category cut-out has room round it. `transform`
+  // on the photo only (GSAP keeps the cut-out's transform scale; the scroll parallax and hover
+  // shrink use `translate` and `scale`, so they add up). Mouse only; nothing with reduced motion
+  // or in the theme editor (above).
+  const MAGNET_EASE = 0.9;
+  const magnets = [
+    ['.pb-bento__tile', '.pb-bento__image', 12],
+    ['.pb-category-tiles__tile', '.pb-category-tiles__image', 14],
+  ];
+  if (finePointer) {
+    magnets.forEach(([tileSelector, photoSelector, MAGNET]) => document.querySelectorAll(tileSelector).forEach((tile) => {
+      const photo = tile.querySelector(photoSelector);
+      if (!photo) return;
+      const toX = gsap.quickTo(photo, 'x', { duration: MAGNET_EASE, ease: 'power3.out' });
+      const toY = gsap.quickTo(photo, 'y', { duration: MAGNET_EASE, ease: 'power3.out' });
+      let box = null;
+      tile.addEventListener('pointerenter', () => (box = tile.getBoundingClientRect()), { passive: true });
+      tile.addEventListener(
+        'pointermove',
+        (event) => {
+          box ??= tile.getBoundingClientRect();
+          toX(((event.clientX - box.left) / box.width - 0.5) * 2 * MAGNET);
+          toY(((event.clientY - box.top) / box.height - 0.5) * 2 * MAGNET);
+        },
+        { passive: true }
+      );
+      tile.addEventListener('pointerleave', () => {
+        box = null;
+        toX(0);
+        toY(0);
+      });
+    }));
+  }
+
   /* Reveals ---------------------------------------------------------------------- */
 
   const revealed = [];

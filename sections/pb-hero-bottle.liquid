@@ -28,12 +28,15 @@
   assign poster_alt = section.settings.poster.alt | default: 'Protection Brands Detailing Spray'
 
 
-  # Headings use the theme's heading font (Oswald).
+  # Headings use the theme's heading font (Manrope); the perks row along the bottom has its
+  # own (Barlow by default).
   assign heading_font = settings.type_heading_font
+  assign perks_font = section.settings.perks_font
 -%}
 
 <style>
   {{ heading_font | font_face: font_display: 'swap' }}
+  {{ perks_font | font_face: font_display: 'swap' }}
 </style>
 
 {%- comment -%}
@@ -65,7 +68,7 @@
   data-wobble="{{ section.settings.liquid_wobble }}"
   data-sparkle="{{ section.settings.liquid_sparkle }}"
   data-strength="{{ section.settings.mouse_strength | divided_by: 100.0 }}"
-  style="--pb-hero-bg: {{ section.settings.background }};{% if section.settings.background_texture %} --pb-hero-texture: url('{{ texture_url }}');{% endif %} --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }};"
+  style="--pb-hero-bg: {{ section.settings.background }};{% if section.settings.background_texture %} --pb-hero-texture: url('{{ texture_url }}');{% endif %} --pb-hero-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-hero-heading-weight: {{ heading_font.weight }}; --pb-hero-perks-font: {{ perks_font.family }}, {{ perks_font.fallback_families }}; --pb-hero-perks-weight: {{ perks_font.weight }};"
 >
   {%- if section.settings.poster != blank -%}
     {{
@@ -166,7 +169,7 @@
   {%- if section.blocks.size > 0 -%}
     <ul class="pb-hero-bottle__perks" role="list">
       {%- for block in section.blocks -%}
-        <li class="pb-hero-bottle__perk" {{ block.shopify_attributes }}>
+        <li class="pb-hero-bottle__perk{% if block.settings.hide_mobile %} pb-hero-bottle__perk--desktop{% endif %}" {{ block.shopify_attributes }}>
           {%- if block.settings.link != blank -%}
             <a class="pb-hero-bottle__perk-body" href="{{ block.settings.link }}">
           {%- else -%}
@@ -396,8 +399,7 @@
     font-size: clamp(2rem, 3.4vw, 3.75rem);
     font-weight: var(--pb-hero-heading-weight, 400);
     line-height: 1.05;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
 
   .pb-hero-bottle__line {
@@ -594,8 +596,10 @@
     align-self: center;
   }
 
+  /* Sized for the heading font (Manrope, wider than the Oswald it was set for at 0.045), so the
+     longest line fits its column. */
   .pb-hero-bottle--intro .pb-hero-bottle__heading {
-    font-size: max(2.5rem, calc(var(--pb-hero-zone) * 0.045));
+    font-size: max(2.25rem, calc(var(--pb-hero-zone) * 0.036));
     line-height: 1.03;
   }
 
@@ -648,9 +652,9 @@
     align-items: center;
     gap: max(14px, calc(var(--pb-hero-zone) * 0.0125));
     color: #fff;
-    font-family: var(--pb-hero-heading-font, inherit);
+    font-family: var(--pb-hero-perks-font, var(--pb-hero-heading-font, inherit));
     font-size: max(14px, calc(var(--pb-hero-zone) * 0.0098));
-    font-weight: var(--pb-hero-heading-weight, 400);
+    font-weight: var(--pb-hero-perks-weight, var(--pb-hero-heading-weight, 400));
     line-height: 1.4;
     text-decoration: none;
     text-transform: uppercase;
@@ -833,10 +837,16 @@
   }
 
   @media screen and (max-width: 749px) {
-    /* Phones: all four promises in one row, icon above two short lines of small text. */
+    /* Phones: the promises in one row (those set to hide on phones left out), icon above two
+       short lines of small text. */
+    .pb-hero-bottle__perk--desktop {
+      display: none;
+    }
+
     .pb-hero-bottle__perks {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
       gap: 8px;
       margin-inline: -8px;
     }
@@ -1176,6 +1186,17 @@
     },
     {
       "type": "header",
+      "content": "Perks"
+    },
+    {
+      "type": "font_picker",
+      "id": "perks_font",
+      "label": "Perks font",
+      "info": "The row of perks along the bottom (Dispatched within 48 hours…).",
+      "default": "barlow_n5"
+    },
+    {
+      "type": "header",
       "content": "Background"
     },
     {
@@ -1281,6 +1302,12 @@
           "id": "link",
           "label": "Link",
           "info": "Optional, e.g. the Contact page."
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_mobile",
+          "label": "Hide on phones",
+          "default": false
         }
       ]
     }

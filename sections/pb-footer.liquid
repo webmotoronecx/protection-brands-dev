@@ -178,7 +178,8 @@
   }
 
   /* The page above curves down into the footer: a strip of page background along the top
-     with rounded bottom corners, so the dark footer shows in the corners. */
+     with rounded bottom corners, so the dark footer shows in the corners. --pb-page-bg is set
+     where a page isn't the theme's white (the homepage's grey, layout/pb-landing.liquid). */
   .pb-footer::before {
     content: '';
     position: absolute;
@@ -186,7 +187,7 @@
     inset: 0 0 auto;
     height: var(--pb-footer-curve);
     border-radius: 0 0 var(--pb-footer-curve) var(--pb-footer-curve);
-    background: var(--color-background, #fff);
+    background: var(--pb-page-bg, var(--color-background, #fff));
   }
 
   .pb-footer__top {
@@ -202,10 +203,9 @@
     margin: 0 0 28px;
     font-family: var(--font-heading--family, inherit);
     font-size: clamp(1.75rem, 2.6vw, 2.5rem);
-    font-weight: 400;
+    font-weight: var(--font-heading--weight, 500);
     line-height: 1.1;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
 
   .pb-footer__field {
@@ -286,9 +286,8 @@
     margin: 0 0 22px;
     font-family: var(--font-heading--family, inherit);
     font-size: 19px;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    font-weight: var(--font-heading--weight, 500);
+    letter-spacing: -0.02em;
   }
 
   .pb-footer__links {

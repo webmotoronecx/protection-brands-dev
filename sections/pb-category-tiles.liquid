@@ -39,7 +39,7 @@
 
 <div
   class="pb-category-tiles pb-category-tiles--{{ section.settings.ratio }} pb-category-tiles--heading-{{ section.settings.heading_alignment }} pb-category-tiles--label-{{ section.settings.label_alignment }}{% if tile_count <= columns %} pb-category-tiles--fits{% endif %}"
-  style="--pb-tile-bg: url('{{ 'bg-cat.png' | asset_url }}'); --pb-tiles-columns: {{ section.settings.columns }}; --pb-tiles-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-tiles-weight: {{ heading_font.weight }};{% if section.settings.background != blank %} --pb-tiles-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-tiles-text: {{ section.settings.text_color }};{% endif %}"
+  style="--pb-tile-bg: url('{{ 'bg-cat.jpg' | asset_url }}'); --pb-tiles-columns: {{ section.settings.columns }}; --pb-tiles-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-tiles-weight: {{ heading_font.weight }};{% if section.settings.background != blank %} --pb-tiles-bg: {{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %} --pb-tiles-text: {{ section.settings.text_color }};{% endif %}"
 >
   {%- liquid
     assign show_link = false
@@ -54,9 +54,9 @@
       {%- endif -%}
       {%- if show_link -%}
         <a class="pb-category-tiles__link" href="{{ section.settings.link }}">
-          {{- section.settings.link_label -}}
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 17 17 7M8 7h9v9"/>
+          <span class="pb-category-tiles__link-label">{{- section.settings.link_label -}}</span>
+          <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
           </svg>
         </a>
       {%- endif -%}
@@ -318,11 +318,15 @@
     justify-content: space-between;
   }
 
+  /* No arrow until hover: then, as on the hero's Shop now (sections/pb-hero-bottle.liquid), the
+     label nudges left and a straight arrow slides in on its right. Transforms and opacity only. */
   .pb-category-tiles__link {
+    --pb-link-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
     display: inline-flex;
     flex: none;
     align-items: center;
-    gap: 4px;
     color: var(--pb-accent, #ca0d0d);
     font-size: 12px;
     font-weight: 600;
@@ -331,14 +335,36 @@
     text-transform: uppercase;
   }
 
+  .pb-category-tiles__link-label {
+    transition: transform 0.45s var(--pb-link-ease);
+  }
+
   .pb-category-tiles__link svg {
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s ease;
+    position: absolute;
+    inset-inline-end: 0;
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-link-ease);
+  }
+
+  .pb-category-tiles__link:is(:hover, :focus-visible) .pb-category-tiles__link-label {
+    transform: translateX(-19px);
   }
 
   .pb-category-tiles__link:is(:hover, :focus-visible) svg {
-    transform: translate(2px, -2px);
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-category-tiles__link-label,
+    .pb-category-tiles__link svg {
+      transition: none;
+    }
   }
 
   .pb-category-tiles__heading {
@@ -348,9 +374,8 @@
     font-size: clamp(1.75rem, 2.6vw, 2.5rem);
     font-weight: var(--pb-tiles-weight, 400);
     line-height: 1.05;
-    letter-spacing: 0;
+    letter-spacing: -0.02em;
     text-align: center;
-    text-transform: uppercase;
   }
 
   .pb-category-tiles__scroller {
@@ -478,7 +503,7 @@
     padding: clamp(14px, 1.6vw, 24px);
     overflow: hidden;
     border-radius: 8px;
-    /* Studio spotlight behind the product (assets/bg-cat.png), over the tile's dark colour. */
+    /* Studio spotlight behind the product (assets/bg-cat.jpg), over the tile's dark colour. */
     background: var(--pb-tile-bg, none) center / cover no-repeat, #111;
     color: #fff;
     text-decoration: none;
@@ -514,9 +539,10 @@
     background: linear-gradient(0deg, rgb(0 0 0 / 0.7) 0%, transparent 55%);
   }
 
+  /* Lifted by 6% of the tile, so the product sits higher, clear of the label. */
   .pb-category-tiles__image {
     position: absolute;
-    inset: 0;
+    inset: -6% 0 6%;
     z-index: -2;
     width: 100%;
     height: 100%;
@@ -540,12 +566,12 @@
     display: -webkit-box;
     overflow: hidden;
     font-family: var(--pb-tiles-font, inherit);
-    font-size: clamp(1rem, 1.5vw, 1.5rem);
+    font-size: clamp(0.9375rem, 1.2vw, 1.25rem);
     font-weight: var(--pb-tiles-weight, 400);
     line-height: 1.05;
-    text-transform: uppercase;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    letter-spacing: -0.02em;
   }
 
   .pb-category-tiles__arrow {

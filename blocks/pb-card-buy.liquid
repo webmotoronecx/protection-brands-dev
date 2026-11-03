@@ -28,8 +28,28 @@
   endif
 %}
 
+{%- liquid
+  # Product images that are photos, not cut-outs (custom.card_photo_media, media IDs set by
+  # docs/store-setup/card-photos.mjs). The card shows those slides full width, fading into the
+  # card (assets/pb-product-card.css); data-pb-card-photos lets the gallery bleed to the edges.
+  assign photo_ids = product.metafields.custom.card_photo_media.value
+-%}
+{%- if photo_ids.size > 0 -%}
+  <style>
+    {% for id in photo_ids %}[slide-id="{{ id | escape }}"]{% unless forloop.last %},{% endunless %}{% endfor %} {
+      --pb-photo-pad: 0;
+      --pb-photo-fit: cover;
+      --pb-photo-blend: normal;
+      --pb-photo-mask: var(--pb-card-photo-mask);
+      --pb-photo-scale: 1.04;
+    }
+  </style>
+{%- endif -%}
 <div
   class="pb-card-buy"
+  {% if photo_ids.size > 0 %}
+    data-pb-card-photos
+  {% endif %}
   {{ block.shopify_attributes }}
 >
   {%- if product == blank -%}

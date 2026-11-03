@@ -60,7 +60,7 @@
 </style>
 
 <div
-  class="pb-brand-header{% if hero_image != blank %} pb-brand-header--image{% endif %}"
+  class="pb-brand-header{% if hero_image != blank %} pb-brand-header--image{% unless show_title %} pb-brand-header--bare{% endunless %}{% endif %}"
   style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};"
 >
   {%- if hero_image != blank -%}
@@ -169,7 +169,7 @@
   /* Watermark: the brand name, wider than the banner so its edges stay hidden when it drifts
      with the mouse, behind everything, fading downwards. */
   .pb-brand-header__marquee {
-    --pb-marquee-height: clamp(4rem, 15vw, 18rem);
+    --pb-marquee-height: clamp(4.8rem, 18vw, 21.6rem);
 
     position: absolute;
     inset-inline: -80px;
@@ -204,6 +204,17 @@
     background:
       linear-gradient(90deg, rgb(0 0 0 / 0.55) 0%, transparent 40%, transparent 60%, rgb(0 0 0 / 0.55) 100%),
       linear-gradient(180deg, rgb(0 0 0 / 0.45) 0%, transparent 30%);
+  }
+
+  /* Photo with the title hidden (the photo carries its own words, e.g. OptiVAN's): shown as
+     it is, without the darkening above, and only a light shadow along the bottom edge. */
+  .pb-brand-header--bare .pb-brand-header__photo::after {
+    content: none;
+  }
+
+  .pb-brand-header--bare::before {
+    height: 60px;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.1) 50%, transparent);
   }
 
   /* Middle product: a cut-out standing on the bottom edge, between the title and the logo.
@@ -269,8 +280,7 @@
     line-height: 0.95;
     overflow-wrap: normal;
     word-break: normal;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
     /* Even lines when the name wraps: "Honda Genuine / Car Care", not "… Car / Care". */
     text-wrap: balance;
   }

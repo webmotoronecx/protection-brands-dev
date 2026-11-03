@@ -215,7 +215,7 @@
             | image_tag:
               alt: '',
               loading: 'lazy',
-              sizes: '(min-width: 990px) 22vw, 0px',
+              sizes: '(min-width: 990px) 30vw, 0px',
               widths: '400, 600, 900'
           -}}
         </div>
@@ -353,9 +353,9 @@
     border: 0;
     background: none;
     color: #fff;
-    font-family: var(--pb-desc-font, inherit);
+    font-family: var(--pb-button-font, var(--pb-desc-font, inherit));
     font-size: 20px;
-    font-weight: var(--pb-heading-medium-weight, var(--pb-desc-weight, 400));
+    font-weight: var(--pb-button-weight, var(--pb-heading-medium-weight, var(--pb-desc-weight, 400)));
     line-height: 22px;
     text-align: start;
     text-transform: uppercase;
@@ -440,9 +440,9 @@
   .pb-product-description__panel-title {
     margin: 0 0 12px;
     color: #fff;
-    font-family: var(--pb-desc-font, inherit);
+    font-family: var(--pb-button-font, var(--pb-desc-font, inherit));
     font-size: 20px;
-    font-weight: var(--pb-heading-medium-weight, var(--pb-desc-weight, 400));
+    font-weight: var(--pb-button-weight, var(--pb-heading-medium-weight, var(--pb-desc-weight, 400)));
     text-transform: uppercase;
   }
 
@@ -468,15 +468,18 @@
 
   .pb-product-description__image {
     justify-self: end;
-    width: min(316px, 100%);
+    width: min(418px, 100%);
     margin-block-start: -27px;
   }
 
-  /* The whole photo at its own shape, never cropped. */
+  /* The whole photo at its own shape, never cropped. A shadow cast down and to the right,
+     following the cut-out (as on the category tiles, sections/pb-category-tiles.liquid).
+     Static: drawn once, nothing animates it. */
   .pb-product-description__image img {
     display: block;
     width: 100%;
     height: auto;
+    filter: drop-shadow(24px 16px 22px rgb(0 0 0 / 0.95));
   }
 
   /* Long descriptions: the tabs and the photo stay in view below the compact header while the

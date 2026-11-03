@@ -1,0 +1,343 @@
+{%- comment -%}
+  Locate Dealership form (Protection Brands), on templates/page.dealer.json beside the page's
+  text. Built on Shopify's contact form, like Horizon's blocks/contact-form.liquid, so each
+  enquiry is emailed to the store's contact address. Besides name, email, phone and message it
+  asks for postcode, state, vehicle type and the brands the customer is interested in; those go
+  in the email under their own names ("Postcode", "Interested in CERFACE"…). Each brand is its
+  own field because Shopify keeps one value per name. A hidden "Form" field tells these emails
+  apart from the Contact page's.
+{%- endcomment -%}
+
+{% capture submit_button %}
+  {% content_for 'block', type: 'contact-form-submit-button', id: 'submit-button' %}
+{% endcapture %}
+
+{%- liquid
+  assign form_id = block.id | prepend: 'DealerForm-'
+  assign brands = block.settings.brands | split: ','
+  assign vehicle_types = block.settings.vehicle_types | split: ','
+  assign states = 'ACT,NSW,NT,QLD,SA,TAS,VIC,WA' | split: ','
+  assign heading_font = settings.type_heading_font
+-%}
+
+<div
+  class="pb-dealer-form"
+  style="--pb-dealer-form-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-dealer-form-weight: {{ heading_font.weight }};"
+  {{ block.shopify_attributes }}
+>
+  {%- form 'contact', id: form_id, class: 'pb-dealer-form__form' -%}
+    <input type="hidden" name="contact[id]" value="{{ form_id }}">
+    <input type="hidden" name="contact[Form]" value="{{ block.settings.form_name | escape }}">
+
+    {%- liquid
+      assign form_matches = false
+      if form.id == form_id or form.id == blank
+        assign form_matches = true
+      endif
+      assign email_error = false
+      if form.errors contains 'email' and form_matches
+        assign email_error = true
+      endif
+    -%}
+
+    {%- if form.errors and form_matches -%}
+      <div id="{{ form_id }}-error" class="pb-dealer-form__message pb-dealer-form__message--error" tabindex="-1" autofocus>
+        {{- 'icon-error.svg' | inline_asset_content -}}
+        <span>
+          {{- form.errors.translated_fields.email | capitalize }}
+          {{ form.errors.messages.email -}}
+        </span>
+      </div>
+    {%- endif -%}
+
+    {%- if form.posted_successfully? and form_matches -%}
+      <div class="pb-dealer-form__message pb-dealer-form__message--success" tabindex="-1" autofocus>
+        {{- 'icon-checkmark.svg' | inline_asset_content -}}
+        <span>{{ block.settings.success_message }}</span>
+      </div>
+    {%- endif -%}
+
+    <div class="pb-dealer-form__field">
+      <label class="pb-dealer-form__label" for="{{ form_id }}-name">Name <span aria-hidden="true">*</span></label>
+      <input
+        type="text"
+        id="{{ form_id }}-name"
+        class="contact-form__input"
+        name="contact[name]"
+        autocomplete="name"
+        required
+        aria-required="true"
+        value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+      >
+    </div>
+
+    <div class="pb-dealer-form__field">
+      <label class="pb-dealer-form__label" for="{{ form_id }}-email">Email <span aria-hidden="true">*</span></label>
+      <input
+        type="email"
+        id="{{ form_id }}-email"
+        class="contact-form__input"
+        name="contact[email]"
+        autocomplete="email"
+        spellcheck="false"
+        autocapitalize="off"
+        required
+        aria-required="true"
+        value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+        {% if email_error %}
+          aria-invalid="true"
+          aria-describedby="{{ form_id }}-error"
+        {% endif %}
+      >
+    </div>
+
+    <div class="pb-dealer-form__field">
+      <label class="pb-dealer-form__label" for="{{ form_id }}-phone">Phone <span aria-hidden="true">*</span></label>
+      <input
+        type="tel"
+        id="{{ form_id }}-phone"
+        class="contact-form__input"
+        name="contact[phone]"
+        autocomplete="tel"
+        required
+        aria-required="true"
+        value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+      >
+    </div>
+
+    <div class="pb-dealer-form__row">
+      <div class="pb-dealer-form__field">
+        <label class="pb-dealer-form__label" for="{{ form_id }}-postcode">Postcode</label>
+        <input
+          type="text"
+          id="{{ form_id }}-postcode"
+          class="contact-form__input"
+          name="contact[Postcode]"
+          autocomplete="postal-code"
+          inputmode="numeric"
+          pattern="[0-9]{4}"
+          maxlength="4"
+          title="A 4-digit postcode"
+          value="{{ form.postcode }}"
+        >
+      </div>
+
+      <div class="pb-dealer-form__field">
+        <label class="pb-dealer-form__label" for="{{ form_id }}-state">State</label>
+        <select id="{{ form_id }}-state" class="contact-form__input pb-dealer-form__select" name="contact[State]">
+          <option value="">Select</option>
+          {%- for state in states -%}
+            <option value="{{ state }}">{{ state }}</option>
+          {%- endfor -%}
+        </select>
+      </div>
+    </div>
+
+    {%- if vehicle_types.size > 0 -%}
+      <div class="pb-dealer-form__field">
+        <label class="pb-dealer-form__label" for="{{ form_id }}-vehicle">Vehicle type</label>
+        <select id="{{ form_id }}-vehicle" class="contact-form__input pb-dealer-form__select" name="contact[Vehicle type]">
+          <option value="">Select</option>
+          {%- for type in vehicle_types -%}
+            {%- assign type = type | strip -%}
+            {%- if type != blank -%}
+              <option value="{{ type | escape }}">{{ type | escape }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </div>
+    {%- endif -%}
+
+    {%- if brands.size > 0 -%}
+      <fieldset class="pb-dealer-form__brands">
+        <legend class="pb-dealer-form__label">Brands you're interested in</legend>
+        <div class="pb-dealer-form__checks">
+          {%- for brand in brands -%}
+            {%- assign brand = brand | strip -%}
+            {%- if brand != blank -%}
+              <label class="pb-dealer-form__check">
+                <input type="checkbox" name="contact[Interested in {{ brand | escape }}]" value="Yes">
+                <span>{{ brand | escape }}</span>
+              </label>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endif -%}
+
+    <div class="pb-dealer-form__field">
+      <label class="pb-dealer-form__label" for="{{ form_id }}-body">Message</label>
+      <textarea
+        rows="5"
+        id="{{ form_id }}-body"
+        class="contact-form__input pb-dealer-form__textarea"
+        name="contact[body]"
+      >
+        {{- form.body -}}
+      </textarea>
+    </div>
+
+    {{ submit_button }}
+  {%- endform -%}
+</div>
+
+{% stylesheet %}
+  .pb-dealer-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pb-dealer-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .pb-dealer-form__row {
+    display: grid;
+    gap: 20px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-dealer-form__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .pb-dealer-form__label {
+    padding: 0;
+    color: #000;
+    font-family: var(--pb-dealer-form-font, inherit);
+    font-size: 14px;
+    font-weight: var(--pb-dealer-form-weight, 400);
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .pb-dealer-form__label span {
+    color: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-dealer-form .contact-form__input:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+
+  /* Select: the input's look with a chevron in place of the browser's arrow. */
+  .pb-dealer-form__select {
+    appearance: none;
+    padding-inline-end: 44px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 12px 8px;
+    cursor: pointer;
+  }
+
+  .pb-dealer-form__textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .pb-dealer-form__brands {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .pb-dealer-form__brands legend {
+    margin-block-end: 12px;
+  }
+
+  .pb-dealer-form__checks {
+    display: grid;
+    gap: 12px 20px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-dealer-form__checks {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .pb-dealer-form__check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+
+  .pb-dealer-form__check input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--pb-accent, #ca0d0d);
+    cursor: pointer;
+  }
+
+  .pb-dealer-form__check input:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+
+  .pb-dealer-form__message {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Dealer enquiry form (PB)",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Enquiries are emailed to the store's contact address (Settings → Notifications → Sender email)."
+    },
+    {
+      "type": "text",
+      "id": "brands",
+      "label": "Brands",
+      "info": "Comma-separated. One tick box each.",
+      "default": "Permagard, CERFACE, OptiVAN, Honda Genuine Car Care"
+    },
+    {
+      "type": "text",
+      "id": "vehicle_types",
+      "label": "Vehicle types",
+      "info": "Comma-separated. Leave empty to hide the question.",
+      "default": "Car, 4WD / SUV, Caravan / RV, Motorbike, Other"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Thank-you message",
+      "default": "Thanks, we'll be in touch with your nearest dealer shortly."
+    },
+    {
+      "type": "text",
+      "id": "form_name",
+      "label": "Form name in emails",
+      "info": "Sent with each enquiry so these emails can be told apart.",
+      "default": "Locate Dealership"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Dealer enquiry form (PB)"
+    }
+  ]
+}
+{% endschema %}

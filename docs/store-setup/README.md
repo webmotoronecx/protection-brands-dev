@@ -144,6 +144,13 @@ The title bar above already shows the page title, so use a different line, e.g. 
 Empty: the template's heading (Contact: *Get in touch*), or no heading on text pages. Fill it
 in at the bottom of the page in admin (**Online Store → Pages**).
 
+**Locate Dealership** (`locate-dealership`, template *dealer*) holds the dealer enquiry form
+(blocks/pb-dealer-form.liquid). It's Shopify's contact form, so each enquiry is emailed to the
+store's contact address (**Settings → Notifications → Sender email**), with postcode, state,
+vehicle type, the ticked brands and *Form: Locate Dealership* so it can be told apart from
+Contact page emails. Brands and vehicle types are block settings in the theme editor. Link it
+from the footer menu as well as the main menu.
+
 Give each new collection an image and a one-line description; the home page cards show both.
 
 ## 4. Filters
@@ -176,6 +183,7 @@ The theme shows nested items as a mega menu on desktop and a drawer on mobile.
 - **Car Care Tips** → blog `car-care-tips`
 - **SDS** → page `sds` (see [sds.md](sds.md))
 - **About Us** → page `about-us`
+- **Locate Dealership** → page `locate-dealership`
 - **Contact** → page `contact-page`
 
 Every product is then two clicks from any page (menu → collection, then the product),

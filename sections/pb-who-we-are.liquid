@@ -1,0 +1,426 @@
+{%- comment -%}
+  Who we are (Protection Brands, homepage): a small label, one large centred statement and a
+  button, then a row of brand logos (blocks) with a small "Our brands" heading on the left, on
+  one light grey band. Used straight after the hero (templates/index.json).
+  Logos: a logo block with no image picked uses the default in assets/ (logo-<brand>.png),
+  matched by its Alt text: Permagard, CERFACE, OptiVAN, Oridon (as sections/pb-brand-logos.liquid).
+  On phones the heading sits above the logos, two to a row.
+  The button is the hero's Shop now button (sections/pb-hero-bottle.liquid): red sweeps in from
+  the left on hover and an arrow slides in. Transforms and opacity only.
+{%- endcomment -%}
+
+{%- liquid
+  assign default_brands = 'permagard,cerface,optivan,oridon' | split: ','
+  assign logo_height = section.settings.logo_height
+  assign label_font = section.settings.label_font
+-%}
+
+<style>
+  {{ label_font | font_face: font_display: 'swap' }}
+</style>
+
+{%- if section.settings.statement != blank or section.blocks.size > 0 or request.design_mode -%}
+<div
+  class="pb-who-we-are"
+  style="--pb-who-bg: {{ section.settings.background }}; --pb-who-text: {{ section.settings.text_color }}; --pb-who-logo-h: {{ logo_height }}px; --pb-who-label-font: {{ label_font.family }}, {{ label_font.fallback_families }}; --pb-who-label-weight: {{ label_font.weight }};"
+>
+  <div class="pb-who-we-are__inner" data-reveal>
+    {%- if section.settings.label != blank -%}
+      <p class="pb-who-we-are__label">{{ section.settings.label | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.statement != blank -%}
+      <h2 class="pb-who-we-are__statement">{{ section.settings.statement | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+      <div>
+        <a class="pb-who-we-are__button" href="{{ section.settings.button_link }}">
+          <span class="pb-who-we-are__button-label">{{ section.settings.button_label | escape }}</span>
+          <svg class="pb-who-we-are__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
+          </svg>
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="pb-who-we-are__brands">
+      {%- if section.settings.logos_heading != blank -%}
+        <h3 class="pb-who-we-are__brands-heading">{{ section.settings.logos_heading | escape }}</h3>
+      {%- endif -%}
+      <ul class="pb-who-we-are__logos" role="list" data-reveal>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign logo = block.settings.image
+            assign brand = block.settings.alt | handleize
+            assign default_logo = blank
+            if logo == blank and default_brands contains brand
+              assign default_logo = 'logo-' | append: brand | append: '.png'
+              case brand
+                when 'permagard'
+                  assign default_ratio = 228.0 | divided_by: 140
+                when 'cerface'
+                  assign default_ratio = 148.0 | divided_by: 140
+                when 'optivan'
+                  assign default_ratio = 374.0 | divided_by: 140
+                when 'oridon'
+                  assign default_ratio = 266.0 | divided_by: 140
+              endcase
+            endif
+            if logo == blank and default_logo == blank and request.design_mode == false
+              continue
+            endif
+            assign logo_alt = block.settings.alt | default: logo.alt
+            assign logo_width = logo.aspect_ratio | times: logo_height | round
+            if default_logo != blank
+              assign logo_width = default_ratio | times: logo_height | round
+            endif
+          -%}
+          <li {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a class="pb-who-we-are__logo" href="{{ block.settings.link }}">
+            {%- else -%}
+              <span class="pb-who-we-are__logo">
+            {%- endif -%}
+
+            {%- if logo != blank -%}
+              {{-
+                logo
+                | image_url: width: 600
+                | image_tag:
+                  alt: logo_alt,
+                  loading: 'lazy',
+                  widths: '200, 400, 600',
+                  sizes: '260px',
+                  width: logo_width,
+                  height: logo_height
+              -}}
+            {%- elsif default_logo != blank -%}
+              <img
+                src="{{ default_logo | asset_url }}"
+                alt="{{ logo_alt | escape }}"
+                width="{{ logo_width }}"
+                height="{{ logo_height }}"
+                loading="lazy"
+              >
+            {%- else -%}
+              <span class="pb-who-we-are__logo-empty">Pick a logo</span>
+            {%- endif -%}
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </span>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  .pb-who-we-are {
+    padding: clamp(64px, 9vw, 150px) calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px)) clamp(48px, 7vw, 120px);
+    background: var(--pb-who-bg, #f5f5f5);
+    color: var(--pb-who-text, #000);
+    text-align: center;
+  }
+
+  .pb-who-we-are__inner {
+    display: grid;
+    justify-items: center;
+    gap: clamp(20px, 2.4vw, 40px);
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+
+  /* "Who we are" and "Our brands": the same small spaced-out label, in the label font
+     (Barlow by default). */
+  .pb-who-we-are__label,
+  .pb-who-we-are__brands-heading {
+    margin: 0;
+    font-family: var(--pb-who-label-font, inherit);
+    font-size: clamp(15px, 1.1vw, 18px);
+    font-weight: var(--pb-who-label-weight, 500);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .pb-who-we-are__label {
+    color: #6b6b6b;
+  }
+
+  .pb-who-we-are__statement {
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: clamp(28px, 3.3vw, 54px);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    text-wrap: balance;
+  }
+
+  .pb-who-we-are__button {
+    --pb-button-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    margin-block-start: clamp(4px, 1vw, 16px);
+    padding: 20px 46px;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 15px;
+    font-weight: var(--pb-button-weight, 600);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform 0.2s var(--pb-button-ease);
+  }
+
+  .pb-who-we-are__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--pb-accent, #ca0d0d);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-who-we-are__button-label {
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-who-we-are__button-arrow {
+    position: absolute;
+    inset-inline-end: 16px;
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-who-we-are__button:is(:hover, :focus-visible)::before {
+    transform: scaleX(1);
+  }
+
+  .pb-who-we-are__button:is(:hover, :focus-visible) .pb-who-we-are__button-label {
+    transform: translateX(-8px);
+  }
+
+  .pb-who-we-are__button:is(:hover, :focus-visible) .pb-who-we-are__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pb-who-we-are__button:active {
+    transform: scale(0.96);
+  }
+
+  /* Brands: a small spaced-out heading, then the logos in their own colours in a centred row
+     (desktop); on phones the heading above, logos two to a row. */
+  .pb-who-we-are__brands {
+    display: grid;
+    justify-items: center;
+    gap: 28px;
+    max-width: 1340px;
+    margin: clamp(72px, 9vw, 150px) auto 0;
+  }
+
+  .pb-who-we-are__brands-heading {
+    color: inherit;
+    white-space: nowrap;
+  }
+
+  .pb-who-we-are__logos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 16px;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-who-we-are__logo {
+    display: block;
+    transition: opacity 0.2s ease;
+  }
+
+  .pb-who-we-are__logo img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: calc(var(--pb-who-logo-h, 80px) * 0.75);
+    object-fit: contain;
+  }
+
+  a.pb-who-we-are__logo:is(:hover, :focus-visible) {
+    opacity: 0.7;
+  }
+
+  .pb-who-we-are__logo-empty {
+    font-size: 13px;
+    opacity: 0.5;
+  }
+
+  @media screen and (min-width: 750px) {
+    /* Heading and logos as one centred group, the logos a set gap apart (not spread). */
+    .pb-who-we-are__brands {
+      grid-template-columns: auto auto;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(32px, 4vw, 72px);
+    }
+
+    .pb-who-we-are__logos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 24px 5vw;
+    }
+
+    .pb-who-we-are__logo img {
+      height: var(--pb-who-logo-h, 80px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-who-we-are__logo,
+    .pb-who-we-are__button,
+    .pb-who-we-are__button::before,
+    .pb-who-we-are__button-label,
+    .pb-who-we-are__button-arrow {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Who we are (PB)",
+  "tag": "section",
+  "class": "pb-who-we-are-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Who we are"
+    },
+    {
+      "type": "font_picker",
+      "id": "label_font",
+      "label": "Label font",
+      "info": "The small \"Who we are\" and \"Our brands\" labels.",
+      "default": "barlow_n5"
+    },
+    {
+      "type": "textarea",
+      "id": "statement",
+      "label": "Statement",
+      "default": "Protection Brands is Australia’s leading OEM and Dealer aftercare supplier offering best in class protection products for the automotive and caravanning industries."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "About us"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "Empty hides the button."
+    },
+    {
+      "type": "header",
+      "content": "Brand logos"
+    },
+    {
+      "type": "text",
+      "id": "logos_heading",
+      "label": "Heading",
+      "default": "Our brands"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 40,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo",
+          "info": "Empty uses the default for Permagard, CERFACE, OptiVAN or Oridon (by Alt text)."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "The brand name, e.g. Permagard."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Who we are (PB)",
+      "blocks": [
+        { "type": "logo", "settings": { "alt": "Permagard" } },
+        { "type": "logo", "settings": { "alt": "CERFACE" } },
+        { "type": "logo", "settings": { "alt": "OptiVAN" } },
+        { "type": "logo", "settings": { "alt": "Oridon" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

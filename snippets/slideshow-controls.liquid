@@ -113,9 +113,10 @@
                 on:click="/select/{{ forloop.index0 }}"
                 style="--aspect-ratio: {% if aspect_ratio == 'adapt' %}{{ media.preview_image.aspect_ratio | default: 1.0 }}{% else %}{{ aspect_ratio }}{% endif %};"
                 ref="thumbnails[]"
-                {%- comment -%} PB: non-square photos fill the thumbnail (assets/pb-product.css). {%- endcomment -%}
+                {%- comment -%} PB: photos fill the thumbnail (assets/pb-product.css): non-square ones, and those listed in Card photos (custom.card_photo_media). {%- endcomment -%}
                 {% assign pb_thumb_ratio = media.preview_image.aspect_ratio | default: 1 | round: 2 %}
-                {% if pb_thumb_ratio != 1 %}
+                {% assign pb_thumb_id = media.id | append: '' %}
+                {% if pb_thumb_ratio != 1 or product.metafields.custom.card_photo_media.value contains pb_thumb_id %}
                   data-pb-fill
                 {% endif %}
                 {% if forloop.first %}

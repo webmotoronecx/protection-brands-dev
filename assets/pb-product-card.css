@@ -1,6 +1,6 @@
 /*
   Protection Brands product cards.
-  Grey card, square contained image, two-line title, review stars, bold price with the
+  White card, square contained image, two-line title, review stars, bold price with the
   compare-at price struck through underneath, and a black quantity + Add To Cart bar
   pinned to the bottom (blocks/pb-card-buy.liquid). Every card in a row is the same height.
 
@@ -11,7 +11,7 @@
 */
 
 :root {
-  --pb-card-bg: #f4f4f4;
+  --pb-card-bg: #ffffff;
   --pb-accent: #ca0d0d;
   --pb-accent-hover: #a30a0a;
   --pb-on-accent: #ffffff;
@@ -25,6 +25,7 @@
   --pb-star-color: #c8291f;
   --pb-title-lines: 2;
   --pb-card-image-inset: 10%;
+  --pb-card-photo-mask: linear-gradient(to bottom, #000 72%, transparent);
 }
 
 .product-card .product-grid__card.product-grid__card {
@@ -41,16 +42,35 @@
 }
 
 /* Image: square, whole product visible, white photo backgrounds blend into the card.
-   The padding shrinks the product inside its square, leaving grey around it. */
+   The padding shrinks the product inside its square, leaving grey around it.
+   Photos (images with a background, listed in the product's custom.card_photo_media) fill
+   the square edge to edge and fade into the card at the bottom instead: the card's buy bar
+   (blocks/pb-card-buy.liquid) sets the --pb-photo-* values below on those slides. */
 .product-grid__card .product-media-container.media-fit img {
   box-sizing: border-box;
-  padding: var(--pb-card-image-inset);
-  object-fit: contain;
-  mix-blend-mode: multiply;
+  padding: var(--pb-photo-pad, var(--pb-cutout-pad, var(--pb-card-image-inset)));
+  object-fit: var(--pb-photo-fit, contain);
+  mix-blend-mode: var(--pb-photo-blend, multiply);
+  -webkit-mask-image: var(--pb-photo-mask, none);
+  mask-image: var(--pb-photo-mask, none);
 }
 
 .product-grid__card :is(slideshow-container, .product-media-container) {
   background: transparent;
+}
+
+/* A card with any photo: the gallery bleeds out by the card padding to the card's edges, so
+   a photo fills the top of the card. The square is then one padding taller at the bottom; the
+   negative bottom margin takes that back (the faded edge sits under the title's spacing), so
+   titles stay in line with other cards. Cut-outs in the same gallery get the padding added to
+   their inset, so they show at the same size and place as on other cards (for the 10% inset:
+   10% of the narrower square is 10% of this one less 0.2 padding). */
+.product-grid__card:has([data-pb-card-photos]) .card-gallery {
+  --pb-cutout-pad: calc(var(--pb-card-image-inset) + 0.8 * var(--pb-card-padding));
+
+  margin: calc(-1 * var(--pb-card-padding));
+  overflow: hidden;
+  border-radius: var(--pb-card-radius) var(--pb-card-radius) 0 0;
 }
 
 /* The buy bar replaces Horizon's quick-add button. */
@@ -191,10 +211,11 @@
   box-shadow: none;
   background: var(--pb-buy-bg);
   color: var(--pb-buy-text);
-  /* The heading font (Oswald) at its own weight, the same in every state. */
-  font-family: var(--font-heading--family);
+  /* The "Product card button font" theme setting (Barlow Medium; snippets/pb-head.liquid),
+     the same in every state; the heading font without it. */
+  font-family: var(--pb-card-button-font, var(--font-heading--family));
   font-size: 14px;
-  font-weight: var(--font-heading--weight, 400);
+  font-weight: var(--pb-card-button-weight, var(--font-heading--weight, 400));
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
@@ -253,8 +274,10 @@
     transition: scale 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
+  /* A photo fills its frame, so it zooms in a little instead (--pb-photo-scale; a shrink
+     would show its edges). */
   .product-card:is(:hover, :has(:focus-visible)) .card-gallery img {
-    scale: 0.96;
+    scale: var(--pb-photo-scale, 0.96);
   }
 
   .product-card:is(:hover, :has(:focus-visible)) .product-grid__card > :not(.card-gallery),

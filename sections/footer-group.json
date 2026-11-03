@@ -31,7 +31,7 @@
         "col_brands": {
           "type": "menu",
           "settings": {
-            "heading": "Our brands",
+            "heading": "Our Brands",
             "menu": "footer-brands"
           }
         }

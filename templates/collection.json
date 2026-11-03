@@ -307,7 +307,7 @@
         "logo_height": 80,
         "greyscale": false,
         "heading_position": "beside",
-        "background": "#ffffff",
+        "background": "#f5f5f5",
         "text_color": "#111111",
         "bottom_border": true
       },
@@ -315,36 +315,40 @@
     },
     "pb_category_tiles": {
       "type": "pb-category-tiles",
-      "disabled": true,
       "blocks": {
         "tile_1": {
           "type": "tile",
           "settings": {
-            "collection": "wash-shampoo"
+            "collection": "wash-shampoo",
+            "label": ""
           }
         },
         "tile_2": {
           "type": "tile",
           "settings": {
-            "collection": "cleaners-sprays"
+            "collection": "cleaners-sprays",
+            "label": ""
           }
         },
         "tile_3": {
           "type": "tile",
           "settings": {
-            "collection": "microfibre-drying"
+            "collection": "microfibre-drying",
+            "label": ""
           }
         },
         "tile_4": {
           "type": "tile",
           "settings": {
-            "collection": "kits-packs"
+            "collection": "kits-packs",
+            "label": ""
           }
         },
         "tile_5": {
           "type": "tile",
           "settings": {
-            "collection": "power-emergency"
+            "collection": "power-emergency",
+            "label": ""
           }
         }
       },
@@ -356,14 +360,13 @@
         "tile_5"
       ],
       "settings": {
-        "heading": "Shop by category",
-        "columns": "5",
+        "heading": "Shop by Category",
+        "columns": "4",
         "ratio": "tall",
         "heading_alignment": "left",
         "label_alignment": "center",
         "link_label": "All categories",
         "link": "/collections",
-        "background": "#f2f2f2",
         "text_color": "#111111"
       }
     },
@@ -372,32 +375,6 @@
       "settings": {
         "show_sort": true,
         "sort_label": "Sort"
-      }
-    },
-    "pb_promo_cards": {
-      "type": "pb-promo-cards",
-      "blocks": {
-        "card_1": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-hydrophobic-1_8ab4c600-eb61-42dc-8cad-2fa766bbb1e7.png",
-            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
-          }
-        },
-        "card_2": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-detailer-pack-1.png",
-            "link": "shopify://products/cerface-detailers-pack"
-          }
-        }
-      },
-      "block_order": [
-        "card_1",
-        "card_2"
-      ],
-      "settings": {
-        "background": "#ffffff"
       }
     },
     "pb_breadcrumb": {
@@ -414,11 +391,10 @@
   "order": [
     "pb_collection_header",
     "pb_brand_logos",
-    "pb_category_tiles",
     "pb_breadcrumb",
     "pb_products_bar",
     "section",
     "main",
-    "pb_promo_cards"
+    "pb_category_tiles"
   ]
 }

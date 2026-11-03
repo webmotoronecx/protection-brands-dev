@@ -83,13 +83,13 @@ main[data-template='product'] .product-information.section.section {
   color: #000;
 }
 
-/* Gallery (carousel with thumbnails on the left, templates/product.json): thumbnails 203px
-   wide and 17px apart, three to the photo's height (697px), the photo 639 × 697, all on the
-   light grey 6px tile. Set on the slideshow, inside <media-gallery>, whose inline style sets
+/* Gallery (carousel with thumbnails on the left, templates/product.json): a square photo, so
+   square uploads (e.g. 2080 × 2080) fill it exactly; square thumbnails 203px wide and 17px
+   apart, about three to the photo's height, all on the light grey 6px tile. Set on the slideshow, inside <media-gallery>, whose inline style sets
    the same variables from the block settings. */
 main[data-template='product'] .product-information media-gallery slideshow-component {
   --thumbnail-width: clamp(72px, 14.1vw, 203px);
-  --gallery-aspect-ratio: 639 / 697;
+  --gallery-aspect-ratio: 1;
   --media-radius: 6px;
 }
 
@@ -125,7 +125,7 @@ main[data-template='product'] .product-information slideshow-controls[pagination
 
 main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control {
   width: 100%;
-  aspect-ratio: 203 / 221;
+  aspect-ratio: 1;
   border-radius: 6px;
 }
 
@@ -174,6 +174,14 @@ main[data-template='product'] .product-information media-gallery .product-media[
   padding: 8%;
 }
 
+/* Photos (with a background, not cut-outs) fill their slide edge to edge, square or not:
+   the slide carries .pb-fill (snippets/product-media-gallery-content.liquid) when its photo is
+   non-square or listed in the product's Card photos (custom.card_photo_media). */
+main[data-template='product'] .product-information media-gallery .pb-fill .product-media:not(.dialog-zoomed-gallery *) img {
+  padding: 0;
+  object-fit: cover;
+}
+
 /* Info column, 408px at 1440px, 19px from the photo. Label, title and stars 31px apart (the
    heading block), then 92px to the price, 39px to the buttons, 92px to the features. */
 main[data-template='product'] .product-information .product-details > .group-block {
@@ -211,9 +219,10 @@ main[data-template='product'] .product-information .product-details product-pric
 
 main[data-template='product'] .product-information .product-details .price {
   color: #000;
-  font-family: var(--font-heading--family);
+  /* Barlow SemiBold (snippets/pb-head.liquid), else the heading font. */
+  font-family: var(--pb-price-font, var(--font-heading--family));
   font-size: clamp(2.75rem, 4.45vw, 4rem);
-  font-weight: var(--pb-heading-medium-weight, var(--font-heading--weight));
+  font-weight: var(--pb-price-weight, var(--pb-heading-medium-weight, var(--font-heading--weight)));
   line-height: 1;
   text-transform: uppercase;
 }
@@ -261,9 +270,9 @@ main[data-template='product'] .product-information .product-details .add-to-cart
   min-height: var(--height-buy-buttons);
   padding-inline: 24px;
   border-radius: 4px;
-  font-family: var(--font-heading--family);
+  font-family: var(--pb-button-font, var(--font-heading--family));
   font-size: 16px;
-  font-weight: var(--pb-heading-medium-weight, var(--font-heading--weight));
+  font-weight: var(--pb-button-weight, var(--font-heading--weight));
   letter-spacing: 0;
 }
 
@@ -283,6 +292,11 @@ main[data-template='product'] .product-information .product-details .pb-product-
 
   main[data-template='product'] .product-information .product-information__media {
     padding-inline: 0;
+  }
+
+  /* Room between the photo and the category label and title below it. */
+  main[data-template='product'] .product-information .product-details {
+    margin-block-start: 28px;
   }
 
   main[data-template='product'] .product-information .product-details .product-form-buttons > span:has(add-to-cart-component) {
@@ -774,4 +788,24 @@ main[data-template='product'] .pb-best-sellers__inner {
 main[data-template='product'] .pb-best-sellers__heading {
   font-size: clamp(1.625rem, 2.2vw, 2rem);
   font-weight: var(--pb-heading-medium-weight, var(--pb-best-weight, 400));
+}
+
+/* The big photo and the thumbnails on light grey inside the white card. White photo
+   backgrounds blend into it (multiply), as on the product cards (assets/pb-product-card.css);
+   transparent cut-outs sit straight on it. The zoom view keeps its own white. */
+main[data-template='product'] .product-information slideshow-slides .product-media-container,
+main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control.slideshow-control {
+  background: #f5f5f5;
+}
+
+main[data-template='product'] .product-information :is(slideshow-slides .product-media-container, .slideshow-controls__thumbnails .slideshow-control) img {
+  mix-blend-mode: multiply;
+}
+
+/* Trial: every photo fills the big preview and its thumbnail (cover), cut-outs included; the
+   rules above that keep cut-outs whole are overridden. The zoom view still shows photos whole. */
+main[data-template='product'] .product-information media-gallery .product-media-container .product-media:not(.dialog-zoomed-gallery *) img,
+main[data-template='product'] .product-information .slideshow-controls__thumbnails .slideshow-control img {
+  padding: 0;
+  object-fit: cover;
 }

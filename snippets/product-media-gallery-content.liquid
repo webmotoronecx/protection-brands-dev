@@ -387,6 +387,17 @@
         {% capture class %}
           {{ product_media_container_class }} product-media-container--{{ media.media_type }}{% if block_settings.zoom %} product-media-container--zoomable{% endif %}{% if forloop.index0 == lowest_aspect_ratio_index and block_settings.aspect_ratio == 'adapt' %} product-media-container--tallest{% endif %}
         {% endcapture %}
+        {%- comment -%}
+          PB: photos fill the slide (assets/pb-product.css): non-square ones, and those listed in
+          Card photos (custom.card_photo_media), as on the thumbnails (snippets/slideshow-controls.liquid).
+        {%- endcomment -%}
+        {%- liquid
+          assign pb_media_ratio = media.preview_image.aspect_ratio | default: 1 | round: 2
+          assign pb_media_id = media.id | append: ''
+          if pb_media_ratio != 1 or selected_product.metafields.custom.card_photo_media.value contains pb_media_id
+            assign class = class | append: ' pb-fill'
+          endif
+        -%}
         {% if block_settings.aspect_ratio == 'adapt' %}
           {% capture style %}
             --media-preview-ratio: {{ media.preview_image.aspect_ratio | default: 1.0 }};

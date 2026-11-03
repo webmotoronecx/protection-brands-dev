@@ -35,37 +35,10 @@
           "honda-genuine-car-care"
         ]
       }
-    },
-    "pb_promo_cards": {
-      "type": "pb-promo-cards",
-      "blocks": {
-        "card_1": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-hydrophobic-1_8ab4c600-eb61-42dc-8cad-2fa766bbb1e7.png",
-            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
-          }
-        },
-        "card_2": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-detailer-pack-1.png",
-            "link": "shopify://products/cerface-detailers-pack"
-          }
-        }
-      },
-      "block_order": [
-        "card_1",
-        "card_2"
-      ],
-      "settings": {
-        "background": "#ffffff"
-      }
     }
   },
   "order": [
     "pb_title_bar",
-    "sds_library",
-    "pb_promo_cards"
+    "sds_library"
   ]
 }

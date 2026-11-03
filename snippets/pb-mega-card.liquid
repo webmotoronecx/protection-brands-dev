@@ -2,11 +2,13 @@
   A card in the PB mega menu (blocks/_pb-mega-highlight.liquid, and the automatic product cards
   in blocks/_pb-mega-panel.liquid): a dark rounded card with a photo, a small red eyebrow at
   the top and a large heading in the heading font at the bottom. A product packshot sits whole
-  on the right instead of filling the card. Styles: sections/pb-landing-header.liquid.
+  on the right instead of filling the card; product cards show the brand as the red eyebrow
+  and the price in grey under the title. Styles: sections/pb-landing-header.liquid.
 
   @param {object} [image] - The photo
   @param {string} [heading] - The large text
   @param {string} [eyebrow] - The small red text at the top
+  @param {string} [price] - A product's price, under the heading
   @param {string} [url] - Where the card links
   @param {boolean} [packshot] - The photo is a product cut-out
   @param {string} [attributes] - Extra attributes on the card (the block's shopify_attributes)
@@ -34,8 +36,15 @@
     {%- if eyebrow != blank -%}
       <span class="pb-mega-card__eyebrow">{{ eyebrow | escape }}</span>
     {%- endif -%}
-    {%- if heading != blank -%}
-      <span class="pb-mega-card__heading">{{ heading | escape }}</span>
+    {%- if heading != blank or price != blank -%}
+      <span class="pb-mega-card__text">
+        {%- if heading != blank -%}
+          <span class="pb-mega-card__heading">{{ heading | escape }}</span>
+        {%- endif -%}
+        {%- if price != blank -%}
+          <span class="pb-mega-card__price">{{ price }}</span>
+        {%- endif -%}
+      </span>
     {%- endif -%}
   </a>
 {%- endif -%}

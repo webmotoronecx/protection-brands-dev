@@ -18,7 +18,7 @@
   # (templates/page.sds.json) and over the default page template's full-width title bar
   # (templates/page.json, e.g. the privacy policy) and over the search page's banner
   # (templates/search.json, laid out like the collection page), and over the same full-width
-  # title bar on the contact and about pages, 404, blog, articles and cart; light on every other page.
+  # title bar on the contact, locate dealership and about pages, 404, blog, articles and cart; light on every other page.
   assign light = false
   case section.settings.style
     when 'light'
@@ -42,6 +42,8 @@
       elsif template.name == 'search'
         assign light = false
       elsif template.name == 'page' and template.suffix == 'contact'
+        assign light = false
+      elsif template.name == 'page' and template.suffix == 'dealer'
         assign light = false
       elsif template.name == 'page' and template.suffix == 'about'
         assign light = false
@@ -79,7 +81,27 @@
         | image_tag: alt: shop.name, loading: 'eager', widths: '300, 450, 600', sizes: '225px'
       }}
     {%- else -%}
-      {%- render 'pb-logo' -%}
+      {%- comment -%}
+        The Protection Brands logo, white lettering for the dark header and black for the light
+        one (assets/logo-white.png, logo-black.png, 322 x 183). Both are in the page; the
+        header's state shows one (styles below).
+      {%- endcomment -%}
+      <img
+        class="pb-landing-header__logo-img pb-landing-header__logo-img--white"
+        src="{{ 'logo-white.png' | asset_url }}"
+        alt="{{ shop.name | escape }}"
+        width="322"
+        height="183"
+        fetchpriority="high"
+      >
+      <img
+        class="pb-landing-header__logo-img pb-landing-header__logo-img--black"
+        src="{{ 'logo-black.png' | asset_url }}"
+        alt=""
+        aria-hidden="true"
+        width="322"
+        height="183"
+      >
     {%- endif -%}
   </a>
 
@@ -120,7 +142,7 @@
         </li>
         <li><a class="pb-landing-header__link" href="{{ routes.collections_url }}">Brands</a></li>
         <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=best-selling">Best Sellers</a></li>
-        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=created-descending">New Arrivals</a></li>
+        <li><a class="pb-landing-header__link" href="{{ pages['locate-dealership'].url | default: '/pages/locate-dealership' }}">Locate Dealership</a></li>
       {%- endif -%}
     </ul>
   </nav>
@@ -193,7 +215,7 @@
     the bar's contents and reaches up to the top, so bar and panel read as one white surface.
   {%- endcomment -%}
   {%- if section.blocks.size > 0 -%}
-    <pb-mega class="pb-mega" style="--pb-mega-card-bg: url('{{ 'bg-cat.png' | asset_url }}');">
+    <pb-mega class="pb-mega" style="--pb-mega-card-bg: url('{{ 'bg-cat.jpg' | asset_url }}');">
       {%- content_for 'blocks' -%}
     </pb-mega>
   {%- endif -%}
@@ -237,24 +259,65 @@
           </ul>
         </nav>
       {%- endif -%}
-      {%- if menu.links.size > 0 -%}
-        <nav class="pb-menu__nav" aria-label="{{ menu.title | escape }}">
+      {%- liquid
+        # Brands, as in the desktop Brands mega panel: its menu if one is picked, otherwise the
+        # brand collections.
+        assign brands_menu = blank
+        assign brands_heading = 'Brands'
+        for block in section.blocks
+          if block.settings.fallback == 'brands'
+            assign brands_menu = block.settings.menu
+            assign brands_heading = block.settings.label | default: brands_heading
+          endif
+        endfor
+        # The header's theme blocks don't always expose their settings here, so the brands menu
+        # the desktop panel uses (footer-brands) is the next choice.
+        unless brands_menu.links.size > 0
+          assign brands_menu = linklists['footer-brands']
+        endunless
+        assign brand_handles = 'protection-brands,permagard-car-care,cerface-ceramic,optivan-caravan-maintenance,honda-genuine-car-care' | split: ','
+      -%}
+      {%- capture brand_links -%}
+        {%- if brands_menu.links.size > 0 -%}
+          {%- for link in brands_menu.links -%}
+            {%- render 'pb-menu-link', url: link.url, title: link.title -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for handle in brand_handles -%}
+            {%- assign collection = collections[handle] -%}
+            {%- if collection.id != blank -%}
+              {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endcapture -%}
+      {%- if brand_links != blank -%}
+        <nav class="pb-menu__nav" aria-labelledby="PBMenuBrands">
+          <h2 id="PBMenuBrands" class="pb-menu__heading">{{ brands_heading | escape }}</h2>
           <ul class="pb-menu__links">
-            {%- for link in menu.links -%}
-              <li>
-                <a
-                  href="{{ link.url }}"
-                  {% if link.current %}
-                    aria-current="page"
-                  {% endif %}
-                >
-                  {{- link.title -}}
-                </a>
-              </li>
-            {%- endfor -%}
+            {{- brand_links -}}
           </ul>
         </nav>
       {%- endif -%}
+
+      {%- comment -%}
+        The rest of the desktop header links: the Floating menu if one is picked, otherwise the
+        same defaults as the desktop row (Best Sellers, Locate Dealership).
+      {%- endcomment -%}
+      <nav class="pb-menu__nav" aria-label="{{ menu.title | default: 'More' | escape }}">
+        <ul class="pb-menu__links">
+          {%- if menu.links.size > 0 -%}
+            {%- for link in menu.links -%}
+              {%- render 'pb-menu-link', url: link.url, title: link.title -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- assign best_sellers_url = routes.all_products_collection_url | append: '?sort_by=best-selling' -%}
+            {%- assign dealer_url = pages['locate-dealership'].url | default: '/pages/locate-dealership' -%}
+            {%- render 'pb-menu-link', url: best_sellers_url, title: 'Best Sellers' -%}
+            {%- render 'pb-menu-link', url: dealer_url, title: 'Locate Dealership' -%}
+          {%- endif -%}
+        </ul>
+      </nav>
 
     </div>
 
@@ -565,10 +628,43 @@
     background: currentColor;
   }
 
+  /* The two default logo images stack in one cell; the one for the header's state shows. */
   .pb-landing-header__logo {
-    display: block;
-    color: inherit; /* the inline logo's wordmark uses the header's text colour */
+    display: grid;
+    color: inherit;
     line-height: 0;
+  }
+
+  .pb-landing-header__logo-img {
+    grid-area: 1 / 1;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Dark header: white lettering. Light header, past the hero, or the mega menu open over the
+     dark header (desktop, below): black lettering. */
+  .pb-landing-header__logo-img--black,
+  :is(.pb-landing-header--light, .pb-landing-header.is-past-hero) .pb-landing-header__logo-img--white {
+    opacity: 0;
+  }
+
+  :is(.pb-landing-header--light, .pb-landing-header.is-past-hero) .pb-landing-header__logo-img--black {
+    opacity: 1;
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-landing-header.is-mega-open .pb-landing-header__logo-img--white {
+      opacity: 0;
+    }
+
+    .pb-landing-header.is-mega-open .pb-landing-header__logo-img--black {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-landing-header__logo-img {
+      transition: none;
+    }
   }
 
   /* No box around the logo on focus. Keyboard users still get a cue: the logo dims while
@@ -582,7 +678,7 @@
     opacity: 0.6;
   }
 
-  /* Sized by height: the logo is stacked (swoosh round the lettering), 123 x 68. */
+  /* Sized by height: the logo is stacked (swoosh round the lettering), 322 x 183. */
   .pb-landing-header__logo :is(img, svg) {
     width: auto;
     height: clamp(48px, 4.4vw, 64px);
@@ -945,7 +1041,7 @@
     padding: clamp(20px, 2vw, 32px);
     overflow: hidden;
     border-radius: 10px;
-    /* Studio spotlight behind the product (assets/bg-cat.png, as on the homepage category
+    /* Studio spotlight behind the product (assets/bg-cat.jpg, as on the homepage category
        tiles), over the card's dark colour; a custom promo's photo covers it. Only downloaded
        once a card shows. */
     background: var(--pb-mega-card-bg, none) center / cover no-repeat, #111;
@@ -995,17 +1091,46 @@
     font-size: clamp(26px, 2.6vw, 42px);
     font-weight: var(--pb-heading-medium-weight, 500);
     line-height: 1.05;
-    text-transform: uppercase;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+    letter-spacing: -0.02em;
+  }
+
+  /* Heading and price together at the bottom (the eyebrow stays at the top). */
+  .pb-mega-card__text {
+    display: grid;
+    gap: 8px;
+    margin-block-start: auto;
+  }
+
+  .pb-mega-card__text .pb-mega-card__heading {
+    margin-block-start: 0;
+  }
+
+  /* Product cards: the brand as the eyebrow, the title (two lines), the price in grey. */
+  .pb-mega-card--packshot .pb-mega-card__eyebrow {
+    font-size: clamp(13px, 1vw, 15px);
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   .pb-mega-card--packshot .pb-mega-card__heading {
     max-width: 52%;
     font-size: clamp(18px, 1.6vw, 26px);
+    font-weight: var(--font-heading--weight, 500);
+    line-height: 1.15;
     overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+  }
+
+  .pb-mega-card__price {
+    color: #8a8a8a;
+    font-family: var(--pb-button-font, var(--font-heading--family));
+    font-size: clamp(15px, 1.2vw, 19px);
+    font-weight: var(--pb-button-weight, 500);
+    line-height: 1.1;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1295,20 +1420,19 @@
       "type": "image_picker",
       "id": "logo",
       "label": "Logo",
-      "info": "Empty uses the Protection Brands logo: white text on Dark, black text on Light. The default logo also turns black when the mega menu opens over the dark header; an uploaded one stays as it is."
+      "info": "Empty uses the Protection Brands logo (assets/logo-white.png on Dark, logo-black.png on Light). The default logo also turns black when the mega menu opens over the dark header; an uploaded one stays as it is."
     },
     {
       "type": "link_list",
       "id": "nav_menu",
       "label": "Header links",
-      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Brands, Best Sellers and New Arrivals."
+      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Brands, Best Sellers and Locate Dealership."
     },
     {
       "type": "link_list",
       "id": "menu",
       "label": "Floating menu",
-      "default": "main-menu",
-      "info": "Opened from the menu button. Top-level links only."
+      "info": "Extra links in the menu button's menu, after the categories and brands. Empty shows Best Sellers and Locate Dealership, as on the desktop header. Top-level links only."
     },
     {
       "type": "text",

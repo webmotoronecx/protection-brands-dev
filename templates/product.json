@@ -632,35 +632,9 @@
         "max_products": 8,
         "link_label": "View all",
         "link": "",
-        "background": "#ffffff",
+        "background": "#f5f5f5",
         "text_color": "#111111",
         "product_collection": true
-      }
-    },
-    "pb_promo_cards": {
-      "type": "pb-promo-cards",
-      "blocks": {
-        "card_1": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-hydrophobic-1_8ab4c600-eb61-42dc-8cad-2fa766bbb1e7.png",
-            "link": "shopify://products/hydrophobic-detailing-finishing-spray"
-          }
-        },
-        "card_2": {
-          "type": "card",
-          "settings": {
-            "image": "shopify://shop_images/promo-detailer-pack-1.png",
-            "link": "shopify://products/cerface-detailers-pack"
-          }
-        }
-      },
-      "block_order": [
-        "card_1",
-        "card_2"
-      ],
-      "settings": {
-        "background": "#ffffff"
       }
     }
   },
@@ -669,7 +643,6 @@
     "main",
     "pb_description",
     "pb_you_might_like",
-    "pb_promo_cards",
     "product_recommendations_qggXJq"
   ]
 }

@@ -122,6 +122,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
+    font-family: var(--pb-button-font, inherit);
     font-size: 17px;
   }
 
@@ -187,7 +188,7 @@
   :is(.pb-breadcrumb-bar--card, .pb-breadcrumb-bar--inline) .pb-breadcrumb-bar__crumbs ol {
     gap: 4px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--pb-button-weight, 700);
     line-height: normal;
     text-transform: uppercase;
   }
@@ -221,7 +222,7 @@
     }
 
     .pb-breadcrumb-bar__crumbs ol {
-      font-size: 15px;
+        font-size: 15px;
     }
 
     .pb-breadcrumb-bar--card {
@@ -235,7 +236,7 @@
     }
 
     .pb-breadcrumb-bar--inline .pb-breadcrumb-bar__crumbs ol {
-      font-size: 12px;
+        font-size: 12px;
     }
   }
 {% endstylesheet %}

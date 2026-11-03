@@ -14,9 +14,39 @@
   {{ 'pb-sticky-cart.css' | asset_url | stylesheet_tag }}
   {%- comment -%}
     The product page design sets its title, price, buttons and tabs in the heading font's
-    medium weight (Oswald 500). Loaded here only; PB styles read --pb-heading-medium-weight
+    medium weight (Manrope 500). Loaded here only; PB styles read --pb-heading-medium-weight
     and fall back to the regular weight if the font has no medium.
   {%- endcomment -%}
+  {%- comment -%}
+    The big price: the Button font (Barlow) in semibold, read by assets/pb-product.css; it
+    falls back to the heading font if the font has no semibold.
+  {%- endcomment -%}
+  {%- assign pb_price_font = settings.pb_card_button_font | font_modify: 'weight', '600' -%}
+  {%- if pb_price_font -%}
+    <style>
+      {{ pb_price_font | font_face: font_display: 'swap' }}
+      :root {
+        --pb-price-font: {{ pb_price_font.family }}, {{ pb_price_font.fallback_families }};
+        --pb-price-weight: {{ pb_price_font.weight }};
+      }
+    </style>
+  {%- endif -%}
+  {%- comment -%}
+    Square photos (the product's Card photos, custom.card_photo_media, as on the product
+    cards) fill the main photo edge to edge like other photos, instead of getting the
+    cut-outs' grey space (assets/pb-product.css). Not in the zoom dialog, which shows every
+    photo whole.
+  {%- endcomment -%}
+  {%- assign pb_photo_ids = product.metafields.custom.card_photo_media.value -%}
+  {%- if pb_photo_ids.size > 0 -%}
+    <style>
+      main[data-template='product'] .product-information media-gallery .product-media:is({% for id in pb_photo_ids %}[data-media-id='{{ id | escape }}']{% unless forloop.last %}, {% endunless %}{% endfor %}):not(.dialog-zoomed-gallery *) img {
+        padding: 0;
+        object-fit: cover;
+        mix-blend-mode: normal;
+      }
+    </style>
+  {%- endif -%}
   {%- assign pb_heading_medium = settings.type_heading_font | font_modify: 'weight', '500' -%}
   {%- if pb_heading_medium -%}
     <style>
@@ -26,6 +56,24 @@
       }
     </style>
   {%- endif -%}
+{%- endif -%}
+{%- comment -%}
+  Button font (theme setting "Button font", Barlow Medium by default): every button on the
+  site, loaded on every page. --pb-button-font is read by Horizon's buttons (below), the hero
+  and Who we are buttons, the product page and sticky Add To Cart (assets/pb-product.css,
+  pb-sticky-cart.css); --pb-card-button-font by the product card buy bar (pb-product-card.css).
+{%- endcomment -%}
+{%- assign pb_card_button_font = settings.pb_card_button_font -%}
+{%- if pb_card_button_font -%}
+  <style>
+    {{ pb_card_button_font | font_face: font_display: 'swap' }}
+    :root {
+      --pb-button-font: {{ pb_card_button_font.family }}, {{ pb_card_button_font.fallback_families }};
+      --pb-button-weight: {{ pb_card_button_font.weight }};
+      --pb-card-button-font: var(--pb-button-font);
+      --pb-card-button-weight: var(--pb-button-weight);
+    }
+  </style>
 {%- endif -%}
 {%- if settings.pb_reveal -%}
   {{ 'pb-intro.css' | asset_url | stylesheet_tag }}
@@ -37,14 +85,14 @@
   page's own scrollbar: drawers and other inner scroll areas keep the stock one.
 {%- endcomment -%}
 <style>
-  /* Button text in the heading font (Oswald). Horizon's buttons read these variables (set in
+  /* Button text in the heading font (Manrope). Horizon's buttons read these variables (set in
      theme-styles-variables, rendered before this); its Button font setting only offers the
      body or accent font. The hero button sets its own type, so it's listed here too (the
      card buy bar sets it in pb-product-card.css). Only the heading font's own weight is
      loaded, so they use it rather than a synthesised bold. */
   :root {
-    --button-font-family-primary: var(--font-heading--family);
-    --button-font-family-secondary: var(--font-heading--family);
+    --button-font-family-primary: var(--pb-button-font, var(--font-heading--family));
+    --button-font-family-secondary: var(--pb-button-font, var(--font-heading--family));
   }
 
   /* Very wide screens (2560px monitors and up): page content stays at most 1920px wide
@@ -56,9 +104,29 @@
     --pb-wide-inset: max(0px, (100vw - var(--pb-content-max)) / 2);
   }
 
+  /* Inner pages: light grey behind the content, as on the homepage (layout/pb-landing.liquid
+     sets its own), so the white product cards stand out. Only the page's main content: the
+     header, footer, drawers and inputs keep the palette's white. Banner curves and sections
+     that use the page colour follow it. The product page keeps its dark backdrop behind the
+     card and description band (assets/pb-product.css); its sections below set their own. */
+  body:not(.pb-landing) .content-for-layout {
+    --color-background: #f5f5f5;
+    --color-background-rgb: 245 245 245;
+  }
+
+  body:not(.pb-landing) .content-for-layout:not([data-template^='product']) {
+    background: var(--color-background);
+  }
+
+  /* The footer's curved top edge is a strip of the page colour (sections/pb-footer.liquid);
+     outside the content, so it's told the grey here. */
+  body:not(.pb-landing) {
+    --pb-page-bg: #f5f5f5;
+  }
+
   .pb-hero-bottle .pb-hero-bottle__button {
-    font-family: var(--font-heading--family);
-    font-weight: var(--font-heading--weight);
+    font-family: var(--pb-button-font, var(--font-heading--family));
+    font-weight: var(--pb-button-weight, var(--font-heading--weight));
   }
 
   html,

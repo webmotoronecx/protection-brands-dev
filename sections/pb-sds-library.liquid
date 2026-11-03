@@ -158,8 +158,9 @@
     margin: 0;
     padding: 0;
     list-style: none;
+    font-family: var(--pb-button-font, inherit);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--pb-button-weight, 700);
     line-height: normal;
     text-transform: uppercase;
   }
@@ -211,24 +212,27 @@
     border-bottom: 1px solid #d9d9d9;
   }
 
-  .pb-sds-library__input {
+  /* Doubled class: Horizon's input styles give text fields the palette's white background
+     with a stronger selector. Small, in the label font (Barlow), like the breadcrumb. */
+  .pb-sds-library__input.pb-sds-library__input {
     width: 100%;
-    padding: 0 36px 14px 0;
+    padding: 0 32px 12px 0;
     border: 0;
     border-radius: 0;
-    background: none;
+    background: transparent;
     color: #000;
-    font-family: var(--pb-sds-font);
-    font-size: clamp(24px, 2.2vw, 32px);
-    font-weight: var(--pb-sds-weight, 400);
-    line-height: 1.1;
+    font-family: var(--pb-button-font, var(--pb-sds-font));
+    font-size: 16px;
+    font-weight: var(--pb-button-weight, 500);
+    line-height: 1.2;
     -webkit-appearance: none;
     appearance: none;
   }
 
   .pb-sds-library__input::placeholder {
-    color: #a6a6a6;
+    color: #8a8a8a;
     opacity: 1;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
@@ -247,24 +251,24 @@
   .pb-sds-library__search-icon {
     position: absolute;
     color: #a6a6a6;
-    inset: 0 0 14px auto;
+    inset: 0 0 12px auto;
     display: flex;
     align-items: center;
     pointer-events: none;
   }
 
   .pb-sds-library__search-icon svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .pb-sds-library__heading {
-    margin: clamp(40px, 5vw, 72px) 0 18px;
+    margin: clamp(36px, 4vw, 56px) 0 12px;
     font-family: var(--pb-sds-font);
-    font-size: clamp(24px, 2.2vw, 32px);
+    font-size: clamp(20px, 1.6vw, 24px);
     font-weight: var(--pb-sds-weight, 400);
     line-height: 1.1;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
 
   .pb-sds-library__brands {
@@ -285,7 +289,7 @@
     background: none;
     color: #000;
     font: inherit;
-    font-size: 19px;
+    font-size: 16px;
     text-align: start;
     cursor: pointer;
   }

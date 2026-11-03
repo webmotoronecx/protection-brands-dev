@@ -15,9 +15,9 @@
       "type": "pb-landing-header",
       "settings": {
         "style": "auto",
-        "menu": "main-menu",
-        "categories_heading": "Categories",
-        "newsletter": true,
+        "menu": "",
+        "categories_heading": "Shop By Category",
+        "newsletter": false,
         "newsletter_heading": "Subscribe to our newsletter",
         "newsletter_text": "New products, offers and car care tips."
       },

@@ -2149,6 +2149,13 @@
         "label": "Category tags",
         "info": "Product tags that name a top-level category, separated by commas. The product page shows the first one a product has above its title and in the breadcrumb (linking to all products with that tag).",
         "default": "Car Care, Professional"
+      },
+      {
+        "type": "font_picker",
+        "id": "pb_card_button_font",
+        "label": "Button font",
+        "info": "Every button: product cards, the product page and sticky Add To Cart, the hero and other section buttons.",
+        "default": "barlow_n5"
       }
     ]
   }

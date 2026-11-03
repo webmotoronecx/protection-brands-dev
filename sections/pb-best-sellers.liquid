@@ -54,9 +54,9 @@
       {%- endif -%}
       {%- if section.settings.link_label != blank and link != blank -%}
         <a class="pb-best-sellers__link" href="{{ link }}">
-          {{- section.settings.link_label -}}
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 17 17 7M8 7h9v9"/>
+          <span class="pb-best-sellers__link-label">{{- section.settings.link_label -}}</span>
+          <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8h11M9 4l4 4-4 4"/>
           </svg>
         </a>
       {%- endif -%}
@@ -179,15 +179,18 @@
     font-size: clamp(1.75rem, 2.6vw, 2.5rem);
     font-weight: var(--pb-best-weight, 400);
     line-height: 1.05;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
 
+  /* No arrow until hover: then, as on the hero's Shop now (sections/pb-hero-bottle.liquid), the
+     label nudges left and a straight arrow slides in on its right. Transforms and opacity only. */
   .pb-best-sellers__link {
+    --pb-link-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
     display: inline-flex;
     flex: none;
     align-items: center;
-    gap: 4px;
     color: var(--pb-accent, #ca0d0d);
     font-size: 12px;
     font-weight: 600;
@@ -196,14 +199,36 @@
     text-transform: uppercase;
   }
 
+  .pb-best-sellers__link-label {
+    transition: transform 0.45s var(--pb-link-ease);
+  }
+
   .pb-best-sellers__link svg {
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s ease;
+    position: absolute;
+    inset-inline-end: 0;
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-link-ease);
+  }
+
+  .pb-best-sellers__link:is(:hover, :focus-visible) .pb-best-sellers__link-label {
+    transform: translateX(-19px);
   }
 
   .pb-best-sellers__link:is(:hover, :focus-visible) svg {
-    transform: translate(2px, -2px);
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-best-sellers__link-label,
+    .pb-best-sellers__link svg {
+      transition: none;
+    }
   }
 
   /* contain: the cards' widths come from this box, so they can't widen the page. */

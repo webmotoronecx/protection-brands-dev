@@ -78,8 +78,12 @@
     gap: 6px;
     padding-block: 6px;
     color: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    /* Barlow, a little smaller than the homepage's small labels ("Who we are",
+       sections/pb-who-we-are.liquid). Only Barlow's medium weight is loaded on every page, so
+       "Sort:" and the choice share it. */
+    font-family: var(--pb-button-font, inherit);
+    font-size: clamp(13px, 0.95vw, 15px);
+    font-weight: var(--pb-button-weight, 500);
     text-transform: uppercase;
     white-space: nowrap;
     list-style: none;
@@ -91,7 +95,7 @@
   }
 
   .pb-sort-menu__current {
-    font-weight: 500;
+    color: #6b6b6b;
   }
 
   .pb-sort-menu__toggle svg {

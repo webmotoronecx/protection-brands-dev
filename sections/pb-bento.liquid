@@ -1,0 +1,345 @@
+{%- comment -%}
+  Bento tiles (Protection Brands, homepage): up to four photo tiles, each a link, laid out by
+  their order:
+    1. tall, on the left across both rows;
+    2 and 3. side by side, top right;
+    4. wide, bottom right.
+  Each tile has a photo (covering the tile), a heading, optional text, an optional brand logo
+  (a light version, for the dark photo) bottom left, and an arrow bottom right. The heading
+  sits top left, top centre or bottom left (setting). A dark gradient behind the words keeps
+  them readable. A tile with no photo shows dark grey until one is picked.
+  On phones: the tall tile, then 2 and 3 side by side, then the wide tile.
+  Hover: the photo inside the tile is pulled a little towards the mouse, smoothly
+  (assets/pb-motion.js); the tile itself stays still, and the arrow nudges right. Transforms only.
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+<div class="pb-bento" style="--pb-bento-bg: {{ section.settings.background }};">
+  <ul class="pb-bento__grid" role="list" data-reveal>
+    {%- for block in section.blocks limit: 4 -%}
+      {%- liquid
+        assign tile = block.settings
+        case forloop.index
+          when 1
+            assign shape = 'tall'
+            assign sizes = '(min-width: 750px) 40vw, 100vw'
+          when 4
+            assign shape = 'wide'
+            assign sizes = '(min-width: 750px) 60vw, 100vw'
+          else
+            assign shape = 'small'
+            assign sizes = '(min-width: 750px) 30vw, 50vw'
+        endcase
+      -%}
+      <li class="pb-bento__item pb-bento__item--{{ shape }}" {{ block.shopify_attributes }}>
+        <a
+          class="pb-bento__tile pb-bento__tile--{{ tile.text_position }}"
+          {% if tile.link != blank %}
+            href="{{ tile.link }}"
+          {% else %}
+            role="link"
+            aria-disabled="true"
+          {% endif %}
+        >
+          {%- if tile.image != blank -%}
+            {{-
+              tile.image
+              | image_url: width: 2000
+              | image_tag:
+                class: 'pb-bento__image',
+                alt: '',
+                loading: 'lazy',
+                sizes: sizes,
+                widths: '400, 600, 800, 1000, 1400, 2000'
+            -}}
+          {%- endif -%}
+
+          <span class="pb-bento__words">
+            {%- if tile.heading != blank -%}
+              <span class="pb-bento__heading">{{ tile.heading | escape }}</span>
+            {%- endif -%}
+            {%- if tile.text != blank -%}
+              <span class="pb-bento__text">{{ tile.text | escape }}</span>
+            {%- endif -%}
+          </span>
+
+          {%- if tile.logo != blank -%}
+            {{-
+              tile.logo
+              | image_url: width: 400
+              | image_tag:
+                class: 'pb-bento__logo',
+                alt: tile.logo.alt,
+                loading: 'lazy',
+                widths: '200, 300, 400',
+                sizes: '160px'
+            -}}
+          {%- endif -%}
+
+          <svg class="pb-bento__arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h17M14 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  .pb-bento {
+    /* Side padding as Best sellers (sections/pb-best-sellers.liquid), so the edges line up. */
+    padding: clamp(24px, 4vw, 64px) calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px));
+    background: var(--pb-bento-bg, #f5f5f5);
+  }
+
+  .pb-bento__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* The same gaps as the Best sellers cards (sections/pb-best-sellers.liquid). */
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-bento__item {
+    display: flex;
+  }
+
+  .pb-bento__item--tall,
+  .pb-bento__item--wide {
+    grid-column: 1 / -1;
+  }
+
+  .pb-bento__item--tall {
+    aspect-ratio: 4 / 5;
+  }
+
+  .pb-bento__item--small {
+    aspect-ratio: 1;
+  }
+
+  .pb-bento__item--wide {
+    aspect-ratio: 16 / 11;
+  }
+
+  /* Desktop: the tall tile on the left over both rows, two small tiles top right and the wide
+     tile under them (the 1440px design: 631 / 435 / 435 wide, rows 418 tall). */
+  @media screen and (min-width: 750px) {
+    .pb-bento__grid {
+      grid-template-columns: minmax(0, 1.45fr) repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      aspect-ratio: 1535 / 857;
+    }
+
+    .pb-bento__item {
+      aspect-ratio: auto;
+    }
+
+    .pb-bento__item--tall {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+
+    .pb-bento__item--wide {
+      grid-column: 2 / span 2;
+    }
+  }
+
+  .pb-bento__tile {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    padding: clamp(20px, 2.4vw, 40px);
+    border-radius: 8px;
+    background: #1c1c1c;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  /* A little bigger than the tile on every side (clipped by it), so the photo can follow the
+     mouse (assets/pb-motion.js, up to 12px) without showing its edges. */
+  .pb-bento__image {
+    position: absolute;
+    inset: -16px;
+    z-index: -2;
+    width: calc(100% + 32px);
+    height: calc(100% + 32px);
+    max-width: none;
+    object-fit: cover;
+  }
+
+  /* Darkened behind the words: from the top or the bottom, by where they sit. */
+  .pb-bento__tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.5), transparent 40%, rgb(0 0 0 / 0.15) 55%, rgb(0 0 0 / 0.9));
+  }
+
+  .pb-bento__tile--bottom-left::before {
+    background: linear-gradient(to top, rgb(0 0 0 / 0.65), transparent 55%);
+  }
+
+  .pb-bento__words {
+    display: grid;
+    gap: 16px;
+    max-width: 22ch;
+  }
+
+  .pb-bento__tile--top-center .pb-bento__words {
+    align-self: center;
+    max-width: none;
+    text-align: center;
+  }
+
+  .pb-bento__tile--bottom-left .pb-bento__words {
+    margin-block-start: auto;
+    max-width: 30rem;
+    padding-inline-end: 56px;
+  }
+
+  .pb-bento__heading {
+    font-family: var(--font-body--family);
+    font-size: clamp(22px, 2.4vw, 40px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .pb-bento__item--tall .pb-bento__heading {
+    font-size: clamp(30px, 3.4vw, 54px);
+  }
+
+  .pb-bento__text {
+    max-width: 24rem;
+    color: rgb(255 255 255 / 0.8);
+    font-size: clamp(14px, 1.2vw, 18px);
+    line-height: 1.4;
+  }
+
+  .pb-bento__logo {
+    position: absolute;
+    inset-block-end: clamp(18px, 2vw, 32px);
+    inset-inline-start: clamp(20px, 2.4vw, 40px);
+    width: auto;
+    max-width: 45%;
+    height: clamp(44px, 5vw, 76px);
+    object-fit: contain;
+    object-position: left bottom;
+  }
+
+  .pb-bento__arrow {
+    position: absolute;
+    inset-block-end: clamp(20px, 2.4vw, 40px);
+    inset-inline-end: clamp(20px, 2.4vw, 40px);
+    width: clamp(24px, 2.2vw, 34px);
+    height: auto;
+    transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Bottom-left words: the arrow sits level with the last line. */
+  .pb-bento__tile--bottom-left .pb-bento__arrow {
+    inset-block-end: clamp(26px, 3vw, 48px);
+  }
+
+  .pb-bento__tile:is(:hover, :focus-visible) .pb-bento__arrow {
+    translate: 6px 0;
+  }
+
+  .pb-bento__tile:focus-visible {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-bento__arrow {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bento tiles (PB)",
+  "tag": "section",
+  "class": "pb-bento-section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Up to four tiles, placed by their order: 1 tall on the left, 2 and 3 small top right, 4 wide bottom right."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#f5f5f5"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo",
+          "info": "Covers the tile; the edges crop to fit. Tile 1 is tall, 2 and 3 about square, 4 wide."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "text_position",
+          "label": "Words",
+          "options": [
+            { "value": "top-left", "label": "Top left" },
+            { "value": "top-center", "label": "Top centre" },
+            { "value": "bottom-left", "label": "Bottom left" }
+          ],
+          "default": "top-left"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Brand logo",
+          "info": "Bottom left. Use a light version, for the dark photo."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bento tiles (PB)",
+      "blocks": [
+        { "type": "tile", "settings": { "heading": "Showroom shine at home", "text_position": "bottom-left" } },
+        { "type": "tile", "settings": { "heading": "Keep your protection working." } },
+        { "type": "tile", "settings": { "heading": "Water just walks off." } },
+        { "type": "tile", "settings": { "heading": "Built for life on the road.", "text_position": "top-center" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
