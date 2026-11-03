@@ -5,6 +5,13 @@
   theme setting is on, and never in the theme editor.
 {%- enddoc -%}
 
+{%- comment -%}
+  Home-screen icon (iPhone, Android) from the theme's Favicon setting; the layouts add the
+  32px browser-tab icon.
+{%- endcomment -%}
+{%- if settings.favicon != blank -%}
+  <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+{%- endif -%}
 {{ 'pb-product-card.css' | asset_url | stylesheet_tag }}
 {{ 'pb-search.css' | asset_url | stylesheet_tag }}
 {{ 'pb-cart.css' | asset_url | stylesheet_tag }}
