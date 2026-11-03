@@ -575,6 +575,11 @@
     display: none;
   }
 }
+/* No Filter button when the drawer would only hold price and availability (blocks/filters.liquid);
+   it comes back once Search & Discovery has other filters (Category, Brand, Suitable for). */
+.facets-toggle.pb-facets-toggle--hidden {
+  display: none;
+}
 .facets__form .products-count-wrapper.products-count-wrapper {
   display: none !important;
 }

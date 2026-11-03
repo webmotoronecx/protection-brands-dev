@@ -208,6 +208,7 @@
               {%- endcomment -%}
               {%- liquid
                 assign pb_pills = false
+                assign pb_other_filters = false
                 if block_settings.filter_style == 'horizontal' and block_settings.enable_sorting == false
                   assign pb_pills = true
                 endif
@@ -252,6 +253,7 @@
                         if pb_pills and filter.param_name == 'filter.v.availability'
                           continue
                         endif
+                        assign pb_other_filters = true
                         render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
                       %}
                   {% endcase %}
@@ -359,6 +361,8 @@
     class="
       facets-toggle
       {%- if block_settings.enable_filtering == false %} facets-toggle--no-filters{% endif %}
+      {%- comment -%} PB: no phone Filter row when the drawer would only hold price and availability, which the PB row leaves out. {%- endcomment -%}
+      {%- if pb_pills and pb_other_filters == false and block_settings.enable_grid_density == false %} pb-facets-toggle--hidden{% endif %}
       {%- if has_custom_color %} color-custom-{{ block.id }}{% endif %}
     "
     style="
