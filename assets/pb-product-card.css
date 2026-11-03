@@ -78,15 +78,19 @@
   display: none;
 }
 
-/* Text: title always takes exactly two lines.
-   (The title's wrappers use display: contents, so this goes on the heading.) */
+/* Text: the title up to two lines, the price straight under it. The spare room of a one-line
+   title goes above it, so prices still line up along the bottom of a row: the title's block
+   (a flex item of the card; the link around it is display: contents) takes the auto margin. */
 .product-grid__card [role='heading'] {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: var(--pb-title-lines);
   overflow: hidden;
-  min-height: calc(var(--pb-title-lines) * 1lh);
   margin: 0;
+}
+
+.product-grid__card .text-block:has(> [role='heading']) {
+  margin-block-start: auto;
 }
 
 /* Reviews: red stars, "2 Reviews" in the text colour, tucked under the title. Only shows
@@ -133,7 +137,6 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  margin-block-start: auto;
   padding-block-start: 8px;
 }
 
