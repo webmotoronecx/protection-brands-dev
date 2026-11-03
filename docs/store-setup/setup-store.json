@@ -75,6 +75,14 @@
       "type": "rich_text_field"
     },
     {
+      "ownerType": "PRODUCT",
+      "namespace": "custom",
+      "key": "card_photo_media",
+      "name": "Card photos",
+      "type": "list.single_line_text_field",
+      "description": "IDs of this product's images that are photos (with a background, not cut-outs). Product cards show those full width, fading into the card. Set by docs/store-setup/card-photos.mjs; add or remove an ID by hand if it guessed wrong."
+    },
+    {
       "ownerType": "PAGE",
       "namespace": "custom",
       "key": "heading",

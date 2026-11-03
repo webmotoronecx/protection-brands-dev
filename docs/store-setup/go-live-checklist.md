@@ -34,8 +34,10 @@ doesn't use them, but do them close to launch day.
 
 ## 3. Search & Discovery (README §4)
 
-- [ ] Filters: Category (product type), Brand (vendor), Suitable for, Price, Availability.
-- [ ] Remove the Tags filter.
+- [ ] Filters: Category (product type), Brand (vendor), Suitable for.
+- [ ] Remove the Tags filter. Price and Availability can go too: the collection pages hide
+      them (the filter row shows sort pills instead), so they'd only show on Shopify's own
+      filter drawer.
 
 ## 4. SDS (sds.md)
 
@@ -44,7 +46,7 @@ doesn't use them, but do them close to launch day.
 - [ ] Add an entry for each SDS PDF from SharePoint.
 - [ ] Set the SDS metafield on each product that has one.
 - [ ] Create the page *Safety Data Sheets*, handle `sds`. The `page.sds` template can only be
-      chosen once the Horizon theme is in the store, so set it after step 6, or now on the
+      chosen once the Horizon theme is in the store, so set it after step 7, or now on the
       unpublished theme.
 
 ### Brand pages
@@ -58,6 +60,13 @@ doesn't use them, but do them close to launch day.
 - [ ] Product page tabs (README §2, *Product page tabs*): create the four Tab metafield
       definitions in admin (rich text), dry-run `split-descriptions.py --store protection-brands`,
       read the report, then run it with `--apply`. Safe before launch: Debut doesn't show them.
+- [ ] **Card photos** (`custom.card_photo_media`, created by setup-store.mjs): which of a
+      product's images are photos, shown full width on product cards and in the card's photo
+      slides. Fill it after the product images are in (step 2): run
+      `node card-photos.mjs --store protection-brands` (report only), check the report, then
+      add `--apply`. Needs ffmpeg. Fix any wrong guesses by hand in the product's metafields.
+      Products without it show their images whole on the grey card, so it's safe to leave
+      some empty.
 - [ ] Optional product metafield **How to use** (`custom.how_to_use`, rich text or multi-line
       text). Products with it show a "How to use" row under Add to cart.
 - [ ] Check the **Delivery & returns** wording on the product page (Theme editor → Product →
@@ -82,14 +91,34 @@ and switch the header to it in the theme editor.
       Claim, Privacy Policy, About Us, Terms & Conditions, Care Instructions, Refer a Friend,
       SDS. Top-level links only.
 
-## 6. Install the theme
+## 6. Store files the theme uses
+
+Some theme settings point at images in **Content → Files**, not in the theme, so they don't
+come with the theme upload. Download them from the dev store's Files and upload them to the
+live store **under the same file names** before installing the theme, or those spots show
+blank:
+
+- [ ] `favicon-pb.png`: favicon (Theme settings → Logo and favicon).
+- [ ] `bento-showroom.webp`, `bento-permagard.webp`, `bento-cerface.webp`,
+      `bento-optivan.webp`: homepage bento tiles.
+- [ ] `brand-logo-cerface.png`, `brand-logo-optivan.png` and the Permagard logo: bento tile
+      logos. On dev the Permagard one was renamed by Shopify
+      (`brand-logo-permagard_27fd2ac9-….png`), so upload it as `brand-logo-permagard.png`
+      and pick it again on the Permagard bento tile in step 8.
+- [ ] `AtHomeDetailersKit.png`: the default hero image on the brand page template.
+
+After installing, open the home page and a brand page in the theme editor and check every
+image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_images/[^"]+'
+templates config sections | sort -u`.
+
+## 7. Install the theme
 
 - [ ] Add the theme as a **new, unpublished** theme: upload a zip of this repo
       (**Online Store → Themes → Add theme → Upload zip file**) or use
       `shopify theme push --unpublished`. Don't upload it into an existing theme.
 - [ ] Rename it, e.g. *Protection Brands 2026*.
 
-## 7. Theme editor (on the unpublished theme)
+## 8. Theme editor (on the unpublished theme)
 
 Placeholders from stock Horizon that must be replaced:
 
@@ -106,7 +135,7 @@ Placeholders from stock Horizon that must be replaced:
 - [ ] **Colours**: the new design once it's ready. Fonts are Manrope; colours are Horizon's
       defaults (black and white) until then.
 
-## 8. Pages
+## 9. Pages
 
 - [ ] **Delivery, Privacy Policy, Terms & Conditions**: they used Debut's `page.delivery`,
       `page.privacy-policy` and `page.terms-conditions` templates. Horizon doesn't have
@@ -119,7 +148,7 @@ Placeholders from stock Horizon that must be replaced:
   for the dev store. On live they already exist and the script leaves them alone.
 - [ ] **Safety Data Sheets**: template `page.sds` (step 4).
 
-## 9. Apps and tracking
+## 10. Apps and tracking
 
 - [ ] **Online Store → Themes → Customize → App embeds**: turn on any app embeds the
       Debut theme had on (reviews, chat, pop-ups, etc.). They don't carry across themes.
@@ -128,7 +157,7 @@ Placeholders from stock Horizon that must be replaced:
 - [ ] Google Search Console: verify the domain, submit `/sitemap.xml` (brief §8, can
       follow later).
 
-## 10. Preview and test on the unpublished theme
+## 11. Preview and test on the unpublished theme
 
 Use **Preview** (and the share-preview link on a phone, iOS and Android):
 
@@ -144,7 +173,7 @@ Use **Preview** (and the share-preview link on a phone, iOS and Android):
 - [ ] Old URLs still load: `/collections/car-care`, `/collections/accessories`,
       `/collections/permagard-car-care`, `/blogs/car-care-tips`, `/pages/about-us`.
 
-## 11. Launch
+## 12. Launch
 
 - [ ] **Publish** the Horizon theme.
 - [ ] Repeat the menu, add-to-cart and checkout checks on the live domain.
