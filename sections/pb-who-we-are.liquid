@@ -8,12 +8,18 @@
   On phones the heading sits above the logos, two to a row.
   The button is the hero's Shop now button (sections/pb-hero-bottle.liquid): red sweeps in from
   the left on hover and an arrow slides in. Transforms and opacity only.
+  With label, statement and button all empty it is just the logo row, as at the foot of the
+  brand pages (templates/collection.brand-*.json).
 {%- endcomment -%}
 
 {%- liquid
   assign default_brands = 'protection-brands,permagard,cerface,optivan,honda-genuine-car-care' | split: ','
   assign logo_height = section.settings.logo_height
   assign label_font = section.settings.label_font
+  assign has_intro = false
+  if section.settings.label != blank or section.settings.statement != blank or section.settings.button_label != blank
+    assign has_intro = true
+  endif
 -%}
 
 <style>
@@ -22,9 +28,10 @@
 
 {%- if section.settings.statement != blank or section.blocks.size > 0 or request.design_mode -%}
 <div
-  class="pb-who-we-are"
+  class="pb-who-we-are{% unless has_intro %} pb-who-we-are--logos-only{% endunless %}"
   style="--pb-who-bg: {{ section.settings.background }}; --pb-who-text: {{ section.settings.text_color }}; --pb-who-logo-h: {{ logo_height }}px; --pb-who-label-font: {{ label_font.family }}, {{ label_font.fallback_families }}; --pb-who-label-weight: {{ label_font.weight }};"
 >
+  {%- if has_intro -%}
   <div class="pb-who-we-are__inner" data-reveal>
     {%- if section.settings.label != blank -%}
       <p class="pb-who-we-are__label">{{ section.settings.label | escape }}</p>
@@ -43,6 +50,7 @@
       </div>
     {%- endif -%}
   </div>
+  {%- endif -%}
 
   {%- if section.blocks.size > 0 -%}
     <div class="pb-who-we-are__brands">
@@ -244,6 +252,15 @@
     gap: 28px;
     max-width: 1340px;
     margin: clamp(72px, 9vw, 150px) auto 0;
+  }
+
+  /* Logos only (label, statement and button empty), e.g. the brand pages' "Our brands" row. */
+  .pb-who-we-are--logos-only {
+    padding-block: clamp(48px, 6vw, 96px);
+  }
+
+  .pb-who-we-are--logos-only .pb-who-we-are__brands {
+    margin-block-start: 0;
   }
 
   .pb-who-we-are__brands-heading {
