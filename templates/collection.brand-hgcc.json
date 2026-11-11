@@ -27,7 +27,8 @@
             "layout": "text",
             "heading": "Exclusively Developed for Honda. Approved by Honda Australia.",
             "text": "<p>Honda Genuine Car Care is a range of premium vehicle protection products developed exclusively for Honda vehicles by Protection Brands and approved by Honda Australia.</p><p>Following extensive testing and evaluation, Protection Brands was selected by Honda Australia to develop and supply a vehicle protection program that meets Honda's standards for quality, performance and reliability.</p>",
-            "label": "Honda Genuine Car Care"
+            "label": "Honda Genuine Car Care",
+            "text_align": "center"
           }
         }
       },
