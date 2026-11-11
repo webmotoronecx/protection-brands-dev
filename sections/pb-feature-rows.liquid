@@ -155,17 +155,17 @@
     padding-block: 0;
   }
 
+  /* Same side margins as the product rows (sections/pb-best-sellers.liquid), so headings,
+     photos and cards line up down the page. */
   .pb-feature-rows__row {
     position: relative;
     isolation: isolate;
-    padding-inline: calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px));
+    padding-inline: calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px));
   }
 
   .pb-feature-rows__inner {
     display: grid;
     gap: 32px;
-    max-width: 1280px;
-    margin-inline: auto;
   }
 
   /* The watermark: one word, as wide as the screen, faint and fading downwards, behind the

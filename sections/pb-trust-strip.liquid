@@ -43,7 +43,8 @@
   /* Section-specific styles for pb-trust-strip. */
 
   .pb-trust-strip {
-    padding: 0 calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px));
+    /* Side margins as the product rows (sections/pb-best-sellers.liquid). */
+    padding: 0 calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px));
     background: var(--pb-trust-bg, #fff);
     color: var(--pb-trust-text, #111);
   }
@@ -52,8 +53,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 16px;
-    max-width: 1280px;
-    margin: 0 auto;
+    margin: 0;
     padding: clamp(28px, 3.5vw, 48px) 0;
     border-block: 1px solid #e6e6e6;
     list-style: none;
