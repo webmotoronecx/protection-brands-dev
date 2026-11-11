@@ -328,9 +328,9 @@
     position: absolute;
     inset: 0;
     z-index: -1;
-    /* Clear at the top to black at the bottom, at "Darken the photo" (70% by default). */
+    /* Clear at the top to black at the bottom, at "Darken the photo" (100% by default). */
     background: linear-gradient(to bottom, rgb(0 0 0 / 0), #000);
-    opacity: var(--pb-feature-overlay, 0.7);
+    opacity: var(--pb-feature-overlay, 1);
   }
 
   /* 24% taller than the banner (12% above and below), so the parallax in assets/pb-motion.js
@@ -631,7 +631,7 @@
           "max": 100,
           "step": 5,
           "unit": "%",
-          "default": 70,
+          "default": 100,
           "visible_if": "{{ block.settings.layout == 'banner' }}"
         }
       ]
