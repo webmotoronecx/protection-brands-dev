@@ -172,7 +172,8 @@
         "link_label": "View all",
         "link": "/collections/cerface-ceramic?view=brand",
         "background": "#ffffff",
-        "text_color": "#111111"
+        "text_color": "#111111",
+        "align_to_text": true
       }
     },
     "pb_brand_rows": {

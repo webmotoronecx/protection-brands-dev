@@ -49,7 +49,7 @@
 </style>
 
 <div
-  class="pb-best-sellers"
+  class="pb-best-sellers{% if section.settings.align_to_text %} pb-best-sellers--aligned{% endif %}"
   style="--pb-best-bg: {{ section.settings.background }}; --pb-best-text: {{ section.settings.text_color }}; --pb-best-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-best-weight: {{ heading_font.weight }};"
 >
   <div class="pb-best-sellers__inner">
@@ -167,6 +167,17 @@
     --pb-best-gutter: calc(clamp(16px, 2.5vw, 40px) + var(--pb-wide-inset, 0px));
 
     padding: clamp(40px, 5vw, 72px) var(--pb-best-gutter) clamp(32px, 3vw, 48px);
+  }
+
+  /* Lined up with the page text: the heading and first card start where the 1280px text column
+     of "Image with text (PB)" (sections/pb-feature-rows.liquid) does. The row still runs out
+     to the screen edges. cqi, so the track's negative margin matches the padding exactly. */
+  .pb-best-sellers--aligned {
+    container-type: inline-size;
+  }
+
+  .pb-best-sellers--aligned .pb-best-sellers__inner {
+    --pb-best-gutter: max(calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px)), calc((100cqi - 1280px) / 2));
   }
 
   .pb-best-sellers__header {
@@ -390,6 +401,13 @@
       "id": "link",
       "label": "Link",
       "info": "Defaults to the collection."
+    },
+    {
+      "type": "checkbox",
+      "id": "align_to_text",
+      "label": "Line up with the page text",
+      "info": "On wide screens the heading and first card start in line with the text of \"Image with text (PB)\" sections. The row still runs to the screen edge.",
+      "default": false
     },
     {
       "type": "color",
