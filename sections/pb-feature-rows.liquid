@@ -10,7 +10,7 @@
   Lists in the text show in two columns with small red square bullets ("Two-column lists").
   A row can have a watermark: one word drawn large and faint behind it.
 
-  An image row with no photo picked shows assets/image-default.png (600 x 600, dark with the
+  An image row with no photo picked shows assets/image-default.webp (1200 x 1200, dark with the
   logo in the middle). A banner without one has a dark background (and a placeholder in the
   theme editor).
 
@@ -94,7 +94,7 @@
                     alt: b.image.alt
                 }}
               {%- else -%}
-                <img src="{{ 'image-default.png' | asset_url }}" alt="" width="600" height="600" loading="lazy">
+                <img src="{{ 'image-default.webp' | asset_url }}" alt="" width="1200" height="1200" loading="lazy">
               {%- endif -%}
             </div>
           {%- endif -%}
