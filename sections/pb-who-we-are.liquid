@@ -250,7 +250,7 @@
     display: grid;
     justify-items: center;
     gap: 28px;
-    max-width: 1340px;
+    max-width: 1440px;
     margin: clamp(72px, 9vw, 150px) auto 0;
   }
 
@@ -315,7 +315,8 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 24px 5vw;
+      /* Capped, or on very wide screens the gaps outgrow the row and the last logo wraps. */
+      gap: 24px clamp(32px, 5vw, 80px);
     }
 
     .pb-who-we-are__logo img {
