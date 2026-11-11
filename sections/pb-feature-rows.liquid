@@ -177,6 +177,12 @@
     gap: 32px;
   }
 
+  /* A row with a watermark: space inside its top, so more of the word shows above the photo
+     and text (the word is placed from the row's top). */
+  .pb-feature-rows__row:not(.pb-feature-rows__row--banner):has(> .pb-feature-rows__watermark) {
+    padding-block-start: clamp(48px, 7vw, 120px);
+  }
+
   /* The watermark: one word, as wide as the screen, faint and fading downwards, behind the
      top of the row. */
   .pb-feature-rows__watermark {
