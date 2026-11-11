@@ -119,6 +119,8 @@ blank:
       (`collection.brand-optivan`). Copies are in the dev store's Files.
 - [ ] `perma-comprehensive.webp`, `perma-professionally.webp` and `perma-feat-row.webp`
       (banner): the Permagard page (`collection.brand-permagard`). Copies are in the dev store's Files.
+- [ ] `hgcc-feat-row.webp` (banner): the Honda Genuine Car Care page (`collection.brand-hgcc`).
+      A copy is in the dev store's Files.
 
 After installing, open the home page and a brand page in the theme editor and check every
 image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_images/[^"]+'

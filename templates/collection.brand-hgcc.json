@@ -253,7 +253,8 @@
             "watermark": "Honda Genuine Car Care",
             "button_label": "Discover Honda Genuine Car Care",
             "button_link": "https://www.honda.com.au/cars.html",
-            "button_new_tab": true
+            "button_new_tab": true,
+            "image": "shopify://shop_images/hgcc-feat-row.webp"
           }
         }
       },
