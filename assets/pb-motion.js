@@ -366,16 +366,16 @@
       );
     });
 
-    // Image with text rows: the photo (drawn 16% taller than its frame) moves from 6% of its
-    // height up to 6% down inside the frame as the frame scrolls through the screen; the frame
+    // Image with text rows: the photo (drawn 35% taller than its frame) moves from 12% of its
+    // height up to 12% down inside the frame as the frame scrolls through the screen; the frame
     // itself doesn't move. Sets --pb-media-shift on the frame; the photo's CSS translates by it.
     document.querySelectorAll('.pb-feature-rows__media:has(> img)').forEach((media) => {
       if (!belowFold(media)) return;
       gsap.fromTo(
         media,
-        { '--pb-media-shift': '-6%' },
+        { '--pb-media-shift': '-12%' },
         {
-          '--pb-media-shift': '6%',
+          '--pb-media-shift': '12%',
           ease: 'none',
           scrollTrigger: { trigger: media, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
         }
