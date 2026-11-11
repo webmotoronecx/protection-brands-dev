@@ -184,7 +184,7 @@
             "layout": "image_left",
             "heading": "Protection for Every Surface",
             "text": "<p>Our range includes:</p><ul><li>Ceramic, Graphene and Reactive Polymer Coatings</li><li>Paint Protection Film (PPF)</li><li>Window Protection Film (WPF)</li><li>Automotive Window Tinting</li><li>Leather, Fabric, Vinyl and Interior Protection</li><li>Antimicrobial Treatments</li><li>Premium Vehicle Care and Maintenance Products</li></ul><p>Each solution is designed to help keep your vehicle looking its best while making ongoing care and maintenance easier.</p>",
-            "watermark": "Protection",
+            "watermark": "Protection Brands",
             "image": "shopify://shop_images/pb-protection-every-surface.webp",
             "image_ratio": "1 / 1"
           }
@@ -264,7 +264,7 @@
           "settings": {
             "layout": "banner",
             "heading": "Protection Brands. Advanced Protection. Trusted Expertise. Lasting Results.",
-            "watermark": "Protection"
+            "watermark": "Protection Brands"
           }
         }
       },
