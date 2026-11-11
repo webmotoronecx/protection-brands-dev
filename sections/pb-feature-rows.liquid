@@ -310,11 +310,15 @@
     background: #f2f2f2;
   }
 
-  .pb-feature-rows__media :is(img, svg) {
+  /* 16% taller than its frame and centred in it (-6.9% of its own height), so the parallax in
+     assets/pb-motion.js (--pb-media-shift, -6% to 6% of the photo's height) never shows an edge.
+     The frame stays still and clips it. */
+  .pb-feature-rows__media img {
     display: block;
     width: 100%;
-    height: 100%;
+    height: 116%;
     object-fit: cover;
+    transform: translateY(calc(-6.9% + var(--pb-media-shift, 0%)));
   }
 
   /* Banner */

@@ -16,7 +16,8 @@
     (.pb-brand-header) have the same, on their photo or watermark, product, title and logo.
   - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
   - The watermark word behind an Image with text row (.pb-feature-rows__watermark) slides up
-    into place as the row scrolls in, and a banner row's photo has scroll parallax.
+    into place as the row scrolls in, and a row's photo (in its frame) and a banner's photo have
+    scroll parallax.
   - The brand banner's middle product (.pb-brand-header__product) drifts slowly towards the
     mouse; see Mouse follow below.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
@@ -183,6 +184,7 @@
       row.style.removeProperty('--pb-watermark-shift');
       row.style.removeProperty('--pb-banner-shift');
     });
+    document.querySelectorAll('.pb-feature-rows__media').forEach((media) => media.style.removeProperty('--pb-media-shift'));
     document.querySelectorAll('.pb-collection-header--full, .pb-brand-header').forEach((banner) => {
       banner.style.removeProperty('--pb-collection-shift');
     });
@@ -360,6 +362,22 @@
           '--pb-banner-shift': '8%',
           ease: 'none',
           scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
+        }
+      );
+    });
+
+    // Image with text rows: the photo (drawn 16% taller than its frame) moves from 6% of its
+    // height up to 6% down inside the frame as the frame scrolls through the screen; the frame
+    // itself doesn't move. Sets --pb-media-shift on the frame; the photo's CSS translates by it.
+    document.querySelectorAll('.pb-feature-rows__media:has(> img)').forEach((media) => {
+      if (!belowFold(media)) return;
+      gsap.fromTo(
+        media,
+        { '--pb-media-shift': '-6%' },
+        {
+          '--pb-media-shift': '6%',
+          ease: 'none',
+          scrollTrigger: { trigger: media, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
         }
       );
     });
