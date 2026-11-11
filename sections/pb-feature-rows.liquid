@@ -174,15 +174,17 @@
      top of the row. */
   .pb-feature-rows__watermark {
     position: absolute;
-    inset-block-start: clamp(-80px, -5vw, -24px);
+    inset-block-start: clamp(-120px, -7vw, -32px);
     inset-inline-start: 50%;
     z-index: -1;
     /* The brand banner's watermark font (sections/pb-brand-header.liquid). */
     font-family: var(--pb-watermark-font, inherit);
-    font-size: clamp(5rem, 19vw, 18rem);
+    /* Same size and spacing as the banner's watermark word (snippets/pb-marquee.liquid at
+       --pb-marquee-height: clamp(4.8rem, 18vw, 21.6rem)). */
+    font-size: calc(clamp(4.8rem, 18vw, 21.6rem) * 1.35);
     font-weight: var(--pb-watermark-weight, 600);
-    line-height: 0.8;
-    letter-spacing: -0.055em;
+    line-height: 0.74;
+    letter-spacing: -1.2rem;
     white-space: nowrap;
     text-transform: uppercase;
     color: transparent;
