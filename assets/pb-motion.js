@@ -16,7 +16,7 @@
     (.pb-brand-header) have the same, on their photo or watermark, product, title and logo.
   - Category tile images (.pb-category-tiles__image) drift a little in their tiles on scroll.
   - The watermark word behind an Image with text row (.pb-feature-rows__watermark) slides up
-    into place as the row scrolls in.
+    into place as the row scrolls in, and a banner row's photo has scroll parallax.
   - The brand banner's middle product (.pb-brand-header__product) drifts slowly towards the
     mouse; see Mouse follow below.
   - Product cards (.product-grid__item) below the first screen fade in (no slide) in batches
@@ -179,7 +179,10 @@
     });
     document.querySelectorAll('.pb-hero-bottle-section ~ .shopify-section').forEach((section) => section.style.removeProperty('--pb-body-scale'));
     document.querySelectorAll('.pb-category-tiles__tile').forEach((tile) => tile.style.removeProperty('--pb-tile-shift'));
-    document.querySelectorAll('.pb-feature-rows__row').forEach((row) => row.style.removeProperty('--pb-watermark-shift'));
+    document.querySelectorAll('.pb-feature-rows__row').forEach((row) => {
+      row.style.removeProperty('--pb-watermark-shift');
+      row.style.removeProperty('--pb-banner-shift');
+    });
     document.querySelectorAll('.pb-collection-header--full, .pb-brand-header').forEach((banner) => {
       banner.style.removeProperty('--pb-collection-shift');
     });
@@ -341,6 +344,22 @@
           '--pb-watermark-shift': '0%',
           ease: 'none',
           scrollTrigger: { trigger: row, start: 'top bottom', end: 'top 35%', scrub: TILE_SCRUB },
+        }
+      );
+    });
+
+    // Image with text banners: the photo (drawn 24% taller than the banner) moves from 8% of its
+    // height up to 8% down as the banner scrolls through the screen, so it drifts slower than
+    // the page. Sets --pb-banner-shift on the row; the photo's CSS translates by it.
+    document.querySelectorAll('.pb-feature-rows__row--banner:has(> .pb-feature-rows__banner-image)').forEach((row) => {
+      if (!belowFold(row)) return;
+      gsap.fromTo(
+        row,
+        { '--pb-banner-shift': '-8%' },
+        {
+          '--pb-banner-shift': '8%',
+          ease: 'none',
+          scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: TILE_SCRUB },
         }
       );
     });
