@@ -10,8 +10,9 @@
   Lists in the text show in two columns with small red square bullets ("Two-column lists").
   A row can have a watermark: one word drawn large and faint behind it.
 
-  A row with no photo shows a placeholder in the theme editor only; on the store an image row
-  without a photo shows its text alone, and a banner without one has a dark background.
+  An image row with no photo picked shows assets/image-default.png (600 x 600, dark with the
+  logo in the middle). A banner without one has a dark background (and a placeholder in the
+  theme editor).
 
   On phones every row is one column, photo first.
 {%- endcomment -%}
@@ -32,10 +33,6 @@
       if b.button_label != blank and b.button_link != blank
         assign has_button = true
       endif
-      assign has_image = false
-      if b.image != blank or request.design_mode
-        assign has_image = true
-      endif
       assign ratio = b.image_ratio
       if ratio == 'original'
         assign ratio = b.image.aspect_ratio | default: '4 / 3'
@@ -47,7 +44,7 @@
     -%}
 
     <div
-      class="pb-feature-rows__row pb-feature-rows__row--{{ b.layout }}{% if b.layout contains 'image' and has_image == false %} pb-feature-rows__row--no-image{% endif %}{% if b.list_columns %} pb-feature-rows__row--list-columns{% endif %}"
+      class="pb-feature-rows__row pb-feature-rows__row--{{ b.layout }}{% if b.list_columns %} pb-feature-rows__row--list-columns{% endif %}"
       {% if b.layout == 'banner' %}
         style="--pb-feature-banner-h: {{ b.banner_height }}px; --pb-feature-overlay: {{ b.overlay | divided_by: 100.0 }};"
       {% endif %}
@@ -84,7 +81,7 @@
         </div>
       {%- else -%}
         <div class="pb-feature-rows__inner">
-          {%- if b.layout != 'text' and has_image -%}
+          {%- if b.layout != 'text' -%}
             <div class="pb-feature-rows__media" style="--pb-feature-ratio: {{ ratio }};">
               {%- if b.image != blank -%}
                 {{
@@ -97,7 +94,7 @@
                     alt: b.image.alt
                 }}
               {%- else -%}
-                {{ 'lifestyle-1' | placeholder_svg_tag: 'pb-feature-rows__placeholder' }}
+                <img src="{{ 'image-default.png' | asset_url }}" alt="" width="600" height="600" loading="lazy">
               {%- endif -%}
             </div>
           {%- endif -%}
@@ -301,11 +298,6 @@
     background: #ececec;
   }
 
-  /* No photo on the store: the text alone, at a readable width. */
-  .pb-feature-rows__row--no-image .pb-feature-rows__content {
-    max-width: 46rem;
-  }
-
   /* Banner */
   .pb-feature-rows__row--banner {
     display: grid;
@@ -451,15 +443,11 @@
       order: 2;
     }
 
-    .pb-feature-rows__row--no-image .pb-feature-rows__inner {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .pb-feature-rows__row--image_left:not(.pb-feature-rows__row--no-image) .pb-feature-rows__content {
+    .pb-feature-rows__row--image_left .pb-feature-rows__content {
       padding-inline-end: clamp(0px, 3vw, 48px);
     }
 
-    .pb-feature-rows__row--image_right:not(.pb-feature-rows__row--no-image) .pb-feature-rows__content {
+    .pb-feature-rows__row--image_right .pb-feature-rows__content {
       padding-inline-start: clamp(0px, 1vw, 16px);
     }
   }
