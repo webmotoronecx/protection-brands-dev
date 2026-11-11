@@ -14,7 +14,7 @@
   # (templates/collection.json, whose title bar is full width under it) and over the default
   # product template (templates/product.json, dark page behind the product card) and over the
   # collections list (templates/list-collections.json, full-width title bar) and over the
-  # brand pages' banner (templates/collection.brand.json), over the SDS page's banner
+  # brand pages' banner (templates/collection.brand.json and collection.brand-*.json), over the SDS page's banner
   # (templates/page.sds.json) and over the default page template's full-width title bar
   # (templates/page.json, e.g. the privacy policy) and over the search page's banner
   # (templates/search.json, laid out like the collection page), and over the same full-width
@@ -33,7 +33,7 @@
         assign light = false
       elsif template.name == 'list-collections'
         assign light = false
-      elsif template.name == 'collection' and template.suffix == 'brand'
+      elsif template.name == 'collection' and template.suffix contains 'brand'
         assign light = false
       elsif template.name == 'page' and template.suffix == 'sds'
         assign light = false
