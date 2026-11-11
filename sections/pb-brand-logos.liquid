@@ -6,7 +6,7 @@
 
 {%- liquid
   # Default logos in assets/ (logo-<brand>.png), used when a logo has no image picked. Matched
-  # by the logo's Alt text: Protection Brands (logo-black.png), Permagard, CERFACE, OptiVAN, Honda Genuine Car Care
+  # by the logo's Alt text: Protection Brands (logo-protection-brands.png), Permagard, CERFACE, OptiVAN, Honda Genuine Car Care
   # (logo-hgcc.png). Sizes in px.
   assign default_brands = 'protection-brands,permagard,cerface,optivan,honda-genuine-car-care' | split: ','
 
@@ -43,8 +43,7 @@
               assign default_logo = 'logo-hgcc.png'
               assign default_ratio = 312.0 | divided_by: 140
             when 'protection-brands'
-              assign default_logo = 'logo-black.png'
-              assign default_ratio = 322.0 | divided_by: 183
+              assign default_ratio = 362.0 | divided_by: 196
             when 'permagard'
               assign default_ratio = 228.0 | divided_by: 140
             when 'cerface'
