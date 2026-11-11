@@ -404,7 +404,8 @@
         "crumbs": false,
         "home_label": "Home",
         "fallback_title": "Our brands"
-      }
+      },
+      "disabled": true
     }
   },
   "order": [
