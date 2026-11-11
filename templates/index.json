@@ -94,12 +94,13 @@
     "pb_who_we_are": {
       "type": "pb-who-we-are",
       "blocks": {
-        "logo_permagard": { "type": "logo", "settings": { "alt": "Permagard", "link": "shopify://collections/permagard-car-care" } },
+        "logo_protection_brands": { "type": "logo", "settings": { "alt": "Protection Brands", "link": "shopify://collections/protection-brands" } },
         "logo_cerface": { "type": "logo", "settings": { "alt": "CERFACE", "link": "shopify://collections/cerface-ceramic" } },
         "logo_optivan": { "type": "logo", "settings": { "alt": "OptiVAN", "link": "shopify://collections/optivan-caravan-maintenance" } },
-        "logo_oridon": { "type": "logo", "settings": { "alt": "Oridon", "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter" } }
+        "logo_permagard": { "type": "logo", "settings": { "alt": "Permagard", "link": "shopify://collections/permagard-car-care" } },
+        "logo_hgcc": { "type": "logo", "settings": { "alt": "Honda Genuine Car Care", "link": "shopify://collections/honda-genuine-car-care" } }
       },
-      "block_order": ["logo_permagard", "logo_cerface", "logo_optivan", "logo_oridon"],
+      "block_order": ["logo_protection_brands", "logo_cerface", "logo_optivan", "logo_permagard", "logo_hgcc"],
       "settings": {
         "logos_heading": "Our brands",
         "logo_height": 80,
@@ -122,7 +123,7 @@
             "heading": "Showroom shine at home",
             "text": "The products our dealer detailers use, packed for your driveway.",
             "text_position": "bottom-left",
-            "link": "shopify://collections/kits-packs"
+            "link": "shopify://collections/value-packs"
           }
         },
         "tile_permagard": {
@@ -165,11 +166,11 @@
       "type": "pb-brand-logos",
       "disabled": true,
       "blocks": {
-        "logo_permagard": {
+        "logo_protection_brands": {
           "type": "logo",
           "settings": {
-            "link": "shopify://collections/permagard-car-care",
-            "alt": "Permagard"
+            "link": "shopify://collections/protection-brands",
+            "alt": "Protection Brands"
           }
         },
         "logo_cerface": {
@@ -186,19 +187,27 @@
             "alt": "OptiVAN"
           }
         },
-        "logo_oridon": {
+        "logo_permagard": {
           "type": "logo",
           "settings": {
-            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
-            "alt": "Oridon"
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/honda-genuine-car-care",
+            "alt": "Honda Genuine Car Care"
           }
         }
       },
       "block_order": [
-        "logo_permagard",
+        "logo_protection_brands",
         "logo_cerface",
         "logo_optivan",
-        "logo_oridon"
+        "logo_permagard",
+        "logo_hgcc"
       ],
       "settings": {
         "heading": "Our brands",
@@ -216,14 +225,7 @@
         "tile_1": {
           "type": "tile",
           "settings": {
-            "collection": "wash-shampoo",
-            "label": ""
-          }
-        },
-        "tile_2": {
-          "type": "tile",
-          "settings": {
-            "collection": "cleaners-sprays",
+            "collection": "wash-detail",
             "label": ""
           }
         },
@@ -237,7 +239,7 @@
         "tile_4": {
           "type": "tile",
           "settings": {
-            "collection": "kits-packs",
+            "collection": "value-packs",
             "label": ""
           }
         },
@@ -251,7 +253,6 @@
       },
       "block_order": [
         "tile_1",
-        "tile_2",
         "tile_3",
         "tile_4",
         "tile_5"
@@ -394,9 +395,9 @@
       },
       "settings": {
         "heading": "Best Sellers",
-        "collection": "",
+        "collection": "best-sellers",
         "product_collection": false,
-        "max_products": 8,
+        "max_products": 6,
         "link_label": "View all",
         "link": "",
         "background": "#ffffff",

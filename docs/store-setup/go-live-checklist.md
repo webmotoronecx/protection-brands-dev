@@ -6,6 +6,9 @@ replaces Debut. Work top to bottom. Tick items off in this file as you go.
 Detail for the bigger steps: [README.md](README.md) (catalogue, filters, menu) and
 [sds.md](sds.md) (SDS page).
 
+Client amendments of 10 Nov 2026 (categories, Best Sellers, HGCC kits, brand text, footer menus):
+[amendments-2026-11-10.md](amendments-2026-11-10.md). Done on dev; repeat on live from there.
+
 ## 1. Before you start
 
 - [ ] Duplicate the live Debut theme (**Online Store → Themes → … → Duplicate**) and keep the

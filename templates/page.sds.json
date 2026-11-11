@@ -29,11 +29,13 @@
       "type": "pb-sds-library",
       "settings": {
         "brand_collections": [
-          "permagard-car-care",
+          "protection-brands",
           "cerface-ceramic",
           "optivan-caravan-maintenance",
+          "permagard-car-care",
           "honda-genuine-car-care"
-        ]
+        ],
+        "brand_order": "Protection Brands, CERFACE, OptiVAN, Permagard, Honda Genuine Car Care, Mazda, Mitsubishi"
       }
     }
   },

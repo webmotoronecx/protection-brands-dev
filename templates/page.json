@@ -36,11 +36,11 @@
     "pb_brand_logos": {
       "type": "pb-brand-logos",
       "blocks": {
-        "logo_permagard": {
+        "logo_protection_brands": {
           "type": "logo",
           "settings": {
-            "link": "shopify://collections/permagard-car-care",
-            "alt": "Permagard"
+            "link": "shopify://collections/protection-brands",
+            "alt": "Protection Brands"
           }
         },
         "logo_cerface": {
@@ -57,19 +57,27 @@
             "alt": "OptiVAN"
           }
         },
-        "logo_oridon": {
+        "logo_permagard": {
           "type": "logo",
           "settings": {
-            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
-            "alt": "Oridon"
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/honda-genuine-car-care",
+            "alt": "Honda Genuine Car Care"
           }
         }
       },
       "block_order": [
-        "logo_permagard",
+        "logo_protection_brands",
         "logo_cerface",
         "logo_optivan",
-        "logo_oridon"
+        "logo_permagard",
+        "logo_hgcc"
       ],
       "settings": {
         "heading": "Our brands",

@@ -15,14 +15,7 @@
         "tile_1": {
           "type": "tile",
           "settings": {
-            "collection": "wash-shampoo",
-            "label": ""
-          }
-        },
-        "tile_2": {
-          "type": "tile",
-          "settings": {
-            "collection": "cleaners-sprays",
+            "collection": "wash-detail",
             "label": ""
           }
         },
@@ -36,7 +29,7 @@
         "tile_4": {
           "type": "tile",
           "settings": {
-            "collection": "kits-packs",
+            "collection": "value-packs",
             "label": ""
           }
         },
@@ -50,7 +43,6 @@
       },
       "block_order": [
         "tile_1",
-        "tile_2",
         "tile_3",
         "tile_4",
         "tile_5"
@@ -350,11 +342,11 @@
     "pb_brand_logos": {
       "type": "pb-brand-logos",
       "blocks": {
-        "logo_permagard": {
+        "logo_protection_brands": {
           "type": "logo",
           "settings": {
-            "link": "shopify://collections/permagard-car-care",
-            "alt": "Permagard"
+            "link": "shopify://collections/protection-brands",
+            "alt": "Protection Brands"
           }
         },
         "logo_cerface": {
@@ -371,19 +363,27 @@
             "alt": "OptiVAN"
           }
         },
-        "logo_oridon": {
+        "logo_permagard": {
           "type": "logo",
           "settings": {
-            "link": "shopify://products/4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter",
-            "alt": "Oridon"
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/honda-genuine-car-care",
+            "alt": "Honda Genuine Car Care"
           }
         }
       },
       "block_order": [
-        "logo_permagard",
+        "logo_protection_brands",
         "logo_cerface",
         "logo_optivan",
-        "logo_oridon"
+        "logo_permagard",
+        "logo_hgcc"
       ],
       "settings": {
         "heading": "Our brands",
@@ -395,12 +395,23 @@
         "bottom_border": true
       },
       "disabled": true
+    },
+    "pb_brand_story": {
+      "type": "pb-page-story",
+      "settings": {
+        "layout": "story",
+        "heading": "",
+        "crumbs": false,
+        "home_label": "Home",
+        "fallback_title": "Our brands"
+      }
     }
   },
   "order": [
     "pb_brand_header",
     "pb_products_bar",
     "main",
+    "pb_brand_story",
     "pb_brand_logos",
     "pb_collection_header",
     "section",

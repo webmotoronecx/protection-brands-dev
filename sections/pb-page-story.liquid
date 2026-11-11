@@ -18,24 +18,30 @@
 
   On mobile both are one column, in the same order. Admin's wrappers (<blockquote>, <div>) lose
   their own indent, rule and italics, so the text lines up with the breadcrumb.
+
+  On a collection (the brand pages, templates/collection.brand.json) it shows the collection's
+  description instead, without the breadcrumb (the brand banner is above it).
 {%- endcomment -%}
 
 {%- liquid
   assign heading_font = settings.type_heading_font
-  assign title = page.title | default: section.settings.fallback_title
+  assign title = page.title | default: collection.title | default: section.settings.fallback_title
   assign heading = page.metafields.custom.heading.value | default: section.settings.heading
+  assign content = page.content | default: collection.description
 -%}
 
 <div
   class="pb-page-story pb-page-story--{{ section.settings.layout }}"
   style="--pb-page-story-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-page-story-weight: {{ heading_font.weight }};"
 >
-  <nav class="pb-page-story__crumbs" aria-label="Breadcrumb">
-    <ol>
-      <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
-      <li><span aria-current="page">{{ title }}</span></li>
-    </ol>
-  </nav>
+  {%- if section.settings.crumbs -%}
+    <nav class="pb-page-story__crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
+        <li><span aria-current="page">{{ title }}</span></li>
+      </ol>
+    </nav>
+  {%- endif -%}
 
   {%- if section.settings.layout == 'contact' -%}
     <div class="pb-page-story__layout">
@@ -43,18 +49,18 @@
         {%- if heading != blank -%}
           <h2 class="pb-page-story__aside">{{ heading | escape }}</h2>
         {%- endif -%}
-        {%- if page.content != blank -%}
-          <div class="pb-page-story__body">{{ page.content }}</div>
+        {%- if content != blank -%}
+          <div class="pb-page-story__body">{{ content }}</div>
         {%- endif -%}
       </div>
       <div class="pb-page-story__blocks">{% content_for 'blocks' %}</div>
     </div>
-  {%- elsif page.content != blank -%}
+  {%- elsif content != blank -%}
     <div class="pb-page-story__layout">
       {%- if section.settings.layout == 'document' and heading != blank -%}
         <h2 class="pb-page-story__aside">{{ heading | escape }}</h2>
       {%- endif -%}
-      <div class="pb-page-story__body">{{ page.content }}</div>
+      <div class="pb-page-story__body">{{ content }}</div>
     </div>
   {%- endif -%}
 </div>
@@ -247,7 +253,9 @@
       column-gap: clamp(48px, 7vw, 120px);
     }
 
-    .pb-page-story--story .pb-page-story__body p {
+    /* Headings and lists too (the brand pages' text), or past the opening line's 20 rows
+       they'd drop into the left column. */
+    .pb-page-story--story .pb-page-story__body :is(p, h2, h3, h4, ul, ol) {
       grid-column: 2;
     }
 
@@ -296,7 +304,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Shows the page's own text (Online Store → Pages). Edit the words there."
+      "content": "Shows the page's own text (Online Store → Pages), or on a collection its description (Products → Collections). Edit the words there."
     },
     {
       "type": "select",
@@ -318,10 +326,17 @@
       "visible_if": "{{ section.settings.layout != 'story' }}"
     },
     {
+      "type": "checkbox",
+      "id": "crumbs",
+      "label": "Show breadcrumb",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "home_label",
       "label": "Breadcrumb home",
-      "default": "Home"
+      "default": "Home",
+      "visible_if": "{{ section.settings.crumbs }}"
     },
     {
       "type": "text",

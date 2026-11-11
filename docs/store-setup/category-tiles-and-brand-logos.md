@@ -14,7 +14,7 @@ Design: [`docs/superpowers/specs/2026-10-14-category-tiles-brand-logos-design.md
 ## 1. Before you start
 
 Do [README.md](README.md) §3 first. The tiles link to the category collections, so these must
-exist: `wash-shampoo`, `cleaners-sprays`, `microfibre-drying`, `kits-packs`, `power-emergency`.
+exist: `wash-detail`, `microfibre-drying`, `value-packs`, `power-emergency`.
 
 ## 2. Collection images (for the tiles)
 
@@ -34,12 +34,15 @@ A tile uses its collection's image unless you give the tile its own photo (step 
 
 **Content → Files → Upload files.**
 
+In this order (amendments 10 Nov 2026):
+
 | Brand | Links to |
 |---|---|
-| Permagard | `/collections/permagard-car-care` |
+| Protection Brands | `/collections/protection-brands` |
 | CERFACE | `/collections/cerface-ceramic` |
 | OptiVAN | `/collections/optivan-caravan-maintenance` |
-| Honda Genuine Car Care (from 4 Nov) | `/collections/honda-genuine-car-care` |
+| Permagard | `/collections/permagard-car-care` |
+| Honda Genuine Car Care | `/collections/honda-genuine-car-care` |
 
 - Use **SVG** or **PNG with a transparent background**. Avoid JPGs with a white box.
 - Trim empty space around the logo, so all logos look the same size in the row.
@@ -76,8 +79,8 @@ Each **Tile** block:
 ## 5. Set up the brand logos
 
 On the same page, open **Brand logos (PB)**, or add it with **Add section → Brand logos (PB)**.
-The Permagard, CERFACE and OptiVAN blocks are already there with their links. Each needs a
-logo.
+The five blocks above are already there with their links. Each uses the theme's own logo
+when no image is picked (matched by Alt text).
 
 Section settings:
 
@@ -97,7 +100,6 @@ Each **Logo** block:
 
 - **Add logo** adds a block, up to 16. Drag logos to reorder them. Until at least one logo has an
   image, the section is hidden on the live store.
-- **Honda (4 Nov):** add a logo block with the Honda logo, linked to `/collections/honda-genuine-car-care`.
 
 ## 6. Check
 

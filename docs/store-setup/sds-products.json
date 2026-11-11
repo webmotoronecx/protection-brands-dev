@@ -1,6 +1,41 @@
 {
-  "_readme": "Products whose SDS metafield (custom.sds) upload-sds.mjs --link-products sets. sheet = PDF filename in files/SDS, product = product handle. Products already linked to another sheet are reported, not changed.",
+  "_readme": "Products whose SDS metafield (custom.sds) upload-sds.mjs --link-products sets. sheet = PDF path under files/SDS, product = product handle. Products already linked to another sheet are reported, not changed.",
   "links": [
-    { "sheet": "SDS - CERFACE Shampoo 1.6.2022.pdf", "product": "cerface-shampoo-concentrate" }
+    {
+      "sheet": "SDS - CERFACE Shampoo 1.6.2022.pdf",
+      "product": "cerface-shampoo-concentrate"
+    },
+    {
+      "sheet": "more-sds/Honda/New - 11.9.2026/SDS - HGCC DETAILING SPRAY - September 2026.pdf",
+      "product": "hgcc-detailing-spray-500ml"
+    },
+    {
+      "sheet": "more-sds/Honda/New - 11.9.2026/SDS - HGCC MULTI-PURPOSE CLEANER -  September 2026.pdf",
+      "product": "hgcc-multipurpose-cleaner-500ml"
+    },
+    {
+      "sheet": "more-sds/Honda/New - 11.9.2026/SDS - HGCC_pH_Neutral_Vehicle_Wash -  September 2026.pdf",
+      "product": "hgcc-ph-neutral-vehicle-wash-500ml"
+    },
+    {
+      "sheet": "more-sds/Permagard/SDS - Permagard Shampoo 24.8.2022.pdf",
+      "product": "permagard-shampoo"
+    },
+    {
+      "sheet": "more-sds/Permagard/SDS - Permagard Tyre Gel 24.8.2022.pdf",
+      "product": "permagard-tyregel"
+    },
+    {
+      "sheet": "more-sds/Protection Brands/SDS - Citrus Multipurpose Cleaner - 01.03.2023.pdf",
+      "product": "car-shampoo-citrus-multipurpose-cleaner-500ml"
+    },
+    {
+      "sheet": "more-sds/Protection Brands/SDS - Hydrophobic Ceramic Detailing Spray - 27.7.2021.pdf",
+      "product": "hydrophobic-detailing-finishing-spray"
+    },
+    {
+      "sheet": "more-sds/Protection Brands/SDS - Protection Brands - ph neutral vehicle wash  (Jan 2022).pdf",
+      "product": "ph-neutral-vehicle-wash-500ml"
+    }
   ]
 }

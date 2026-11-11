@@ -6,8 +6,9 @@
 
 {%- liquid
   # Default logos in assets/ (logo-<brand>.png), used when a logo has no image picked. Matched
-  # by the logo's Alt text: Permagard, CERFACE, OptiVAN, Oridon. Sizes in px.
-  assign default_brands = 'permagard,cerface,optivan,oridon' | split: ','
+  # by the logo's Alt text: Protection Brands (logo-black.png), Permagard, CERFACE, OptiVAN, Honda Genuine Car Care
+  # (logo-hgcc.png). Sizes in px.
+  assign default_brands = 'protection-brands,permagard,cerface,optivan,honda-genuine-car-care' | split: ','
 
   # Nothing to show (no logo picked and no default): render nothing.
   for block in section.blocks
@@ -38,14 +39,18 @@
         if logo == blank and default_brands contains brand
           assign default_logo = 'logo-' | append: brand | append: '.png'
           case brand
+            when 'honda-genuine-car-care'
+              assign default_logo = 'logo-hgcc.png'
+              assign default_ratio = 312.0 | divided_by: 140
+            when 'protection-brands'
+              assign default_logo = 'logo-black.png'
+              assign default_ratio = 322.0 | divided_by: 183
             when 'permagard'
               assign default_ratio = 228.0 | divided_by: 140
             when 'cerface'
               assign default_ratio = 148.0 | divided_by: 140
             when 'optivan'
               assign default_ratio = 374.0 | divided_by: 140
-            when 'oridon'
-              assign default_ratio = 266.0 | divided_by: 140
           endcase
         endif
         if logo == blank and default_logo == blank and request.design_mode == false
@@ -314,7 +319,7 @@
           "type": "image_picker",
           "id": "image",
           "label": "Image",
-          "info": "SVG or transparent PNG, trimmed. Empty: the default logo in the theme for the brand named in Alt text (Permagard, CERFACE, OptiVAN, Oridon); other logos without an image are skipped."
+          "info": "SVG or transparent PNG, trimmed. Empty: the default logo in the theme for the brand named in Alt text (Protection Brands, Permagard, CERFACE, OptiVAN, Honda Genuine Car Care); other logos without an image are skipped."
         },
         {
           "type": "url",

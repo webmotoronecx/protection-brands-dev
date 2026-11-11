@@ -19,7 +19,7 @@ Name **SDS document**. Type (handle) must be `sds_document`. Turn on **Storefron
 |---|---|---|---|
 | Product name | `product_name` | Single line text | Required |
 | File | `file` | File | Required; accepted file types **Any file type** (there's no PDF-only option, and *Media files only* blocks PDFs) |
-| Brand | `brand` | Single line text | Preset choices: `Permagard`, `CERFACE`, `OptiVAN`, `Honda Genuine Car Care`, `Protection Brands` |
+| Brand | `brand` | Single line text | Preset choices: `Permagard`, `CERFACE`, `OptiVAN`, `Honda Genuine Car Care`, `Protection Brands`, `Mazda`, `Mitsubishi` |
 | Issue date | `issue_date` | Date | — |
 
 Keys must match exactly; the theme reads them by name.
@@ -50,8 +50,11 @@ Add it to the main menu (see the menu outline in [README.md](README.md)).
 
 ### From the PDF folder (script)
 
-`upload-sds.mjs` uploads every PDF in `files/SDS` (next to `shopify-theme/`) and creates an
-entry for each one the store doesn't have yet. Files must be named
+`upload-sds.mjs` uploads every PDF in `files/SDS` (next to `shopify-theme/`) and its
+subfolders, except folders named `Old`, and creates an entry for each one the store doesn't have
+yet. Files whose name it can't read are listed in [`sds-sheets.json`](sds-sheets.json) with the
+name, brand and date to show (the `more-sds/` sheets: brand subfolders, prefixes such as HGCC,
+MPCC, MMAL and Diamond Protect, month-only dates, which become the 1st). Other files must be named
 `SDS - <Brand> <Product> <D.M.YYYY>.pdf`: the product name is the filename without
 `SDS - `, the brand its first word(s), the issue date read day first (`3.2.2025` is 3 February
 2025). From `docs/store-setup/`:

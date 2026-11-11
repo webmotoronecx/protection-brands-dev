@@ -3,14 +3,15 @@
   button, then a row of brand logos (blocks) with a small "Our brands" heading on the left, on
   one light grey band. Used straight after the hero (templates/index.json).
   Logos: a logo block with no image picked uses the default in assets/ (logo-<brand>.png),
-  matched by its Alt text: Permagard, CERFACE, OptiVAN, Oridon (as sections/pb-brand-logos.liquid).
+  matched by its Alt text: Protection Brands, Permagard, CERFACE, OptiVAN, Honda Genuine Car
+  Care (as sections/pb-brand-logos.liquid).
   On phones the heading sits above the logos, two to a row.
   The button is the hero's Shop now button (sections/pb-hero-bottle.liquid): red sweeps in from
   the left on hover and an arrow slides in. Transforms and opacity only.
 {%- endcomment -%}
 
 {%- liquid
-  assign default_brands = 'permagard,cerface,optivan,oridon' | split: ','
+  assign default_brands = 'protection-brands,permagard,cerface,optivan,honda-genuine-car-care' | split: ','
   assign logo_height = section.settings.logo_height
   assign label_font = section.settings.label_font
 -%}
@@ -57,14 +58,18 @@
             if logo == blank and default_brands contains brand
               assign default_logo = 'logo-' | append: brand | append: '.png'
               case brand
+                when 'honda-genuine-car-care'
+                  assign default_logo = 'logo-hgcc.png'
+                  assign default_ratio = 312.0 | divided_by: 140
+                when 'protection-brands'
+                  assign default_logo = 'logo-black.png'
+                  assign default_ratio = 322.0 | divided_by: 183
                 when 'permagard'
                   assign default_ratio = 228.0 | divided_by: 140
                 when 'cerface'
                   assign default_ratio = 148.0 | divided_by: 140
                 when 'optivan'
                   assign default_ratio = 374.0 | divided_by: 140
-                when 'oridon'
-                  assign default_ratio = 266.0 | divided_by: 140
               endcase
             endif
             if logo == blank and default_logo == blank and request.design_mode == false
@@ -395,7 +400,7 @@
           "type": "image_picker",
           "id": "image",
           "label": "Logo",
-          "info": "Empty uses the default for Permagard, CERFACE, OptiVAN or Oridon (by Alt text)."
+          "info": "Empty uses the default for Protection Brands, Permagard, CERFACE, OptiVAN or Honda Genuine Car Care (by Alt text)."
         },
         {
           "type": "url",
@@ -415,10 +420,11 @@
     {
       "name": "Who we are (PB)",
       "blocks": [
-        { "type": "logo", "settings": { "alt": "Permagard" } },
+        { "type": "logo", "settings": { "alt": "Protection Brands" } },
         { "type": "logo", "settings": { "alt": "CERFACE" } },
         { "type": "logo", "settings": { "alt": "OptiVAN" } },
-        { "type": "logo", "settings": { "alt": "Oridon" } }
+        { "type": "logo", "settings": { "alt": "Permagard" } },
+        { "type": "logo", "settings": { "alt": "Honda Genuine Car Care" } }
       ]
     }
   ]

@@ -30,21 +30,10 @@
             "fallback": "categories"
           },
           "blocks": {}
-        },
-        "mega_brands": {
-          "type": "_pb-mega-panel",
-          "settings": {
-            "label": "Brands",
-            "heading": "",
-            "menu": "footer-brands",
-            "fallback": "brands"
-          },
-          "blocks": {}
         }
       },
       "block_order": [
-        "mega_categories",
-        "mega_brands"
+        "mega_categories"
       ]
     },
     "header_announcements_9jGBFp": {

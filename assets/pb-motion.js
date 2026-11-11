@@ -51,13 +51,21 @@
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const root = document.documentElement;
 
+  // .page-wrapper has no single content element (header group, main, footer side by side), so
+  // Lenis watches the wrapper itself, which never changes size. When the page grows (the
+  // collection grid loading its next page, late images) it kept the old scroll height and
+  // stopped at the old bottom. Watch the wrapper's children and re-measure instead.
+  const contentObserver = new ResizeObserver(() => lenis?.resize());
+
   const startLenis = () => {
     lenis?.destroy();
+    contentObserver.disconnect();
     const wrapper = scroller();
     lenis =
       wrapper === window
         ? new Lenis({ anchors: true, autoRaf: false, allowNestedScroll: true })
         : new Lenis({ wrapper, content: wrapper, anchors: true, autoRaf: false, allowNestedScroll: true });
+    if (wrapper !== window) for (const child of wrapper.children) contentObserver.observe(child);
     if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
     if (root.hasAttribute('scroll-lock') || root.hasAttribute('data-pb-menu-open')) lenis.stop();
   };
@@ -355,6 +363,7 @@
     () => {
       if (!reducedMotion.matches) return;
       squeeze.removeEventListener('change', startLenis);
+      contentObserver.disconnect();
       lenis?.destroy();
       lenis = null;
       showAll();

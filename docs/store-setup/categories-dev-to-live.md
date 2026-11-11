@@ -61,16 +61,15 @@ One row per category collection, as finalised on dev.
 
 The **handle** must be identical on live. The menu, the home page tiles and the brand logo
 links all point to handles. If a handle is already taken on live, Shopify silently adds `-1`
-(e.g. `wash-shampoo-1`). Rename or delete the old collection first, then check the handle
+(e.g. `wash-detail-1`). Rename or delete the old collection first, then check the handle
 before saving.
 
 | # | Title | Handle | Conditions (all / any) | Sort order | Theme template | Image filename | Description |
 |---|---|---|---|---|---|---|---|
-| 1 | Wash & Shampoo | `wash-shampoo` | all: Product type = `Wash & Shampoo` | Best selling | default | | |
-| 2 | Cleaners & Sprays | `cleaners-sprays` | all: Product type = `Cleaners & Sprays` | Best selling | default | | |
-| 3 | Microfibre & Drying | `microfibre-drying` | all: Product type = `Microfibre & Drying` | Best selling | default | | |
-| 4 | Kits & Packs | `kits-packs` | all: Product type = `Kits & Packs` | Best selling | default | | |
-| 5 | Power & Emergency | `power-emergency` | all: Product type = `Power & Emergency` | Best selling | default | | |
+| 1 | Wash & Detail | `wash-detail` | all: Product type = `Wash & Detail` | Best selling | default | | |
+| 2 | Microfibre & Drying | `microfibre-drying` | all: Product type = `Microfibre & Drying` | Best selling | default | | |
+| 3 | Value Packs | `value-packs` | all: Product type = `Value Packs` | Best selling | default | | |
+| 4 | Power & Emergency | `power-emergency` | all: Product type = `Power & Emergency` | Best selling | default | | |
 | | | | | | | | |
 
 SEO, from each collection's **Search engine listing** panel:
@@ -134,10 +133,9 @@ brackets.
 ```
 Shop (/collections/all)
   By category (/collections/all)
-    Wash & Shampoo (/collections/wash-shampoo)
-    Cleaners & Sprays (/collections/cleaners-sprays)
+    Wash & Detail (/collections/wash-detail)
     Microfibre & Drying (/collections/microfibre-drying)
-    Kits & Packs (/collections/kits-packs)
+    Value Packs (/collections/value-packs)
     Power & Emergency (/collections/power-emergency)
   By brand (/collections/all)
     Permagard (/collections/permagard-car-care)

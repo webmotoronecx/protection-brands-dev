@@ -14,7 +14,7 @@
           "key": "brand",
           "name": "Brand",
           "type": "single_line_text_field",
-          "choices": ["Permagard", "CERFACE", "OptiVAN", "Honda Genuine Car Care", "Protection Brands"]
+          "choices": ["Permagard", "CERFACE", "OptiVAN", "Honda Genuine Car Care", "Protection Brands", "Mazda", "Mitsubishi"]
         },
         { "key": "issue_date", "name": "Issue date", "type": "date" }
       ]
@@ -141,19 +141,16 @@
   ],
 
   "collections": [
-    { "handle": "wash-shampoo", "title": "Wash & Shampoo", "rules": [["TYPE", "Wash & Shampoo"]], "sortOrder": "BEST_SELLING" },
-    { "handle": "cleaners-sprays", "title": "Cleaners & Sprays", "rules": [["TYPE", "Cleaners & Sprays"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "wash-detail", "title": "Wash & Detail", "rules": [["TYPE", "Wash & Detail"]], "sortOrder": "BEST_SELLING" },
     { "handle": "microfibre-drying", "title": "Microfibre & Drying", "rules": [["TYPE", "Microfibre & Drying"]], "sortOrder": "BEST_SELLING" },
-    { "handle": "kits-packs", "title": "Kits & Packs", "rules": [["TYPE", "Kits & Packs"]], "sortOrder": "BEST_SELLING" },
+    { "handle": "value-packs", "title": "Value Packs", "rules": [["TYPE", "Value Packs"]], "sortOrder": "BEST_SELLING" },
     { "handle": "power-emergency", "title": "Power & Emergency", "rules": [["TYPE", "Power & Emergency"]], "sortOrder": "BEST_SELLING" },
 
     { "handle": "protection-brands", "title": "Protection Brands", "rules": [["SUITABLE_FOR", "Protection Brands"]], "templateSuffix": "brand" },
     { "handle": "permagard-car-care", "title": "Permagard Car Care", "rules": [["SUITABLE_FOR", "Permagard"]], "templateSuffix": "brand" },
     { "handle": "cerface-ceramic", "title": "CERFACE Ceramic", "rules": [["SUITABLE_FOR", "CERFACE"]], "templateSuffix": "brand" },
     { "handle": "optivan-caravan-maintenance", "title": "OptiVAN Caravan Maintenance", "rules": [["SUITABLE_FOR", "OptiVAN"]], "templateSuffix": "brand" },
-    { "handle": "honda-genuine-car-care", "title": "Honda Genuine Car Care", "rules": [["SUITABLE_FOR", "Honda Genuine Car Care"]], "templateSuffix": "brand", "watermark": "Honda" },
-
-    { "handle": "bulk-professional", "title": "Bulk & Professional", "rules": [["TAG", "Bulk"]] }
+    { "handle": "honda-genuine-car-care", "title": "Honda Genuine Car Care", "rules": [["SUITABLE_FOR", "Honda Genuine Car Care"]], "templateSuffix": "brand", "watermark": "Honda" }
   ],
 
   "pages": [
@@ -217,7 +214,12 @@
     }
   ],
 
-  "redirects": [],
+  "redirects": [
+    { "path": "/collections/wash-shampoo", "target": "/collections/wash-detail" },
+    { "path": "/collections/cleaners-sprays", "target": "/collections/wash-detail" },
+    { "path": "/collections/bulk-professional", "target": "/collections/wash-detail" },
+    { "path": "/collections/kits-packs", "target": "/collections/value-packs" }
+  ],
 
   "menus": [
     {
@@ -226,16 +228,16 @@
       "items": [
         { "title": "Shop", "link": "catalog", "items": [
           { "title": "By category", "link": "catalog", "items": [
-            { "title": "Wash & Shampoo", "link": "collection:wash-shampoo" },
-            { "title": "Cleaners & Sprays", "link": "collection:cleaners-sprays" },
+            { "title": "Wash & Detail", "link": "collection:wash-detail" },
             { "title": "Microfibre & Drying", "link": "collection:microfibre-drying" },
-            { "title": "Kits & Packs", "link": "collection:kits-packs" },
+            { "title": "Value Packs", "link": "collection:value-packs" },
             { "title": "Power & Emergency", "link": "collection:power-emergency" }
           ] },
           { "title": "By brand", "link": "catalog", "items": [
-            { "title": "Permagard", "link": "collection:permagard-car-care" },
+            { "title": "Protection Brands", "link": "collection:protection-brands" },
             { "title": "CERFACE", "link": "collection:cerface-ceramic" },
             { "title": "OptiVAN", "link": "collection:optivan-caravan-maintenance" },
+            { "title": "Permagard", "link": "collection:permagard-car-care" },
             { "title": "Honda Genuine Car Care", "link": "collection:honda-genuine-car-care" }
           ] },
           { "title": "Professional / Bulk", "link": "collection:professional" }
@@ -248,8 +250,7 @@
         { "title": "Car Care Tips", "link": "blog:car-care-tips" },
         { "title": "SDS", "link": "page:sds" },
         { "title": "About Us", "link": "page:about-us" },
-        { "title": "Locate Dealership", "link": "page:locate-dealership" },
-        { "title": "Contact", "link": "page:contact-page" }
+        { "title": "Contact Us", "link": "page:contact-page" }
       ]
     },
 
@@ -262,28 +263,20 @@
           "link": "catalog"
         },
         {
-          "title": "Wash & Shampoo",
-          "link": "collection:wash-shampoo"
-        },
-        {
-          "title": "Cleaners & Sprays",
-          "link": "collection:cleaners-sprays"
+          "title": "Wash & Detail",
+          "link": "collection:wash-detail"
         },
         {
           "title": "Microfibre & Drying",
           "link": "collection:microfibre-drying"
         },
         {
-          "title": "Kits & Packs",
-          "link": "collection:kits-packs"
+          "title": "Value Packs",
+          "link": "collection:value-packs"
         },
         {
           "title": "Power & Emergency",
           "link": "collection:power-emergency"
-        },
-        {
-          "title": "Bulk & Professional",
-          "link": "collection:bulk-professional"
         }
       ]
     },
@@ -297,10 +290,6 @@
           "link": "collection:protection-brands"
         },
         {
-          "title": "Permagard",
-          "link": "collection:permagard-car-care"
-        },
-        {
           "title": "CERFACE",
           "link": "collection:cerface-ceramic"
         },
@@ -309,12 +298,12 @@
           "link": "collection:optivan-caravan-maintenance"
         },
         {
-          "title": "Honda Genuine Car Care",
-          "link": "collection:honda-genuine-car-care"
+          "title": "Permagard",
+          "link": "collection:permagard-car-care"
         },
         {
-          "title": "Oridon",
-          "link": "product:4-in-1-multi-power-unit-vacuum-flashlight-tyre-pump-jump-starter"
+          "title": "Honda Genuine Car Care",
+          "link": "collection:honda-genuine-car-care"
         }
       ]
     }

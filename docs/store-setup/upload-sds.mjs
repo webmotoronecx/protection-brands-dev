@@ -10,18 +10,21 @@
 // PDFs are named "SDS - <Brand> <Product> <D.M.YYYY>.pdf", e.g.
 // "SDS - CERFACE Shampoo 1.6.2022.pdf" → product name "CERFACE Shampoo 1.6.2022", brand
 // CERFACE, issued 1 June 2022. The folder defaults to ../../../../files/SDS (--dir to change).
+// Subfolders are included, except any named "Old". Files the name can't be read from (brand
+// subfolders, other prefixes such as HGCC or MPCC, month-year dates) are listed in
+// sds-sheets.json with their name, brand and date.
 //
 // Safety, as setup-store.mjs: nothing is written without --apply. Files and entries that
 // already exist (same filename / handle) are left as they are; nothing is deleted or replaced.
 // A product whose SDS metafield is already set to something else is reported, not changed.
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const BRANDS = ['Permagard', 'CERFACE', 'OptiVAN', 'Honda Genuine Car Care', 'Protection Brands'];
+const BRANDS = ['Permagard', 'CERFACE', 'OptiVAN', 'Honda Genuine Car Care', 'Protection Brands', 'Mazda', 'Mitsubishi'];
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
@@ -77,20 +80,44 @@ function mutate(query, variables, field) {
 
 // The sheets ---------------------------------------------------------------------------------
 
-const sheets = readdirSync(DIR).filter((n) => /\.pdf$/i.test(n)).sort().map((file) => {
-  const name = file.replace(/^SDS\s*-\s*/i, '').replace(/\.pdf$/i, '').trim();
+// Every PDF under DIR, as a path relative to it, skipping folders named "Old".
+function pdfs(dir, prefix = '') {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    if (e.isDirectory()) return e.name.toLowerCase() === 'old' ? [] : pdfs(join(dir, e.name), join(prefix, e.name));
+    return /\.pdf$/i.test(e.name) ? [join(prefix, e.name)] : [];
+  });
+}
+
+const handleize = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const listedPath = join(HERE, 'sds-sheets.json');
+const listed = existsSync(listedPath) ? JSON.parse(readFileSync(listedPath, 'utf8')).sheets : [];
+
+const sheets = pdfs(DIR).sort().map((file) => {
+  // Shopify stores the file without brackets and with each run of spaces as one underscore:
+  // "SDS - X  SPRAY (Feb 2026).pdf" → "SDS_-_X_SPRAY_Feb_2026.pdf".
+  const storedName = basename(file).replace(/[()]/g, '').replace(/\s+/g, '_');
+  const entry = listed.find((l) => l.file === file);
+  if (entry) {
+    return { file, storedName, name: entry.name, brand: entry.brand, date: entry.date, handle: handleize(`${entry.name} ${entry.date.slice(0, 7)}`) };
+  }
+  const name = basename(file).replace(/^SDS\s*-\s*/i, '').replace(/\.pdf$/i, '').trim();
   const brand = BRANDS.find((b) => name.toLowerCase().startsWith(b.toLowerCase()));
   const d = name.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
   return {
     file,
-    // Shopify stores the file with spaces as underscores.
-    storedName: file.replace(/ /g, '_'),
+    storedName,
     name,
     brand,
     date: d ? `${d[3]}-${d[2].padStart(2, '0')}-${d[1].padStart(2, '0')}` : null,
-    handle: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    handle: handleize(name),
   };
 });
+
+const unknownBrand = sheets.filter((s) => s.brand && !BRANDS.includes(s.brand));
+if (unknownBrand.length) {
+  for (const s of unknownBrand) console.error(`"${s.brand}" (${s.file}) isn't one of the brand choices: ${BRANDS.join(', ')}`);
+  process.exit(1);
+}
 
 const bad = sheets.filter((s) => !s.brand || !s.date);
 if (bad.length) {
@@ -147,19 +174,19 @@ async function uploadFile(s) {
   const path = join(DIR, s.file);
   const target = mutate(`mutation($i: [StagedUploadInput!]!) {
     stagedUploadsCreate(input: $i) { stagedTargets { url resourceUrl parameters { name value } } userErrors { field message } }
-  }`, { i: [{ filename: s.file, mimeType: 'application/pdf', resource: 'FILE', httpMethod: 'POST', fileSize: String(statSync(path).size) }] },
+  }`, { i: [{ filename: basename(s.file), mimeType: 'application/pdf', resource: 'FILE', httpMethod: 'POST', fileSize: String(statSync(path).size) }] },
   'stagedUploadsCreate').stagedTargets[0];
 
   const form = new FormData();
   for (const p of target.parameters) form.append(p.name, p.value);
-  form.append('file', new Blob([readFileSync(path)], { type: 'application/pdf' }), s.file);
+  form.append('file', new Blob([readFileSync(path)], { type: 'application/pdf' }), basename(s.file));
   const res = await fetch(target.url, { method: 'POST', body: form });
   if (!res.ok) throw new Error(`Upload of ${s.file} failed: ${res.status} ${await res.text()}`);
 
   // RAISE_ERROR: never rename or replace a file that's already there.
   const p = mutate(`mutation($f: [FileCreateInput!]!) {
     fileCreate(files: $f) { files { id } userErrors { field message code } }
-  }`, { f: [{ originalSource: target.resourceUrl, filename: s.file, contentType: 'FILE', duplicateResolutionMode: 'RAISE_ERROR' }] },
+  }`, { f: [{ originalSource: target.resourceUrl, filename: basename(s.file), contentType: 'FILE', duplicateResolutionMode: 'RAISE_ERROR' }] },
   'fileCreate');
   return { file: s.file, id: (fileIds[s.storedName] = p.files[0].id) };
 }

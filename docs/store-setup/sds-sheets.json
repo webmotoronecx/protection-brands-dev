@@ -1,0 +1,203 @@
+{
+  "_readme": "SDS PDFs whose filename upload-sds.mjs can't read (brand subfolders, other brand prefixes, month-year dates). file = path under files/SDS; name, brand and date are what the SDS page shows. Folders named Old are skipped.",
+  "sheets": [
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC DETAILING SPRAY - September 2026.pdf",
+      "name": "HGCC Detailing Spray",
+      "brand": "Honda Genuine Car Care",
+      "date": "2026-09-01"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC FINISHING  SPRAY - September 2026.pdf",
+      "name": "HGCC Finishing Spray",
+      "brand": "Honda Genuine Car Care",
+      "date": "2026-09-01"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC GRAPHENE CERAMIC PAINT PROTECTION -  September 2026.pdf",
+      "name": "HGCC Graphene Ceramic Paint Protection",
+      "brand": "Honda Genuine Car Care",
+      "date": "2026-09-01"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC Leather and Fabric Protection 24.8.2022.pdf",
+      "name": "HGCC Leather and Fabric Protection",
+      "brand": "Honda Genuine Car Care",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC MULTI-PURPOSE CLEANER -  September 2026.pdf",
+      "name": "HGCC Multi-Purpose Cleaner",
+      "brand": "Honda Genuine Car Care",
+      "date": "2026-09-01"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC Plastic and Vinyl Protection 24.8.2022.pdf",
+      "name": "HGCC Plastic and Vinyl Protection",
+      "brand": "Honda Genuine Car Care",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Honda/New - 11.9.2026/SDS - HGCC_pH_Neutral_Vehicle_Wash -  September 2026.pdf",
+      "name": "HGCC pH Neutral Vehicle Wash",
+      "brand": "Honda Genuine Car Care",
+      "date": "2026-09-01"
+    },
+    {
+      "file": "more-sds/Mazda/SDS - MPCC Leather and Fabric Protection 24.8.2022.pdf",
+      "name": "MPCC Leather and Fabric Protection",
+      "brand": "Mazda",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mazda/SDS - MPCC Plastic and Vinyl Protection 24.8.2022.pdf",
+      "name": "MPCC Plastic and Vinyl Protection",
+      "brand": "Mazda",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mazda/SDS - MPCC Reactive Polymer Paint Protection 24.8.2022.pdf",
+      "name": "MPCC Reactive Polymer Paint Protection",
+      "brand": "Mazda",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mazda/SDS - MPCC Shampoo for Painted Surfaces 24.8.2022.pdf",
+      "name": "MPCC Shampoo for Painted Surfaces",
+      "brand": "Mazda",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - DIAMOND PROTECT DETAILING SPRAY (Feb 2026).pdf",
+      "name": "Diamond Protect Detailing Spray",
+      "brand": "Mitsubishi",
+      "date": "2026-02-01"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - DIAMOND PROTECT FINISHING SPRAY (Feb 2026).pdf",
+      "name": "Diamond Protect Finishing Spray",
+      "brand": "Mitsubishi",
+      "date": "2026-02-01"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - DIAMOND PROTECT MULTI-PURPOSE CLEANER  (FEB 2026).pdf",
+      "name": "Diamond Protect Multi-Purpose Cleaner",
+      "brand": "Mitsubishi",
+      "date": "2026-02-01"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - DIAMOND PROTECT VEHICLE WASH (Feb 2026).pdf",
+      "name": "Diamond Protect Vehicle Wash",
+      "brand": "Mitsubishi",
+      "date": "2026-02-01"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - MMAL Leather and Fabric Protection 24.8.2022.pdf",
+      "name": "MMAL Leather and Fabric Protection",
+      "brand": "Mitsubishi",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - MMAL Plastic and Vinyl Paint Protection 24.8.2022.pdf",
+      "name": "MMAL Plastic and Vinyl Protection",
+      "brand": "Mitsubishi",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - MMAL Reactive Polymer Paint Protection 24.8.2022.pdf",
+      "name": "MMAL Reactive Polymer Paint Protection",
+      "brand": "Mitsubishi",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS - MMAL Shampoo for Painted Surfaces 24.8.2022.pdf",
+      "name": "MMAL Shampoo for Painted Surfaces",
+      "brand": "Mitsubishi",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Mitsubishi/SDS -MITSUBISHI - DIAMOND PROTECT GRAPHENE CERAMIC PAINT PROTECTION  (FEB 2026).pdf",
+      "name": "Diamond Protect Graphene Ceramic Paint Protection",
+      "brand": "Mitsubishi",
+      "date": "2026-02-01"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Engine Cleaner 24.8.2022.pdf",
+      "name": "Permagard Engine Cleaner",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Leather and Fabric Protection 24.8.2022.pdf",
+      "name": "Permagard Leather and Fabric Protection",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Multipurpose Cleaner Concentrate 24.8.2022.pdf",
+      "name": "Permagard Multipurpose Cleaner Concentrate",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Plastic and Vinyl Protection 24.8.2022.pdf",
+      "name": "Permagard Plastic and Vinyl Protection",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Reactive Polymer Paint Protection 24.8.2022.pdf",
+      "name": "Permagard Reactive Polymer Paint Protection",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Reactive Polymer Refresh for Slightly Damaged Surfaces Paint Protection 24.8.2022.pdf",
+      "name": "Permagard Reactive Polymer Refresh for Slightly Damaged Surfaces",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Shampoo 24.8.2022.pdf",
+      "name": "Permagard Shampoo",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Tar Remover 24.8.2022.pdf",
+      "name": "Permagard Tar Remover",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Tyre Gel 24.8.2022.pdf",
+      "name": "Permagard Tyre Gel",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Permagard/SDS - Permagard Window Cleaner 24.8.2022.pdf",
+      "name": "Permagard Window Cleaner",
+      "brand": "Permagard",
+      "date": "2022-08-24"
+    },
+    {
+      "file": "more-sds/Protection Brands/SDS - Citrus Multipurpose Cleaner - 01.03.2023.pdf",
+      "name": "Protection Brands Citrus Multipurpose Cleaner",
+      "brand": "Protection Brands",
+      "date": "2023-03-01"
+    },
+    {
+      "file": "more-sds/Protection Brands/SDS - Hydrophobic Ceramic Detailing Spray - 27.7.2021.pdf",
+      "name": "Protection Brands Hydrophobic Ceramic Detailing Spray",
+      "brand": "Protection Brands",
+      "date": "2021-07-27"
+    },
+    {
+      "file": "more-sds/Protection Brands/SDS - Protection Brands - ph neutral vehicle wash  (Jan 2022).pdf",
+      "name": "Protection Brands pH Neutral Vehicle Wash",
+      "brand": "Protection Brands",
+      "date": "2022-01-01"
+    }
+  ]
+}

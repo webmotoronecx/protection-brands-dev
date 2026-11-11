@@ -106,6 +106,15 @@
   </a>
 
   {%- comment -%}
+    Best Sellers: the hand-picked best-sellers collection if the store has one, otherwise all
+    products by best selling.
+  {%- endcomment -%}
+  {%- liquid
+    assign best_sellers_url = routes.all_products_collection_url | append: '?sort_by=best-selling'
+    assign best_sellers_url = collections['best-sellers'].url | default: best_sellers_url
+  -%}
+
+  {%- comment -%}
     Desktop links: the Header links menu if one is picked, otherwise these defaults. A link
     whose text matches a mega menu panel's Header link opens that panel on hover (matched by
     assets/pb-mega.js). Without a panel, Shop By Category opens the floating menu, which lists
@@ -140,9 +149,8 @@
             Shop By Category
           </button>
         </li>
-        <li><a class="pb-landing-header__link" href="{{ routes.collections_url }}">Brands</a></li>
-        <li><a class="pb-landing-header__link" href="{{ routes.all_products_collection_url }}?sort_by=best-selling">Best Sellers</a></li>
-        <li><a class="pb-landing-header__link" href="{{ pages['locate-dealership'].url | default: '/pages/locate-dealership' }}">Locate Dealership</a></li>
+        <li><a class="pb-landing-header__link" href="{{ best_sellers_url }}">Best Sellers</a></li>
+        <li><a class="pb-landing-header__link" href="{{ pages['contact-page'].url | default: '/pages/contact-page' }}">Contact Us</a></li>
       {%- endif -%}
     </ul>
   </nav>
@@ -234,7 +242,7 @@
         # Categories: the ones picked in the section, otherwise the shop's product categories.
         assign categories = section.settings.categories
         if categories == blank
-          assign category_handles = 'wash-shampoo,cleaners-sprays,microfibre-drying,kits-packs,power-emergency,bulk-professional' | split: ','
+          assign category_handles = 'wash-detail,microfibre-drying,value-packs,power-emergency' | split: ','
         endif
       -%}
       {%- capture category_links -%}
@@ -259,50 +267,10 @@
           </ul>
         </nav>
       {%- endif -%}
-      {%- liquid
-        # Brands, as in the desktop Brands mega panel: its menu if one is picked, otherwise the
-        # brand collections.
-        assign brands_menu = blank
-        assign brands_heading = 'Brands'
-        for block in section.blocks
-          if block.settings.fallback == 'brands'
-            assign brands_menu = block.settings.menu
-            assign brands_heading = block.settings.label | default: brands_heading
-          endif
-        endfor
-        # The header's theme blocks don't always expose their settings here, so the brands menu
-        # the desktop panel uses (footer-brands) is the next choice.
-        unless brands_menu.links.size > 0
-          assign brands_menu = linklists['footer-brands']
-        endunless
-        assign brand_handles = 'protection-brands,permagard-car-care,cerface-ceramic,optivan-caravan-maintenance,honda-genuine-car-care' | split: ','
-      -%}
-      {%- capture brand_links -%}
-        {%- if brands_menu.links.size > 0 -%}
-          {%- for link in brands_menu.links -%}
-            {%- render 'pb-menu-link', url: link.url, title: link.title -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- for handle in brand_handles -%}
-            {%- assign collection = collections[handle] -%}
-            {%- if collection.id != blank -%}
-              {%- render 'pb-menu-link', url: collection.url, title: collection.title -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endif -%}
-      {%- endcapture -%}
-      {%- if brand_links != blank -%}
-        <nav class="pb-menu__nav" aria-labelledby="PBMenuBrands">
-          <h2 id="PBMenuBrands" class="pb-menu__heading">{{ brands_heading | escape }}</h2>
-          <ul class="pb-menu__links">
-            {{- brand_links -}}
-          </ul>
-        </nav>
-      {%- endif -%}
 
       {%- comment -%}
         The rest of the desktop header links: the Floating menu if one is picked, otherwise the
-        same defaults as the desktop row (Best Sellers, Locate Dealership).
+        same defaults as the desktop row (Best Sellers, Contact Us).
       {%- endcomment -%}
       <nav class="pb-menu__nav" aria-label="{{ menu.title | default: 'More' | escape }}">
         <ul class="pb-menu__links">
@@ -311,10 +279,9 @@
               {%- render 'pb-menu-link', url: link.url, title: link.title -%}
             {%- endfor -%}
           {%- else -%}
-            {%- assign best_sellers_url = routes.all_products_collection_url | append: '?sort_by=best-selling' -%}
-            {%- assign dealer_url = pages['locate-dealership'].url | default: '/pages/locate-dealership' -%}
+            {%- assign contact_url = pages['contact-page'].url | default: '/pages/contact-page' -%}
             {%- render 'pb-menu-link', url: best_sellers_url, title: 'Best Sellers' -%}
-            {%- render 'pb-menu-link', url: dealer_url, title: 'Locate Dealership' -%}
+            {%- render 'pb-menu-link', url: contact_url, title: 'Contact Us' -%}
           {%- endif -%}
         </ul>
       </nav>
@@ -1426,13 +1393,13 @@
       "type": "link_list",
       "id": "nav_menu",
       "label": "Header links",
-      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Brands, Best Sellers and Locate Dealership."
+      "info": "The row of links beside the logo on desktop. Empty shows Shop By Category (opens the floating menu), Best Sellers and Contact Us."
     },
     {
       "type": "link_list",
       "id": "menu",
       "label": "Floating menu",
-      "info": "Extra links in the menu button's menu, after the categories and brands. Empty shows Best Sellers and Locate Dealership, as on the desktop header. Top-level links only."
+      "info": "Extra links in the menu button's menu, after the categories. Empty shows Best Sellers and Contact Us, as on the desktop header. Top-level links only."
     },
     {
       "type": "text",
@@ -1444,7 +1411,7 @@
       "type": "collection_list",
       "id": "categories",
       "label": "Categories",
-      "info": "Empty: Wash & Shampoo, Cleaners & Sprays, Microfibre & Drying, Kits & Packs, Power & Emergency, Bulk & Professional.",
+      "info": "Empty: Wash & Detail, Microfibre & Drying, Value Packs, Power & Emergency.",
       "limit": 12
     },
     {

@@ -6,8 +6,9 @@ built on the dev store first; record them in [categories-dev-to-live.md](categor
 so they can be rebuilt on live.
 Do them in this order; each step depends on the one before.
 
-The theme expects these collection handles: `wash-shampoo`, `cleaners-sprays`, `microfibre-drying`,
-`kits-packs`, `power-emergency` (home page "Shop by category"), and the existing
+The theme expects these collection handles: `wash-detail`, `microfibre-drying`, `value-packs`,
+`power-emergency` (home page "Shop by category"), `best-sellers` (home page Best Sellers, a
+manual collection), and the existing
 `permagard-car-care`, `cerface-ceramic`, `optivan-caravan-maintenance` ("Shop by brand").
 
 ## 1. Metafield definition
@@ -75,10 +76,9 @@ After that, edit the Tab fields in admin; the script is only for the first fill.
 
 | Collection | Handle | Condition |
 |---|---|---|
-| Wash & Shampoo | `wash-shampoo` | Product type is equal to `Wash & Shampoo` |
-| Cleaners & Sprays | `cleaners-sprays` | Product type is equal to `Cleaners & Sprays` |
+| Wash & Detail | `wash-detail` | Product type is equal to `Wash & Detail` |
 | Microfibre & Drying | `microfibre-drying` | Product type is equal to `Microfibre & Drying` |
-| Kits & Packs | `kits-packs` | Product type is equal to `Kits & Packs` |
+| Value Packs | `value-packs` | Product type is equal to `Value Packs` |
 | Power & Emergency | `power-emergency` | Product type is equal to `Power & Emergency` |
 
 "By treatment" and bulk, for the Shop menu (also automated, *all conditions*). Treatments use
@@ -93,7 +93,6 @@ several treatments is in each of those collections. Don't use the old `OptiVAN` 
 | CERFACE Ceramic | `cerface-ceramic` | Suitable for is equal to `CERFACE` |
 | OptiVAN Caravan Maintenance | `optivan-caravan-maintenance` | Suitable for is equal to `OptiVAN` |
 | Honda Genuine Car Care (from 4 Nov) | `honda-genuine-car-care` | Suitable for is equal to `Honda Genuine Car Care` |
-| Bulk & Professional | `bulk-professional` | Product tag is equal to `Bulk` |
 
 These are the brand collections listed below, so the menu and the brand logos share one
 URL per treatment. On the dev store, create them with these conditions; on live, decide whether
