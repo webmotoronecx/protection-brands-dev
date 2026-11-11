@@ -49,7 +49,7 @@
     -%}
 
     <div
-      class="pb-feature-rows__row pb-feature-rows__row--{{ b.layout }}{% if b.list_columns %} pb-feature-rows__row--list-columns{% endif %}"
+      class="pb-feature-rows__row pb-feature-rows__row--{{ b.layout }}{% if b.list_columns %} pb-feature-rows__row--list-columns{% endif %}{% if b.layout == 'text' %} pb-feature-rows__row--text-{{ b.text_align | default: 'start' }}{% endif %}"
       {% if b.layout == 'banner' %}
         style="--pb-feature-banner-h: {{ b.banner_height }}px; --pb-feature-overlay: {{ b.overlay | divided_by: 100.0 }};"
       {% endif %}
@@ -468,6 +468,15 @@
       align-items: start;
     }
 
+    /* Text layout: "Text position" lines the text up with the heading's middle or bottom. */
+    .pb-feature-rows__row--text-center .pb-feature-rows__inner {
+      align-items: center;
+    }
+
+    .pb-feature-rows__row--text-end .pb-feature-rows__inner {
+      align-items: end;
+    }
+
     .pb-feature-rows__row--image_right .pb-feature-rows__media {
       order: 2;
     }
@@ -588,6 +597,19 @@
           "id": "text",
           "label": "Text",
           "visible_if": "{{ block.settings.layout != 'banner' }}"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text position",
+          "info": "Where the text sits beside the heading, on wider screens.",
+          "options": [
+            { "value": "start", "label": "Top" },
+            { "value": "center", "label": "Middle" },
+            { "value": "end", "label": "Bottom" }
+          ],
+          "default": "start",
+          "visible_if": "{{ block.settings.layout == 'text' }}"
         },
         {
           "type": "checkbox",

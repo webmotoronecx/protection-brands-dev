@@ -27,7 +27,8 @@
             "layout": "text",
             "heading": "Aviation-Proven Protection. Exceptional Everyday Performance.",
             "text": "<p>Established in France in 1997, Permagard draws on decades of expertise in advanced surface protection, with technologies trusted across the aviation, marine and automotive industries.</p>",
-            "label": "Permagard"
+            "label": "Permagard",
+            "text_align": "end"
           }
         }
       },
