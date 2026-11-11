@@ -162,7 +162,7 @@ templates it doesn't have). Edit the words and photos per brand in **Customize â
 (template)**, not in the collection description.
 
 Photos: every row and banner has an empty image slot until the client sends images (step 9).
-Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner a dark background.
+Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop
 
