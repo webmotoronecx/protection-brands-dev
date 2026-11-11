@@ -1,0 +1,150 @@
+{%- comment -%}
+  Trust strip (PB): a row of short promises, each with a small line icon ("Australian Owned",
+  "Fast AU shipping"…), spread evenly between thin rules. Used on the brand pages
+  (templates/collection.brand-*.json). On phones they sit two to a row.
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+<div class="pb-trust-strip" style="--pb-trust-bg: {{ section.settings.background }}; --pb-trust-text: {{ section.settings.text_color }};">
+  <ul class="pb-trust-strip__list" role="list" data-reveal>
+    {%- for block in section.blocks -%}
+      <li class="pb-trust-strip__item" {{ block.shopify_attributes }}>
+        <svg class="pb-trust-strip__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          {%- case block.settings.icon -%}
+            {%- when 'australia' -%}
+              <path d="M3.5 10.5 7 6.5l3 .5 1.5-2.5 2 1.5 1-2 1.5 2.5 2 4 1.5 1-.5 3-2.5 3.5-2.5.5-1.5-1.5-2 .5-1.5-2H6.5l-2-1-1-3z"/>
+              <path d="M15 20.5h2"/>
+            {%- when 'shield' -%}
+              <path d="M12 3 5 6v5.5c0 4.2 2.9 7.9 7 9 4.1-1.1 7-4.8 7-9V6z"/>
+              <path d="m9 12 2 2 4-4"/>
+            {%- when 'return' -%}
+              <path d="M9 14 4 9l5-5"/>
+              <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
+            {%- when 'truck' -%}
+              <path d="M3 6h11v10H3z"/>
+              <path d="M14 10h4l3 3v3h-7"/>
+              <circle cx="7" cy="17.5" r="1.8"/>
+              <circle cx="17" cy="17.5" r="1.8"/>
+            {%- when 'star' -%}
+              <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>
+            {%- else -%}
+              <circle cx="12" cy="12" r="9"/>
+              <path d="m8 12 3 3 5-6"/>
+          {%- endcase -%}
+        </svg>
+        <span>{{ block.settings.text | escape }}</span>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  /* Section-specific styles for pb-trust-strip. */
+
+  .pb-trust-strip {
+    padding: 0 calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px));
+    background: var(--pb-trust-bg, #fff);
+    color: var(--pb-trust-text, #111);
+  }
+
+  .pb-trust-strip__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: clamp(28px, 3.5vw, 48px) 0;
+    border-block: 1px solid #e6e6e6;
+    list-style: none;
+  }
+
+  .pb-trust-strip__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .pb-trust-strip__icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-trust-strip__list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 24px 40px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Trust strip (PB)",
+  "tag": "section",
+  "class": "pb-trust-strip-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#111111"
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "australia", "label": "Australia" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "return", "label": "Return arrow" },
+            { "value": "truck", "label": "Delivery truck" },
+            { "value": "star", "label": "Star" },
+            { "value": "check", "label": "Tick" }
+          ],
+          "default": "check"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Australian Owned"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust strip (PB)",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "australia", "text": "Australian Owned" } },
+        { "type": "item", "settings": { "icon": "shield", "text": "Made for dealer-applied protection" } },
+        { "type": "item", "settings": { "icon": "return", "text": "Fast AU shipping" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

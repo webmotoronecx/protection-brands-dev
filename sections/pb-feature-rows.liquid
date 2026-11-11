@@ -1,0 +1,661 @@
+{%- comment -%}
+  Image with text (PB): a stack of rows, each a block, for the brand pages
+  (templates/collection.brand-*.json) and anywhere else. Each row's Layout picks its look:
+
+  - Text: a small label and a large heading on the left, the text on the right (a page intro).
+  - Image left / Image right: a rounded photo on one side, label, heading, text and button on
+    the other.
+  - Banner: a full-width photo, darkened, with one centred statement and an optional button.
+
+  Lists in the text show in two columns with small red square bullets ("Two-column lists").
+  A row can have a watermark: one word drawn large and faint behind it.
+
+  A row with no photo shows a placeholder in the theme editor only; on the store an image row
+  without a photo shows its text alone, and a banner without one has a dark background.
+
+  On phones every row is one column, photo first.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+-%}
+
+{%- if section.blocks.size > 0 -%}
+<div
+  class="pb-feature-rows"
+  style="--pb-feature-bg: {{ section.settings.background }}; --pb-feature-text: {{ section.settings.text_color }}; --pb-feature-gap: {{ section.settings.row_gap }}px; --pb-feature-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-feature-weight: {{ heading_font.weight }};"
+>
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign b = block.settings
+      assign has_button = false
+      if b.button_label != blank and b.button_link != blank
+        assign has_button = true
+      endif
+      assign has_image = false
+      if b.image != blank or request.design_mode
+        assign has_image = true
+      endif
+      assign ratio = b.image_ratio
+      if ratio == 'original'
+        assign ratio = b.image.aspect_ratio | default: '4 / 3'
+      endif
+      assign heading_tag = 'h2'
+      if b.layout == 'banner'
+        assign heading_tag = 'p'
+      endif
+    -%}
+
+    <div
+      class="pb-feature-rows__row pb-feature-rows__row--{{ b.layout }}{% if b.layout contains 'image' and has_image == false %} pb-feature-rows__row--no-image{% endif %}{% if b.list_columns %} pb-feature-rows__row--list-columns{% endif %}"
+      {% if b.layout == 'banner' %}
+        style="--pb-feature-banner-h: {{ b.banner_height }}px; --pb-feature-overlay: {{ b.overlay | divided_by: 100.0 }};"
+      {% endif %}
+      {{ block.shopify_attributes }}
+    >
+      {%- if b.watermark != blank -%}
+        <span class="pb-feature-rows__watermark" aria-hidden="true">{{ b.watermark | escape }}</span>
+      {%- endif -%}
+
+      {%- if b.layout == 'banner' -%}
+        {%- if b.image != blank -%}
+          {{
+            b.image
+            | image_url: width: 2400
+            | image_tag:
+              class: 'pb-feature-rows__banner-image',
+              loading: 'lazy',
+              sizes: '100vw',
+              widths: '750, 1100, 1500, 1920, 2400',
+              alt: b.image.alt
+          }}
+        {%- elsif request.design_mode -%}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'pb-feature-rows__banner-image pb-feature-rows__placeholder' }}
+        {%- endif -%}
+        <div class="pb-feature-rows__banner-content" data-reveal>
+          {%- if b.heading != blank -%}
+            <{{ heading_tag }} class="pb-feature-rows__statement">{{ b.heading | escape }}</{{ heading_tag }}>
+          {%- endif -%}
+          {%- if has_button -%}
+            <div>
+              {%- render 'pb-feature-rows-button', row: b -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- else -%}
+        <div class="pb-feature-rows__inner">
+          {%- if b.layout != 'text' and has_image -%}
+            <div class="pb-feature-rows__media" style="--pb-feature-ratio: {{ ratio }};">
+              {%- if b.image != blank -%}
+                {{
+                  b.image
+                  | image_url: width: 1600
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 990px) 50vw, 100vw',
+                    widths: '600, 900, 1200, 1600',
+                    alt: b.image.alt
+                }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'pb-feature-rows__placeholder' }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if b.layout == 'text' -%}
+            <div class="pb-feature-rows__aside" data-reveal>
+              {%- if b.label != blank -%}
+                <p class="pb-feature-rows__label">{{ b.label | escape }}</p>
+              {%- endif -%}
+              {%- if b.heading != blank -%}
+                <h2 class="pb-feature-rows__heading pb-feature-rows__heading--large">{{ b.heading | escape }}</h2>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          <div class="pb-feature-rows__content" data-reveal>
+            {%- if b.layout != 'text' -%}
+              {%- if b.label != blank -%}
+                <p class="pb-feature-rows__label">{{ b.label | escape }}</p>
+              {%- endif -%}
+              {%- if b.heading != blank -%}
+                <h2 class="pb-feature-rows__heading">{{ b.heading | escape }}</h2>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if b.text != blank -%}
+              <div class="pb-feature-rows__text">{{ b.text }}</div>
+            {%- endif -%}
+            {%- if has_button -%}
+              <div>
+                {%- render 'pb-feature-rows-button', row: b -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+</div>
+{%- endif -%}
+
+{% stylesheet %}
+  /* Section-specific styles for pb-feature-rows. */
+
+  .pb-feature-rows {
+    display: grid;
+    gap: var(--pb-feature-gap, 96px);
+    overflow-x: clip;
+    padding-block: clamp(56px, 7vw, 104px);
+    background: var(--pb-feature-bg, #fff);
+    color: var(--pb-feature-text, #111);
+  }
+
+  /* A banner alone fills the section edge to edge, with no white band above or below. */
+  .pb-feature-rows:has(> .pb-feature-rows__row--banner:only-child) {
+    padding-block: 0;
+  }
+
+  .pb-feature-rows__row {
+    position: relative;
+    isolation: isolate;
+    padding-inline: calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px));
+  }
+
+  .pb-feature-rows__inner {
+    display: grid;
+    gap: 32px;
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+
+  /* The watermark: one word, as wide as the screen, faint and fading downwards, behind the
+     top of the row. */
+  .pb-feature-rows__watermark {
+    position: absolute;
+    inset-block-start: clamp(-80px, -5vw, -24px);
+    inset-inline-start: 50%;
+    z-index: -1;
+    font-family: var(--pb-feature-font, inherit);
+    font-size: clamp(5rem, 19vw, 18rem);
+    font-weight: 700;
+    line-height: 0.8;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: transparent;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.06), rgb(0 0 0 / 0) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pb-feature-rows__label {
+    margin: 0 0 20px;
+    color: #737373;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 12px;
+    font-weight: var(--pb-button-weight, 600);
+    letter-spacing: 0.12em;
+    line-height: normal;
+    text-transform: uppercase;
+  }
+
+  .pb-feature-rows__heading {
+    margin: 0;
+    color: #000;
+    font-family: var(--pb-feature-font, inherit);
+    font-size: clamp(26px, 2.5vw, 40px);
+    font-weight: var(--pb-feature-weight, 400);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .pb-feature-rows__heading--large {
+    font-size: clamp(30px, 3.4vw, 52px);
+    line-height: 1.08;
+  }
+
+  .pb-feature-rows__heading + .pb-feature-rows__text {
+    margin-block-start: clamp(20px, 2.4vw, 36px);
+  }
+
+  .pb-feature-rows__text {
+    color: #222;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .pb-feature-rows__text > * {
+    margin: 0;
+  }
+
+  .pb-feature-rows__text > * + * {
+    margin-block-start: 1.1em;
+  }
+
+  .pb-feature-rows__text :is(b, strong) {
+    color: #000;
+    font-weight: 700;
+  }
+
+  .pb-feature-rows__text a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--pb-accent, #ca0d0d);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  /* Lists: small red squares; two columns when the row asks for them. */
+  .pb-feature-rows__text ul {
+    display: grid;
+    gap: 14px 32px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb-feature-rows__text li {
+    position: relative;
+    padding-inline-start: 18px;
+    color: #000;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .pb-feature-rows__text li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.5em;
+    inset-inline-start: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-feature-rows__text ul + * {
+    margin-block-start: 2em;
+  }
+
+  .pb-feature-rows__content > div:has(.pb-feature-rows__button) {
+    margin-block-start: clamp(24px, 3vw, 40px);
+  }
+
+  .pb-feature-rows__media {
+    overflow: hidden;
+    aspect-ratio: var(--pb-feature-ratio, 4 / 3);
+    border-radius: 6px;
+    background: #f2f2f2;
+  }
+
+  .pb-feature-rows__media :is(img, svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pb-feature-rows__placeholder {
+    fill: #c8c8c8;
+    background: #ececec;
+  }
+
+  /* No photo on the store: the text alone, at a readable width. */
+  .pb-feature-rows__row--no-image .pb-feature-rows__content {
+    max-width: 46rem;
+  }
+
+  /* Banner */
+  .pb-feature-rows__row--banner {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    min-height: min(var(--pb-feature-banner-h, 640px), 90vh);
+    padding-block: clamp(64px, 8vw, 120px);
+    background: #111;
+    color: #fff;
+    text-align: center;
+  }
+
+  .pb-feature-rows__row--banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(0 0 0 / var(--pb-feature-overlay, 0.35));
+  }
+
+  .pb-feature-rows__banner-image {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* On the photo the watermark sits along the bottom, white and fading upwards. */
+  .pb-feature-rows__row--banner .pb-feature-rows__watermark {
+    inset-block: auto clamp(-48px, -3vw, -16px);
+    z-index: 0;
+    background: linear-gradient(to top, rgb(255 255 255 / 0.18) 10%, rgb(255 255 255 / 0) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .pb-feature-rows__banner-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: clamp(28px, 4vw, 56px);
+    max-width: 62rem;
+  }
+
+  .pb-feature-rows__statement {
+    margin: 0;
+    font-family: var(--pb-feature-font, inherit);
+    font-size: clamp(28px, 3.6vw, 56px);
+    font-weight: var(--pb-feature-weight, 400);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* Button: red, black sweeps in from the left on hover and an arrow slides in (the homepage
+     button reversed, so it shows on a photo). Transforms and opacity only. */
+  .pb-feature-rows__button {
+    --pb-button-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 18px 40px;
+    border-radius: 6px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 14px;
+    font-weight: var(--pb-button-weight, 600);
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform 0.2s var(--pb-button-ease);
+  }
+
+  .pb-feature-rows__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-feature-rows__button-label {
+    transition: transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-feature-rows__button-arrow {
+    position: absolute;
+    inset-inline-end: 14px;
+    width: 13px;
+    height: 13px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s var(--pb-button-ease);
+  }
+
+  .pb-feature-rows__button:is(:hover, :focus-visible)::before {
+    transform: scaleX(1);
+  }
+
+  .pb-feature-rows__button:is(:hover, :focus-visible) .pb-feature-rows__button-label {
+    transform: translateX(-8px);
+  }
+
+  .pb-feature-rows__button:is(:hover, :focus-visible) .pb-feature-rows__button-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .pb-feature-rows__button:active {
+    transform: scale(0.96);
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-feature-rows__row--list-columns .pb-feature-rows__text ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-feature-rows__inner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(48px, 6vw, 96px);
+      align-items: center;
+    }
+
+    .pb-feature-rows__row--text .pb-feature-rows__inner {
+      align-items: start;
+    }
+
+    .pb-feature-rows__row--image_right .pb-feature-rows__media {
+      order: 2;
+    }
+
+    .pb-feature-rows__row--no-image .pb-feature-rows__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pb-feature-rows__row--image_left:not(.pb-feature-rows__row--no-image) .pb-feature-rows__content {
+      padding-inline-end: clamp(0px, 3vw, 48px);
+    }
+
+    .pb-feature-rows__row--image_right:not(.pb-feature-rows__row--no-image) .pb-feature-rows__content {
+      padding-inline-start: clamp(0px, 1vw, 16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-feature-rows__button,
+    .pb-feature-rows__button::before,
+    .pb-feature-rows__button-label,
+    .pb-feature-rows__button-arrow {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image with text (PB)",
+  "tag": "section",
+  "class": "pb-feature-rows-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Each block is one row. Pick its look under Layout: an intro (Text), a photo beside the text (Image left / Image right), or a full-width photo with one statement (Banner)."
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Space between rows",
+      "min": 24,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "Layout",
+          "options": [
+            { "value": "text", "label": "Text (heading left, text right)" },
+            { "value": "image_left", "label": "Image left" },
+            { "value": "image_right", "label": "Image right" },
+            { "value": "banner", "label": "Banner (full-width photo)" }
+          ],
+          "default": "image_left"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "visible_if": "{{ block.settings.layout != 'text' }}"
+        },
+        {
+          "type": "select",
+          "id": "image_ratio",
+          "label": "Image shape",
+          "options": [
+            { "value": "4 / 3", "label": "Landscape (4:3)" },
+            { "value": "1 / 1", "label": "Square" },
+            { "value": "4 / 5", "label": "Portrait (4:5)" },
+            { "value": "original", "label": "Image's own shape" }
+          ],
+          "default": "4 / 3",
+          "visible_if": "{{ block.settings.layout == 'image_left' or block.settings.layout == 'image_right' }}"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Small text above the heading, e.g. the brand name.",
+          "visible_if": "{{ block.settings.layout != 'banner' }}"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "info": "On a banner, the statement over the photo."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "visible_if": "{{ block.settings.layout != 'banner' }}"
+        },
+        {
+          "type": "checkbox",
+          "id": "list_columns",
+          "label": "Two-column lists",
+          "info": "Bulleted lists in the text show in two columns on wider screens.",
+          "default": true,
+          "visible_if": "{{ block.settings.layout != 'banner' }}"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "info": "Leave empty for no button."
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_new_tab",
+          "label": "Open the link in a new tab",
+          "info": "For links to other websites.",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "watermark",
+          "label": "Watermark",
+          "info": "One word drawn large and faint behind the row, e.g. the brand name. Leave empty for none."
+        },
+        {
+          "type": "range",
+          "id": "banner_height",
+          "label": "Banner height",
+          "min": 320,
+          "max": 900,
+          "step": 20,
+          "unit": "px",
+          "default": 640,
+          "visible_if": "{{ block.settings.layout == 'banner' }}"
+        },
+        {
+          "type": "range",
+          "id": "overlay",
+          "label": "Darken the photo",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "default": 35,
+          "visible_if": "{{ block.settings.layout == 'banner' }}"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text (PB)",
+      "blocks": [
+        {
+          "type": "row",
+          "settings": {
+            "layout": "image_left",
+            "heading": "Protection for Every Surface",
+            "text": "<p>Our range includes:</p><ul><li>Graphene Ceramic Coatings</li><li>Paint Protection Film (PPF)</li><li>Window Protection Film (WPF)</li><li>Window Tinting</li></ul><p>Each solution is designed to help keep your vehicle looking its best.</p>"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "layout": "image_right",
+            "heading": "Trusted by leading manufacturers",
+            "text": "<p>Tell the story of the brand here.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Banner with statement (PB)",
+      "blocks": [
+        {
+          "type": "row",
+          "settings": {
+            "layout": "banner",
+            "heading": "Advanced Protection. Trusted Expertise. Lasting Results."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -146,11 +146,11 @@
     { "handle": "value-packs", "title": "Value Packs", "rules": [["TYPE", "Value Packs"]], "sortOrder": "BEST_SELLING" },
     { "handle": "power-emergency", "title": "Power & Emergency", "rules": [["TYPE", "Power & Emergency"]], "sortOrder": "BEST_SELLING" },
 
-    { "handle": "protection-brands", "title": "Protection Brands", "rules": [["SUITABLE_FOR", "Protection Brands"]], "templateSuffix": "brand" },
-    { "handle": "permagard-car-care", "title": "Permagard Car Care", "rules": [["SUITABLE_FOR", "Permagard"]], "templateSuffix": "brand" },
-    { "handle": "cerface-ceramic", "title": "CERFACE Ceramic", "rules": [["SUITABLE_FOR", "CERFACE"]], "templateSuffix": "brand" },
-    { "handle": "optivan-caravan-maintenance", "title": "OptiVAN Caravan Maintenance", "rules": [["SUITABLE_FOR", "OptiVAN"]], "templateSuffix": "brand" },
-    { "handle": "honda-genuine-car-care", "title": "Honda Genuine Car Care", "rules": [["SUITABLE_FOR", "Honda Genuine Car Care"]], "templateSuffix": "brand", "watermark": "Honda" }
+    { "handle": "protection-brands", "title": "Protection Brands", "rules": [["SUITABLE_FOR", "Protection Brands"]], "templateSuffix": "brand-protection-brands" },
+    { "handle": "permagard-car-care", "title": "Permagard Car Care", "rules": [["SUITABLE_FOR", "Permagard"]], "templateSuffix": "brand-permagard" },
+    { "handle": "cerface-ceramic", "title": "CERFACE Ceramic", "rules": [["SUITABLE_FOR", "CERFACE"]], "templateSuffix": "brand-cerface" },
+    { "handle": "optivan-caravan-maintenance", "title": "OptiVAN Caravan Maintenance", "rules": [["SUITABLE_FOR", "OptiVAN"]], "templateSuffix": "brand-optivan" },
+    { "handle": "honda-genuine-car-care", "title": "Honda Genuine Car Care", "rules": [["SUITABLE_FOR", "Honda Genuine Car Care"]], "templateSuffix": "brand-hgcc", "watermark": "Honda" }
   ],
 
   "pages": [

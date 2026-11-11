@@ -7,12 +7,17 @@
   On the product page (templates/product.json, "Products you might like") it can show the
   product's own collection instead: the one the visitor came from, else the product's first
   (skipping the home page and catch-all collections), leaving out the product itself.
+
+  With no collection picked, a collection page (the brand pages) shows its own products.
 {%- endcomment -%}
 
 {%- liquid
   assign heading_font = settings.type_heading_font
 
   assign source = section.settings.collection
+  if source == blank and template.name == 'collection'
+    assign source = collection
+  endif
   if source == blank
     assign source = collections.all
   endif
@@ -356,7 +361,7 @@
       "type": "collection",
       "id": "collection",
       "label": "Collection",
-      "info": "Shows this collection's products in its own sort order. Leave empty for all products."
+      "info": "Shows this collection's products in its own sort order. Leave empty for the page's own collection (on a collection page), else all products."
     },
     {
       "type": "checkbox",

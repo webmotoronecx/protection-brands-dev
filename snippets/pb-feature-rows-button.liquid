@@ -1,0 +1,19 @@
+{%- doc -%}
+  The button on a row of sections/pb-feature-rows.liquid ("Image with text (PB)"). Styles are
+  in that section.
+
+  @param {object} row - The row block's settings (button_label, button_link, button_new_tab).
+{%- enddoc -%}
+
+<a
+  class="pb-feature-rows__button"
+  href="{{ row.button_link }}"
+  {% if row.button_new_tab %}
+    target="_blank" rel="noopener"
+  {% endif %}
+>
+  <span class="pb-feature-rows__button-label">{{ row.button_label | escape }}</span>
+  <svg class="pb-feature-rows__button-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 8h11M9 4l4 4-4 4"/>
+  </svg>
+</a>

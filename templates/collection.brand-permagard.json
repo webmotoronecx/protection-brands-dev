@@ -1,0 +1,334 @@
+{
+  "sections": {
+    "pb_brand_header": {
+      "type": "pb-brand-header",
+      "settings": {
+        "height": 580,
+        "height_mobile": 520,
+        "show_title": true,
+        "show_tagline": true,
+        "show_logo": true,
+        "logo_width": 340,
+        "logo_height": 200,
+        "full_image": true,
+        "middle": "hero",
+        "watermark": true,
+        "watermark_font": "barlow_n6",
+        "fallback_title": "Our brands",
+        "product_size": 145
+      }
+    },
+    "pb_brand_intro": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "text",
+            "heading": "Aviation-Proven Protection. Exceptional Everyday Performance.",
+            "text": "<p>Established in France in 1997, Permagard draws on decades of expertise in advanced surface protection, with technologies trusted across the aviation, marine and automotive industries.</p>",
+            "label": "Permagard"
+          }
+        }
+      },
+      "block_order": [
+        "row_1"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_products": {
+      "type": "pb-best-sellers",
+      "blocks": {
+        "static-product-card": {
+          "type": "_product-card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 4,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "card-gallery": {
+              "type": "_product-card-gallery",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_4nY4eT": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "paragraph",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "pb_review": {
+              "type": "review",
+              "settings": {
+                "stars_style": "shaded",
+                "show_number": true,
+                "text_color": "",
+                "type_preset": "paragraph",
+                "width": "100%",
+                "alignment": "left"
+              },
+              "blocks": {}
+            },
+            "price_EzJzMm": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "swatches": {
+              "type": "swatches",
+              "name": "t:names.swatches",
+              "settings": {
+                "product_swatches_alignment": "flex-start",
+                "product_swatches_alignment_mobile": "flex-start",
+                "hide_padding": false,
+                "product_swatches_padding_top": 4,
+                "product_swatches_padding_bottom": 0,
+                "product_swatches_padding_left": 0,
+                "product_swatches_padding_right": 0
+              },
+              "blocks": {}
+            },
+            "pb_card_buy": {
+              "type": "pb-card-buy",
+              "settings": {},
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "card-gallery",
+            "product_title_4nY4eT",
+            "pb_review",
+            "price_EzJzMm",
+            "swatches",
+            "pb_card_buy"
+          ]
+        }
+      },
+      "settings": {
+        "heading": "Permagard Products",
+        "product_collection": false,
+        "max_products": 12,
+        "link_label": "View all",
+        "link": "/collections/permagard-car-care?view=brand",
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_rows": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "image_left",
+            "heading": "Comprehensive Protection. Inside and Out.",
+            "text": "<p>At the heart of Permagard is its advanced Reactive Polymer Protection System, engineered to create a durable, high-gloss protective barrier that enhances paint depth and clarity while helping defend against UV exposure, oxidation and environmental contaminants.</p><p>Permagard's premium protection range extends beyond the exterior, with specialised treatments for fabric, leather, plastic and vinyl surfaces to help guard against spills, stains and everyday wear.</p>",
+            "watermark": "Permagard"
+          }
+        },
+        "row_2": {
+          "type": "row",
+          "settings": {
+            "layout": "image_right",
+            "heading": "Professionally Applied. Internationally Trusted.",
+            "text": "<p>Available through select dealership partners and supported by Protection Brands in Australia, Permagard combines internationally proven technology with professional application, dedicated customer support and warranty-backed confidence.</p><p>Designed for owners who appreciate quality, craftsmanship and lasting results, Permagard helps preserve the appearance and enjoyment of your vehicle for years to come.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "row_1",
+        "row_2"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_trust_strip": {
+      "type": "pb-trust-strip",
+      "blocks": {
+        "item_1": {
+          "type": "item",
+          "settings": {
+            "icon": "australia",
+            "text": "Australian Owned"
+          }
+        },
+        "item_2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "text": "Made for dealer-applied protection"
+          }
+        },
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "text": "Fast AU shipping"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3"
+      ],
+      "settings": {
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_banner": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "banner",
+            "heading": "Permagard Automotive. Engineered for Aviation. Trusted Worldwide. Designed for Your Vehicle.",
+            "watermark": "Permagard",
+            "button_label": "Discover Permagard Automotive",
+            "button_link": "https://permagardautomotive.com.au/",
+            "button_new_tab": true
+          }
+        }
+      },
+      "block_order": [
+        "row_1"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_protection_brands": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/protection-brands",
+            "alt": "Protection Brands"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/honda-genuine-car-care",
+            "alt": "Honda Genuine Car Care"
+          }
+        }
+      },
+      "block_order": [
+        "logo_protection_brands",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_permagard",
+        "logo_hgcc"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 80,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#ffffff",
+        "text_color": "#111111",
+        "bottom_border": true
+      }
+    }
+  },
+  "order": [
+    "pb_brand_header",
+    "pb_brand_intro",
+    "pb_brand_products",
+    "pb_brand_rows",
+    "pb_trust_strip",
+    "pb_brand_banner",
+    "pb_brand_logos"
+  ]
+}

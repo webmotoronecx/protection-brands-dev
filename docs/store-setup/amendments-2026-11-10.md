@@ -24,6 +24,7 @@ title.
 | 7 | Contact form email to auto.admin@protectionbrands.com.au | Not on dev | At the switch |
 | 8 | Brand page images | Waiting on client | Waiting on client |
 | 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | To do |
+| 10 | Brand page layout (mock): one template per brand | Done 11 Nov | Set each collection's template |
 
 ## 0. Theme
 
@@ -124,6 +125,44 @@ For each brand collection: **Products → Collections → (brand) → Descriptio
 - **(changes Debut)** if Debut shows collection descriptions on these pages. Check one on live
   before and after.
 - The brand collections need the `brand` template (README §3), or the new layout doesn't show.
+  Since 11 Nov each has its own template instead (below); the description is kept for search
+  engines and as the source of the text.
+
+### Brand page layout (11 Nov, from `mocks/brand-protectionbrands.png`)
+
+Each brand has its own template, filled with its text from `brand-copy/`. Under the unchanged
+banner, in order:
+
+1. Intro: brand name label, the tagline large on the left, the opening paragraphs on the right.
+2. "<Brand> Products": the brand collection's products in a sideways row. **View all** opens
+   the same collection with the full grid and filters (`?view=brand`, the `collection.brand`
+   template, unchanged).
+3. Image and text rows, photo left and right in turn, one per subheading of the copy. Lists
+   show in two columns with red bullets.
+4. Trust strip: Australian Owned, Made for dealer-applied protection, Fast AU shipping.
+5. Banner: the closing bold line over a photo. OptiVAN, Permagard and HGCC have their
+   "Discover …" button (opens their site in a new tab).
+6. Our brands logos.
+
+Sections: **Image with text (PB)** (`pb-feature-rows`: rows and banner, one block per row,
+Layout = Text / Image left / Image right / Banner, optional button and watermark word) and
+**Trust strip (PB)** (`pb-trust-strip`). Both can be added to any page.
+
+| Collection | Template (Theme template in the collection's admin page) |
+|---|---|
+| `protection-brands` | `brand-protection-brands` |
+| `cerface-ceramic` | `brand-cerface` |
+| `optivan-caravan-maintenance` | `brand-optivan` |
+| `permagard-car-care` | `brand-permagard` |
+| `honda-genuine-car-care` | `brand-hgcc` |
+
+**Live:** the templates only appear once the Horizon theme is installed. After installing, set
+each collection's **Theme template** as above (it doesn't change Debut, which ignores the
+templates it doesn't have). Edit the words and photos per brand in **Customize → Collections →
+(template)**, not in the collection description.
+
+Photos: every row and banner has an empty image slot until the client sends images (step 9).
+Without a photo a row shows its text alone, and the banner a dark background.
 
 ## 5. Footer menus: Our Brands and Shop
 
@@ -192,7 +231,9 @@ On live:
 ## 9. Waiting on the client
 
 - **Brand page images:** each brand in the doc says "[Insert any … images where applicable]". None
-  supplied yet.
+  supplied yet. Slots per brand template (step 4): one per image row and one banner. Protection
+  Brands, CERFACE and OptiVAN 3 + 1; Permagard and HGCC 2 + 1. Landscape, at least 1600 px
+  wide; banners at least 2400 px wide.
 
 ## Check on live after the switch
 
@@ -203,7 +244,8 @@ On live:
 - Footer: the three columns as in steps 5 and 6. Click every link, including Warranty & Care.
 - Old links redirect: `/collections/wash-shampoo`, `/collections/cleaners-sprays`,
   `/collections/bulk-professional`, `/collections/kits-packs`.
-- Each brand page shows its text under the products.
+- Each brand page: intro, its products (View all opens the full grid), image rows, trust strip,
+  banner (with the Discover button on OptiVAN, Permagard, HGCC), logos.
 - The three HGCC kits don't appear anywhere; the Gift Box shows $99.00.
 - Contact form: send a test message and check it arrives at auto.admin@.
 - SDS page: 40 sheets, each brand button filters; open one PDF per brand. Product pages for the

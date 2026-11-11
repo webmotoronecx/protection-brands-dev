@@ -1,0 +1,343 @@
+{
+  "sections": {
+    "pb_brand_header": {
+      "type": "pb-brand-header",
+      "settings": {
+        "height": 580,
+        "height_mobile": 520,
+        "show_title": true,
+        "show_tagline": true,
+        "show_logo": true,
+        "logo_width": 340,
+        "logo_height": 200,
+        "full_image": true,
+        "middle": "hero",
+        "watermark": true,
+        "watermark_font": "barlow_n6",
+        "fallback_title": "Our brands",
+        "product_size": 145
+      }
+    },
+    "pb_brand_intro": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "text",
+            "heading": "Protect Your Home Away From Home.",
+            "text": "<p>Your caravan, camper, RV or motorhome is built for adventure. OptiVAN is designed to help protect it every step of the way.</p><p>Developed specifically for Australian touring conditions, OptiVAN combines advanced exterior and interior protection technologies to help preserve your vehicle's appearance, reduce maintenance and protect your investment.</p>",
+            "label": "OptiVAN"
+          }
+        }
+      },
+      "block_order": [
+        "row_1"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_products": {
+      "type": "pb-best-sellers",
+      "blocks": {
+        "static-product-card": {
+          "type": "_product-card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 4,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "card-gallery": {
+              "type": "_product-card-gallery",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_4nY4eT": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "paragraph",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "pb_review": {
+              "type": "review",
+              "settings": {
+                "stars_style": "shaded",
+                "show_number": true,
+                "text_color": "",
+                "type_preset": "paragraph",
+                "width": "100%",
+                "alignment": "left"
+              },
+              "blocks": {}
+            },
+            "price_EzJzMm": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "swatches": {
+              "type": "swatches",
+              "name": "t:names.swatches",
+              "settings": {
+                "product_swatches_alignment": "flex-start",
+                "product_swatches_alignment_mobile": "flex-start",
+                "hide_padding": false,
+                "product_swatches_padding_top": 4,
+                "product_swatches_padding_bottom": 0,
+                "product_swatches_padding_left": 0,
+                "product_swatches_padding_right": 0
+              },
+              "blocks": {}
+            },
+            "pb_card_buy": {
+              "type": "pb-card-buy",
+              "settings": {},
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "card-gallery",
+            "product_title_4nY4eT",
+            "pb_review",
+            "price_EzJzMm",
+            "swatches",
+            "pb_card_buy"
+          ]
+        }
+      },
+      "settings": {
+        "heading": "OptiVAN Products",
+        "product_collection": false,
+        "max_products": 12,
+        "link_label": "View all",
+        "link": "/collections/optivan-caravan-maintenance?view=brand",
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_rows": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "image_left",
+            "heading": "Advanced Protection for Life on the Road",
+            "text": "<p>At the heart of the OptiVAN range is its innovative two-stage 9H+ Graphene Ceramic Surface Protection, delivering outstanding gloss, water repellency and long-lasting protection against harsh UV exposure, oxidation, environmental contaminants and everyday touring conditions.</p><p>OptiVAN also offers a complete range of protection solutions, including:</p><ul><li>Graphene Ceramic Coatings</li><li>Paint Protection Film (PPF)</li><li>Window Protection Film (WPF)</li><li>Window Tinting</li><li>Interior Fabric, Leather, Plastic and Vinyl Protection</li><li>Antimicrobial Treatments</li></ul>",
+            "watermark": "OptiVAN"
+          }
+        },
+        "row_2": {
+          "type": "row",
+          "settings": {
+            "layout": "image_right",
+            "heading": "Designed for Australian Conditions",
+            "text": "<p>From coastal salt and harsh UV exposure to dust, road debris and everyday touring wear, OptiVAN helps protect your caravan or RV from the challenges of life on the road while making ongoing cleaning and maintenance easier.</p>"
+          }
+        },
+        "row_3": {
+          "type": "row",
+          "settings": {
+            "layout": "image_left",
+            "heading": "Protection You Can Trust",
+            "text": "<p>Professionally applied and backed by Protection Brands' customer support and warranty programs, OptiVAN provides confidence that your vehicle is protected by an Australian specialist in surface protection.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "row_1",
+        "row_2",
+        "row_3"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_trust_strip": {
+      "type": "pb-trust-strip",
+      "blocks": {
+        "item_1": {
+          "type": "item",
+          "settings": {
+            "icon": "australia",
+            "text": "Australian Owned"
+          }
+        },
+        "item_2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "text": "Made for dealer-applied protection"
+          }
+        },
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "text": "Fast AU shipping"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3"
+      ],
+      "settings": {
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_banner": {
+      "type": "pb-feature-rows",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "layout": "banner",
+            "heading": "Protect your investment. Spend less time cleaning and more time enjoying the journey.",
+            "watermark": "OptiVAN",
+            "button_label": "Discover OptiVAN",
+            "button_link": "https://optivan.com.au/",
+            "button_new_tab": true
+          }
+        }
+      },
+      "block_order": [
+        "row_1"
+      ],
+      "settings": {
+        "row_gap": 96,
+        "background": "#ffffff",
+        "text_color": "#111111"
+      }
+    },
+    "pb_brand_logos": {
+      "type": "pb-brand-logos",
+      "blocks": {
+        "logo_protection_brands": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/protection-brands",
+            "alt": "Protection Brands"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/cerface-ceramic",
+            "alt": "CERFACE"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/optivan-caravan-maintenance",
+            "alt": "OptiVAN"
+          }
+        },
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/permagard-car-care",
+            "alt": "Permagard"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "link": "shopify://collections/honda-genuine-car-care",
+            "alt": "Honda Genuine Car Care"
+          }
+        }
+      },
+      "block_order": [
+        "logo_protection_brands",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_permagard",
+        "logo_hgcc"
+      ],
+      "settings": {
+        "heading": "Our brands",
+        "logo_height": 80,
+        "greyscale": false,
+        "heading_position": "beside",
+        "background": "#ffffff",
+        "text_color": "#111111",
+        "bottom_border": true
+      }
+    }
+  },
+  "order": [
+    "pb_brand_header",
+    "pb_brand_intro",
+    "pb_brand_products",
+    "pb_brand_rows",
+    "pb_trust_strip",
+    "pb_brand_banner",
+    "pb_brand_logos"
+  ]
+}

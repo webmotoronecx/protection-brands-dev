@@ -54,9 +54,11 @@ doesn't use them, but do them close to launch day.
 
 ### Brand pages
 
-- [ ] Brand collection fields (README §3): create the definitions with setup-store.mjs, set each
-      brand collection's template to `brand`, and fill Brand logo (light version), Tagline,
-      Hero product and, for a full-screen banner, Hero image.
+- [ ] Brand collection fields (README §3): create the definitions with setup-store.mjs and fill
+      Brand logo (light version), Tagline, Hero product and, for a full-screen banner, Hero image.
+- [ ] Set each brand collection's template to its own `brand-<brand>` template
+      ([amendments-2026-11-10.md](amendments-2026-11-10.md) §4, *Brand page layout*). Keep
+      `collection.brand` in the theme: it is the brand's "View all" grid (`?view=brand`).
 
 ### Product page extras
 
