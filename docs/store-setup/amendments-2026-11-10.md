@@ -167,6 +167,8 @@ Protection Brands has its three row photos (11 Nov, square, in the dev store's F
 upload them to live's Files under the same names, go-live checklist §6).
 OptiVAN has its three row photos and its banner photo (11 Nov): `optivan-advanced-protection.webp`,
 `optivan-design-australian.webp`, `optivan-protection-trust.webp`, `optivan-feat-row.webp`.
+Permagard has its two row photos and its banner photo (11 Nov): `perma-comprehensive.webp`,
+`perma-professionally.webp`, `perma-feat-row.webp`.
 Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop
