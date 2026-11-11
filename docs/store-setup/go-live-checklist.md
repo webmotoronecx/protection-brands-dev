@@ -111,6 +111,9 @@ blank:
       (`brand-logo-permagard_27fd2ac9-….png`), so upload it as `brand-logo-permagard.png`
       and pick it again on the Permagard bento tile in step 8.
 - [ ] `AtHomeDetailersKit.png`: the default hero image on the brand page template.
+- [ ] `pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`,
+      `pb-support-beyond.webp`: the Protection Brands page's three image rows
+      (`collection.brand-protection-brands`). Copies are in the dev store's Files.
 
 After installing, open the home page and a brand page in the theme editor and check every
 image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_images/[^"]+'

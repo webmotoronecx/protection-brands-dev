@@ -184,7 +184,9 @@
             "layout": "image_left",
             "heading": "Protection for Every Surface",
             "text": "<p>Our range includes:</p><ul><li>Ceramic, Graphene and Reactive Polymer Coatings</li><li>Paint Protection Film (PPF)</li><li>Window Protection Film (WPF)</li><li>Automotive Window Tinting</li><li>Leather, Fabric, Vinyl and Interior Protection</li><li>Antimicrobial Treatments</li><li>Premium Vehicle Care and Maintenance Products</li></ul><p>Each solution is designed to help keep your vehicle looking its best while making ongoing care and maintenance easier.</p>",
-            "watermark": "Protection"
+            "watermark": "Protection",
+            "image": "shopify://shop_images/pb-protection-every-surface.webp",
+            "image_ratio": "1 / 1"
           }
         },
         "row_2": {
@@ -192,7 +194,9 @@
           "settings": {
             "layout": "image_right",
             "heading": "Trusted by Some of the World's Most Respected Automotive Manufacturers.",
-            "text": "<p>Protection Brands is proud to partner with some of the world's most respected automotive manufacturers, including Mercedes-Benz Australia, Honda Australia, Mitsubishi Motors Australia and Mazda Australia.</p><p>These exclusive partnerships reflect our commitment to quality, innovation and delivering protection solutions that vehicle owners can trust.</p>"
+            "text": "<p>Protection Brands is proud to partner with some of the world's most respected automotive manufacturers, including Mercedes-Benz Australia, Honda Australia, Mitsubishi Motors Australia and Mazda Australia.</p><p>These exclusive partnerships reflect our commitment to quality, innovation and delivering protection solutions that vehicle owners can trust.</p>",
+            "image": "shopify://shop_images/pb-trusted-manufacturers.webp",
+            "image_ratio": "1 / 1"
           }
         },
         "row_3": {
@@ -200,7 +204,9 @@
           "settings": {
             "layout": "image_left",
             "heading": "Supporting You Beyond Installation",
-            "text": "<p>Our commitment extends beyond the day your protection is applied. Through dedicated customer support, warranty programs and a range of premium maintenance products, we help you maintain the benefits of your protection throughout your ownership journey.</p>"
+            "text": "<p>Our commitment extends beyond the day your protection is applied. Through dedicated customer support, warranty programs and a range of premium maintenance products, we help you maintain the benefits of your protection throughout your ownership journey.</p>",
+            "image": "shopify://shop_images/pb-support-beyond.webp",
+            "image_ratio": "1 / 1"
           }
         }
       },

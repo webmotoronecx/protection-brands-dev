@@ -162,6 +162,9 @@ templates it doesn't have). Edit the words and photos per brand in **Customize โ
 (template)**, not in the collection description.
 
 Photos: every row and banner has an empty image slot until the client sends images (step 9).
+Protection Brands has its three row photos (11 Nov, square, in the dev store's Files:
+`pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`, `pb-support-beyond.webp`;
+upload them to live's Files under the same names, go-live checklist ยง6).
 Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop
