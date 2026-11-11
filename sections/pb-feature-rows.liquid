@@ -191,7 +191,8 @@
     background: linear-gradient(to bottom, rgb(0 0 0 / 0.06), rgb(0 0 0 / 0) 85%);
     -webkit-background-clip: text;
     background-clip: text;
-    transform: translateX(-50%);
+    /* Centred, and lifted by a tenth of its height. */
+    transform: translate(-50%, -10%);
     pointer-events: none;
     user-select: none;
   }
@@ -340,6 +341,7 @@
   .pb-feature-rows__row--banner .pb-feature-rows__watermark {
     inset-block: auto clamp(-48px, -3vw, -16px);
     z-index: 0;
+    transform: translateX(-50%);
     background: linear-gradient(to top, rgb(255 255 255 / 0.18) 10%, rgb(255 255 255 / 0) 90%);
     -webkit-background-clip: text;
     background-clip: text;
