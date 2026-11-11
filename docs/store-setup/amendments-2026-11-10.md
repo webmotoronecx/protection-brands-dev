@@ -165,6 +165,8 @@ Photos: every row and banner has an empty image slot until the client sends imag
 Protection Brands has its three row photos (11 Nov, square, in the dev store's Files:
 `pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`, `pb-support-beyond.webp`;
 upload them to live's Files under the same names, go-live checklist §6).
+OptiVAN has its three row photos and its banner photo (11 Nov): `optivan-advanced-protection.webp`,
+`optivan-design-australian.webp`, `optivan-protection-trust.webp`, `optivan-feat-row.webp`.
 Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop

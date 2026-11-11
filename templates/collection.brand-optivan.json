@@ -184,7 +184,9 @@
             "layout": "image_left",
             "heading": "Advanced Protection for Life on the Road",
             "text": "<p>At the heart of the OptiVAN range is its innovative two-stage 9H+ Graphene Ceramic Surface Protection, delivering outstanding gloss, water repellency and long-lasting protection against harsh UV exposure, oxidation, environmental contaminants and everyday touring conditions.</p><p>OptiVAN also offers a complete range of protection solutions, including:</p><ul><li>Graphene Ceramic Coatings</li><li>Paint Protection Film (PPF)</li><li>Window Protection Film (WPF)</li><li>Window Tinting</li><li>Interior Fabric, Leather, Plastic and Vinyl Protection</li><li>Antimicrobial Treatments</li></ul>",
-            "watermark": "OptiVAN"
+            "watermark": "OptiVAN",
+            "image": "shopify://shop_images/optivan-advanced-protection.webp",
+            "image_ratio": "1 / 1"
           }
         },
         "row_2": {
@@ -192,7 +194,9 @@
           "settings": {
             "layout": "image_right",
             "heading": "Designed for Australian Conditions",
-            "text": "<p>From coastal salt and harsh UV exposure to dust, road debris and everyday touring wear, OptiVAN helps protect your caravan or RV from the challenges of life on the road while making ongoing cleaning and maintenance easier.</p>"
+            "text": "<p>From coastal salt and harsh UV exposure to dust, road debris and everyday touring wear, OptiVAN helps protect your caravan or RV from the challenges of life on the road while making ongoing cleaning and maintenance easier.</p>",
+            "image": "shopify://shop_images/optivan-design-australian.webp",
+            "image_ratio": "1 / 1"
           }
         },
         "row_3": {
@@ -200,7 +204,9 @@
           "settings": {
             "layout": "image_left",
             "heading": "Protection You Can Trust",
-            "text": "<p>Professionally applied and backed by Protection Brands' customer support and warranty programs, OptiVAN provides confidence that your vehicle is protected by an Australian specialist in surface protection.</p>"
+            "text": "<p>Professionally applied and backed by Protection Brands' customer support and warranty programs, OptiVAN provides confidence that your vehicle is protected by an Australian specialist in surface protection.</p>",
+            "image": "shopify://shop_images/optivan-protection-trust.webp",
+            "image_ratio": "1 / 1"
           }
         }
       },
@@ -261,7 +267,8 @@
             "watermark": "OptiVAN",
             "button_label": "Discover OptiVAN",
             "button_link": "https://optivan.com.au/",
-            "button_new_tab": true
+            "button_new_tab": true,
+            "image": "shopify://shop_images/optivan-feat-row.webp"
           }
         }
       },

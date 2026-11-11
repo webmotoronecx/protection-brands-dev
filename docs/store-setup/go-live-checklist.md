@@ -114,6 +114,9 @@ blank:
 - [ ] `pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`,
       `pb-support-beyond.webp`: the Protection Brands page's three image rows
       (`collection.brand-protection-brands`). Copies are in the dev store's Files.
+- [ ] `optivan-advanced-protection.webp`, `optivan-design-australian.webp`,
+      `optivan-protection-trust.webp` and `optivan-feat-row.webp` (banner): the OptiVAN page
+      (`collection.brand-optivan`). Copies are in the dev store's Files.
 
 After installing, open the home page and a brand page in the theme editor and check every
 image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_images/[^"]+'
