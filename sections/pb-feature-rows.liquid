@@ -328,7 +328,9 @@
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: rgb(0 0 0 / var(--pb-feature-overlay, 0.35));
+    /* Clear at the top to black at the bottom, at "Darken the photo" (70% by default). */
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0), #000);
+    opacity: var(--pb-feature-overlay, 0.7);
   }
 
   /* 24% taller than the banner (12% above and below), so the parallax in assets/pb-motion.js
@@ -624,11 +626,12 @@
           "type": "range",
           "id": "overlay",
           "label": "Darken the photo",
+          "info": "A fade from clear at the top to black at the bottom, at this strength.",
           "min": 0,
-          "max": 80,
+          "max": 100,
           "step": 5,
           "unit": "%",
-          "default": 35,
+          "default": 70,
           "visible_if": "{{ block.settings.layout == 'banner' }}"
         }
       ]
