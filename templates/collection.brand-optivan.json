@@ -172,8 +172,7 @@
         "link_label": "View all",
         "link": "/collections/optivan-caravan-maintenance?view=brand",
         "background": "#ffffff",
-        "text_color": "#111111",
-        "align_to_text": true
+        "text_color": "#111111"
       }
     },
     "pb_brand_rows": {
