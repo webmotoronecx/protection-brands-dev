@@ -191,8 +191,9 @@
     background: linear-gradient(to bottom, rgb(0 0 0 / 0.06), rgb(0 0 0 / 0) 85%);
     -webkit-background-clip: text;
     background-clip: text;
-    /* Centred, and lifted by a tenth of its height. */
-    transform: translate(-50%, -10%);
+    /* Centred, and lifted by a tenth of its height. --pb-watermark-shift slides it up into
+       place as the row scrolls in (assets/pb-motion.js). */
+    transform: translate(-50%, calc(-10% + var(--pb-watermark-shift, 0%)));
     pointer-events: none;
     user-select: none;
   }
@@ -341,7 +342,7 @@
   .pb-feature-rows__row--banner .pb-feature-rows__watermark {
     inset-block: auto clamp(-48px, -3vw, -16px);
     z-index: 0;
-    transform: translateX(-50%);
+    transform: translate(-50%, var(--pb-watermark-shift, 0%));
     background: linear-gradient(to top, rgb(255 255 255 / 0.18) 10%, rgb(255 255 255 / 0) 90%);
     -webkit-background-clip: text;
     background-clip: text;
