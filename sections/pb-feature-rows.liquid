@@ -372,6 +372,9 @@
     justify-items: center;
     gap: clamp(28px, 4vw, 56px);
     max-width: 62rem;
+    /* Sits 10% of the banner's height above centre (with or without a button). A margin, not a
+       transform: data-reveal animates the transform. */
+    margin-block-end: calc(min(var(--pb-feature-banner-h, 700px), 100vh) * 0.2);
   }
 
   .pb-feature-rows__statement {
