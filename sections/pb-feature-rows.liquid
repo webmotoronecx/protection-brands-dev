@@ -19,12 +19,17 @@
 
 {%- liquid
   assign heading_font = settings.type_heading_font
+  assign watermark_font = section.settings.watermark_font
 -%}
+
+<style>
+  {{ watermark_font | font_face: font_display: 'swap' }}
+</style>
 
 {%- if section.blocks.size > 0 -%}
 <div
   class="pb-feature-rows"
-  style="--pb-feature-bg: {{ section.settings.background }}; --pb-feature-text: {{ section.settings.text_color }}; --pb-feature-gap: {{ section.settings.row_gap }}px; --pb-feature-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-feature-weight: {{ heading_font.weight }};"
+  style="--pb-watermark-font: {{ watermark_font.family }}, {{ watermark_font.fallback_families }}; --pb-watermark-weight: {{ watermark_font.weight }}; --pb-feature-bg: {{ section.settings.background }}; --pb-feature-text: {{ section.settings.text_color }}; --pb-feature-gap: {{ section.settings.row_gap }}px; --pb-feature-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-feature-weight: {{ heading_font.weight }};"
 >
   {%- for block in section.blocks -%}
     {%- liquid
@@ -172,10 +177,12 @@
     inset-block-start: clamp(-80px, -5vw, -24px);
     inset-inline-start: 50%;
     z-index: -1;
-    font-family: var(--pb-feature-font, inherit);
+    /* The brand banner's watermark font (sections/pb-brand-header.liquid). */
+    font-family: var(--pb-watermark-font, inherit);
     font-size: clamp(5rem, 19vw, 18rem);
-    font-weight: 700;
+    font-weight: var(--pb-watermark-weight, 600);
     line-height: 0.8;
+    letter-spacing: -0.055em;
     white-space: nowrap;
     text-transform: uppercase;
     color: transparent;
@@ -474,6 +481,13 @@
     {
       "type": "paragraph",
       "content": "Each block is one row. Pick its look under Layout: an intro (Text), a photo beside the text (Image left / Image right), or a full-width photo with one statement (Banner)."
+    },
+    {
+      "type": "font_picker",
+      "id": "watermark_font",
+      "label": "Watermark font",
+      "info": "As the brand banner's watermark (Barlow).",
+      "default": "barlow_n6"
     },
     {
       "type": "range",
