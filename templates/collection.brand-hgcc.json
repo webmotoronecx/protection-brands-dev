@@ -183,6 +183,8 @@
           "type": "row",
           "settings": {
             "layout": "image_left",
+            "image": "shopify://shop_images/hgcc-genuine-protection.webp",
+            "image_ratio": "1 / 1",
             "heading": "Genuine Protection for Every Journey",
             "text": "<p>Designed specifically for Honda owners, the range provides comprehensive protection inside and out. Advanced Graphene Ceramic Paint Protection helps maintain gloss and defend against UV exposure, environmental contaminants and everyday wear, while Interior Protection treatments help protect leather, fabric, vinyl and trim from spills, stains and soiling.</p><p>The range also includes Window Tinting, Antimicrobial Treatments and Genuine Honda maintenance products, providing a complete vehicle care solution.</p>",
             "watermark": "Honda Genuine Car Care"
@@ -192,6 +194,8 @@
           "type": "row",
           "settings": {
             "layout": "image_right",
+            "image": "shopify://shop_images/hgcc-honda-approved.webp",
+            "image_ratio": "1 / 1",
             "heading": "Honda Approved. Professionally Applied.",
             "text": "<p>Available through authorised Honda Centres, Honda Genuine Car Care is professionally applied by trained specialists and supported by dedicated customer care and warranty programs.</p><p>With products developed exclusively for Honda and endorsed by Honda Australia, you can enjoy confidence that your vehicle is protected by a solution designed to help keep it looking its best for years to come.</p>"
           }

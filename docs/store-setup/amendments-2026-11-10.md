@@ -169,7 +169,7 @@ OptiVAN has its three row photos and its banner photo (11 Nov): `optivan-advance
 `optivan-design-australian.webp`, `optivan-protection-trust.webp`, `optivan-feat-row.webp`.
 Permagard has its two row photos and its banner photo (11 Nov): `perma-comprehensive.webp`,
 `perma-professionally.webp`, `perma-feat-row.webp`.
-Honda Genuine Car Care has its banner photo (11 Nov): `hgcc-feat-row.webp`; its rows keep the default image.
+Honda Genuine Car Care has its photos (11 Nov): rows `hgcc-genuine-protection.webp` and `hgcc-honda-approved.webp`, banner `hgcc-feat-row.webp` (replaced in place with the client's second version, kit smaller).
 Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop
