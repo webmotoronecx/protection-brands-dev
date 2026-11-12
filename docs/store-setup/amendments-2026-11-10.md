@@ -170,6 +170,13 @@ OptiVAN has its three row photos and its banner photo (11 Nov): `optivan-advance
 Permagard has its two row photos and its banner photo (11 Nov): `perma-comprehensive.webp`,
 `perma-professionally.webp`, `perma-feat-row.webp`.
 Honda Genuine Car Care has its photos (11 Nov): rows `hgcc-genuine-protection.webp` and `hgcc-honda-approved.webp`, banner `hgcc-feat-row.webp` (replaced in place with the client's second version, kit smaller).
+The row photos were replaced on dev on 12 Nov (new `pb-support-beyond`, sharper
+`pb-protection-every-surface`, re-laid-out `pb-trusted-manufacturers`): copy the current dev versions.
+
+**Permagard's Tagline is empty** (12 Nov, client): on live, leave Collections → Permagard →
+Metafields → Tagline blank (delete "Most tested and proven coating technology" if it's there).
+The brand page and the "View all" page then show no red line under the name.
+
 Without a photo a row shows the default image (`assets/image-default.webp`, dark with the logo), and the banner `assets/pb-feat-row.webp` (a detailer polishing a black car).
 
 ## 5. Footer menus: Our Brands and Shop

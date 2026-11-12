@@ -6,7 +6,7 @@
         "height": 580,
         "height_mobile": 520,
         "show_title": true,
-        "show_tagline": false,
+        "show_tagline": true,
         "show_logo": true,
         "logo_width": 340,
         "logo_height": 200,
