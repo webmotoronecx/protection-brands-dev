@@ -119,8 +119,8 @@ blank:
       (`collection.brand-optivan`). Copies are in the dev store's Files.
 - [ ] `perma-comprehensive.webp`, `perma-professionally.webp` and `perma-feat-row.webp`
       (banner): the Permagard page (`collection.brand-permagard`). Copies are in the dev store's Files.
-- [ ] `cerface-protection-beyond.webp`, `cerface-professionally.webp`, `cerface-owners.webp`:
-      the CERFACE page's three rows (`collection.brand-cerface`). Copies are in the dev store's Files.
+- [ ] `cerface-protection-beyond.webp`, `cerface-professionally.webp`, `cerface-owners.webp` and
+      `cerface-feat-row.webp` (banner): the CERFACE page (`collection.brand-cerface`). Copies are in the dev store's Files.
 - [ ] `hgcc-genuine-protection.webp`, `hgcc-honda-approved.webp` and `hgcc-feat-row.webp`
       (banner): the Honda Genuine Car Care page (`collection.brand-hgcc`). Copies are in the dev
       store's Files.

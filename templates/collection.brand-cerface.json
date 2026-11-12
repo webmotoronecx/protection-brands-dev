@@ -263,6 +263,7 @@
           "type": "row",
           "settings": {
             "layout": "banner",
+            "image": "shopify://shop_images/cerface-feat-row.webp",
             "heading": "CERFACE isn't simply about protecting your vehicle today. It's about preserving everything you love about it for the journeys ahead.",
             "banner_note": "Ask your dealer about CERFACE from Protection Brands today!",
             "watermark": "CERFACE Ceramic"
