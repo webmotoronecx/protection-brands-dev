@@ -42,6 +42,14 @@
       if ratio == 'original'
         assign ratio = b.image.aspect_ratio | default: '4 / 3'
       endif
+      # The frame is 24% shorter than the photo (frame ratio = photo ratio x 1.24), so the photo
+      # shows at the frame's width, never scaled up, and slides inside it for the parallax.
+      assign ratio_parts = ratio | append: '' | split: '/'
+      assign frame_ratio = ratio_parts[0] | strip | times: 1.24
+      if ratio_parts.size > 1
+        assign ratio_h = ratio_parts[1] | strip | times: 1.0
+        assign frame_ratio = frame_ratio | divided_by: ratio_h
+      endif
       assign heading_tag = 'h2'
       if b.layout == 'banner'
         assign heading_tag = 'p'
@@ -97,14 +105,14 @@
       {%- else -%}
         <div class="pb-feature-rows__inner">
           {%- if b.layout != 'text' -%}
-            <div class="pb-feature-rows__media" style="--pb-feature-ratio: {{ ratio }};">
+            <div class="pb-feature-rows__media" style="--pb-feature-ratio: {{ ratio }}; --pb-feature-frame-ratio: {{ frame_ratio }};">
               {%- if b.image != blank -%}
                 {{
                   b.image
                   | image_url: width: 2400
                   | image_tag:
                     loading: 'lazy',
-                    sizes: '(min-width: 990px) min(62vw, 1000px), 124vw',
+                    sizes: '(min-width: 990px) min(50vw, 800px), 100vw',
                     widths: '600, 900, 1200, 1600, 2000, 2400',
                     alt: b.image.alt
                 }}
@@ -308,18 +316,20 @@
 
   .pb-feature-rows__media {
     overflow: hidden;
-    aspect-ratio: var(--pb-feature-ratio, 4 / 3);
+    aspect-ratio: var(--pb-feature-frame-ratio, 1.6533);
     border-radius: 6px;
     /* No fill: a cut-out image (transparent background) sits on the section's background. */
   }
 
-  /* 24% taller than its frame and centred in it (-9.68% of its own height), so the parallax in
+  /* The photo at its own ratio and the frame's width (not zoomed, so it stays sharp): 24% taller
+     than the frame and centred in it (-9.68% of its own height), so the parallax in
      assets/pb-motion.js (--pb-media-shift, -9% to 9% of the photo's height) never shows an edge.
      The frame stays still and clips it. */
   .pb-feature-rows__media img {
     display: block;
     width: 100%;
-    height: 124%;
+    height: auto;
+    aspect-ratio: var(--pb-feature-ratio, 4 / 3);
     object-fit: cover;
     transform: translateY(calc(-9.68% + var(--pb-media-shift, 0%)));
   }
