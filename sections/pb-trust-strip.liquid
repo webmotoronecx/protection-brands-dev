@@ -51,22 +51,20 @@
 
   .pb-trust-strip__list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
     margin: 0;
     padding: clamp(28px, 3.5vw, 48px) 0;
     border-block: 1px solid #e6e6e6;
     list-style: none;
   }
 
-  /* Phones: icon above the text, both centred; an odd last item gets the whole row. */
+  /* Phones: one item per row, icon beside the text, centred. */
   .pb-trust-strip__item {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    text-align: center;
+    gap: 12px;
     font-size: 15px;
     font-weight: 500;
     line-height: 1.3;
@@ -78,22 +76,12 @@
     height: 30px;
   }
 
-  .pb-trust-strip__item:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-  }
-
   @media screen and (min-width: 750px) {
     .pb-trust-strip__list {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-around;
       gap: 24px 40px;
-    }
-
-    .pb-trust-strip__item {
-      flex-direction: row;
-      gap: 12px;
-      text-align: start;
     }
   }
 {% endstylesheet %}
