@@ -182,6 +182,8 @@
           "type": "row",
           "settings": {
             "layout": "image_left",
+            "image": "shopify://shop_images/cerface-protection-beyond.webp",
+            "image_ratio": "1 / 1",
             "heading": "Protection Beyond the Exterior",
             "text": "<p>CERFACE BEYOND Interior Protection complements the exterior coating by helping protect leather, fabric, carpet, vinyl and interior trim surfaces. The invisible protective barrier helps reduce the impact of everyday spills, stains, soiling and UV-related wear, helping maintain the appearance and comfort of your vehicle's interior.</p>",
             "watermark": "CERFACE Ceramic"
@@ -191,6 +193,8 @@
           "type": "row",
           "settings": {
             "layout": "image_right",
+            "image": "shopify://shop_images/cerface-professionally.webp",
+            "image_ratio": "1 / 1",
             "heading": "Professionally Applied. Backed by Experience.",
             "text": "<p>Unlike many retail ceramic coatings, CERFACE is professionally applied by trained specialists through selected dealership partners. Every application is supported by Protection Brands’ national customer care and warranty program, providing added confidence and long-term support.</p>"
           }
@@ -199,6 +203,8 @@
           "type": "row",
           "settings": {
             "layout": "image_left",
+            "image": "shopify://shop_images/cerface-owners.webp",
+            "image_ratio": "1 / 1",
             "heading": "Designed for Owners Who Value Their Vehicle",
             "text": "<p>Whether you're driving a luxury European vehicle, a family SUV, a performance car or your everyday pride and joy, CERFACE is designed for owners who appreciate quality, value their investment and want their vehicle looking its very best.</p>"
           }

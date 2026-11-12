@@ -169,6 +169,8 @@ OptiVAN has its three row photos and its banner photo (11 Nov): `optivan-advance
 `optivan-design-australian.webp`, `optivan-protection-trust.webp`, `optivan-feat-row.webp`.
 Permagard has its two row photos and its banner photo (11 Nov): `perma-comprehensive.webp`,
 `perma-professionally.webp`, `perma-feat-row.webp`.
+CERFACE has its three row photos (12 Nov): `cerface-protection-beyond.webp`,
+`cerface-professionally.webp`, `cerface-owners.webp`; its banner keeps the default photo.
 Honda Genuine Car Care has its photos (11 Nov): rows `hgcc-genuine-protection.webp` and `hgcc-honda-approved.webp`, banner `hgcc-feat-row.webp` (replaced in place with the client's second version, kit smaller).
 The row photos were replaced on dev on 12 Nov (new `pb-support-beyond`, sharper
 `pb-protection-every-surface`, re-laid-out `pb-trusted-manufacturers`): copy the current dev versions.
