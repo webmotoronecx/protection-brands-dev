@@ -370,8 +370,14 @@
       object-position: left center;
     }
 
+    /* 30% bigger than half the banner's height times "Product size". */
     .pb-brand-header__product {
-      --pb-brand-product-h: calc(var(--pb-brand-h-mobile, 520px) * 0.5 * var(--pb-brand-product-size, 1.45));
+      --pb-brand-product-h: calc(var(--pb-brand-h-mobile, 520px) * 0.65 * var(--pb-brand-product-size, 1.45));
+    }
+
+    /* The watermark word centred top to bottom (the strip is --pb-marquee-height tall). */
+    .pb-brand-header__marquee {
+      inset-block-start: calc(50% - var(--pb-marquee-height) / 2);
     }
 
     .pb-brand-header__photo::after {
