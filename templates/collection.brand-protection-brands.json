@@ -339,10 +339,10 @@
   "order": [
     "pb_brand_header",
     "pb_brand_intro",
+    "pb_our_brands",
     "pb_brand_products",
     "pb_brand_rows",
     "pb_trust_strip",
-    "pb_brand_banner",
-    "pb_our_brands"
+    "pb_brand_banner"
   ]
 }
