@@ -334,7 +334,7 @@
     translate: 0 calc(var(--pb-collection-shift, 0px) * -0.08);
   }
 
-  /* Phones: title and tagline at the top, a smaller logo under them, the product at the
+  /* Phones: a smaller logo at the top, the title and tagline under it, the product at the
      bottom. */
   @media screen and (max-width: 749px) {
     .pb-brand-header {
@@ -357,6 +357,7 @@
     }
 
     .pb-brand-header__logo {
+      order: -1;
       grid-column: 1;
       justify-self: start;
       place-items: start;
