@@ -279,6 +279,11 @@
     list-style: none;
   }
 
+  /* Phones: an odd last logo gets the whole row, so it sits in the middle. */
+  .pb-who-we-are__logos > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
   .pb-who-we-are__logo {
     display: block;
     transition: opacity 0.2s ease;
