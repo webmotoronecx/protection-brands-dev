@@ -314,8 +314,10 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      /* Capped, or on very wide screens the gaps outgrow the row and the last logo wraps. */
-      gap: 24px clamp(32px, 5vw, 80px);
+      /* Grows faster than the screen (about 64px at 1280px, 83px at 1440px, capped at 104px), so
+         it's wider on big screens but still leaves room for all five logos on one line at
+         1280px. Capped, or on very wide screens the gaps outgrow the row and the last logo wraps. */
+      gap: 24px clamp(40px, calc(12vw - 90px), 104px);
     }
 
     .pb-who-we-are__logo img {
