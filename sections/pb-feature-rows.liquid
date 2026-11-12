@@ -336,10 +336,14 @@
 
   /* Banner */
   .pb-feature-rows__row--banner {
+    /* The banner's height: "Banner height", but no taller than the screen, and at most 520px
+       on phones (raised from 750px below). */
+    --pb-banner-min: min(var(--pb-feature-banner-h, 700px), 100vh, 520px);
+
     display: grid;
     place-items: center;
     overflow: hidden;
-    min-height: min(var(--pb-feature-banner-h, 700px), 100vh);
+    min-height: var(--pb-banner-min);
     padding-block: clamp(64px, 8vw, 120px);
     background: #111;
     color: #fff;
@@ -387,7 +391,7 @@
     max-width: 62rem;
     /* Sits 10% of the banner's height above centre (with or without a button). A margin, not a
        transform: data-reveal animates the transform. */
-    margin-block-end: calc(min(var(--pb-feature-banner-h, 700px), 100vh) * 0.2);
+    margin-block-end: calc(var(--pb-banner-min) * 0.2);
   }
 
   /* The banner's small line: pinned near the bottom, centred, over the watermark. */
@@ -483,6 +487,10 @@
   @media screen and (min-width: 750px) {
     .pb-feature-rows__row--list-columns .pb-feature-rows__text ul {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pb-feature-rows__row--banner {
+      --pb-banner-min: min(var(--pb-feature-banner-h, 700px), 100vh);
     }
   }
 
