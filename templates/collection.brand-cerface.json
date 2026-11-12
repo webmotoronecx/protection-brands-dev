@@ -200,7 +200,7 @@
           "settings": {
             "layout": "image_left",
             "heading": "Designed for Owners Who Value Their Vehicle",
-            "text": "<p>Whether you're driving a luxury European vehicle, a family SUV, a performance car or your everyday pride and joy, CERFACE is designed for owners who appreciate quality, value their investment and want their vehicle looking its very best.</p><p>CERFACE isn't simply about protecting your vehicle today. It's about preserving everything you love about it for the journeys ahead.</p>"
+            "text": "<p>Whether you're driving a luxury European vehicle, a family SUV, a performance car or your everyday pride and joy, CERFACE is designed for owners who appreciate quality, value their investment and want their vehicle looking its very best.</p>"
           }
         }
       },
@@ -257,7 +257,8 @@
           "type": "row",
           "settings": {
             "layout": "banner",
-            "heading": "Ask your dealer about CERFACE from Protection Brands today!",
+            "heading": "CERFACE isn't simply about protecting your vehicle today. It's about preserving everything you love about it for the journeys ahead.",
+            "banner_note": "Ask your dealer about CERFACE from Protection Brands today!",
             "watermark": "CERFACE Ceramic"
           }
         }

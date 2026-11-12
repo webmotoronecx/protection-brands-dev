@@ -91,6 +91,9 @@
             </div>
           {%- endif -%}
         </div>
+        {%- if b.banner_note != blank -%}
+          <p class="pb-feature-rows__banner-note" data-reveal>{{ b.banner_note | escape }}</p>
+        {%- endif -%}
       {%- else -%}
         <div class="pb-feature-rows__inner">
           {%- if b.layout != 'text' -%}
@@ -377,6 +380,19 @@
     margin-block-end: calc(min(var(--pb-feature-banner-h, 700px), 100vh) * 0.2);
   }
 
+  /* The banner's small line: pinned near the bottom, centred, over the watermark. */
+  .pb-feature-rows__banner-note {
+    position: absolute;
+    z-index: 1;
+    inset-inline: clamp(16px, 4vw, 64px);
+    bottom: clamp(32px, 5vw, 72px);
+    margin: 0;
+    font-size: clamp(16px, 1.6vw, 24px);
+    line-height: 1.35;
+    text-align: center;
+    text-wrap: balance;
+  }
+
   .pb-feature-rows__statement {
     margin: 0;
     font-family: var(--pb-feature-font, inherit);
@@ -594,6 +610,13 @@
           "id": "heading",
           "label": "Heading",
           "info": "On a banner, the statement over the photo."
+        },
+        {
+          "type": "text",
+          "id": "banner_note",
+          "label": "Small text at the bottom",
+          "info": "A short line near the bottom of the banner, e.g. \"Ask your dealer…\".",
+          "visible_if": "{{ block.settings.layout == 'banner' }}"
         },
         {
           "type": "richtext",
