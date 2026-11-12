@@ -328,15 +328,74 @@
         "background": "#ffffff",
         "text_color": "#000000"
       }
+    },
+    "pb_our_brands_bottom": {
+      "type": "pb-who-we-are",
+      "blocks": {
+        "logo_protection_brands": {
+          "type": "logo",
+          "settings": {
+            "alt": "Protection Brands",
+            "link": "shopify://collections/protection-brands"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "alt": "CERFACE",
+            "link": "shopify://collections/cerface-ceramic"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "alt": "OptiVAN",
+            "link": "shopify://collections/optivan-caravan-maintenance"
+          }
+        },
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "alt": "Permagard",
+            "link": "shopify://collections/permagard-car-care"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "alt": "Honda Genuine Car Care",
+            "link": "shopify://collections/honda-genuine-car-care"
+          }
+        }
+      },
+      "block_order": [
+        "logo_protection_brands",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_permagard",
+        "logo_hgcc"
+      ],
+      "settings": {
+        "logos_heading": "Our brands",
+        "logo_height": 80,
+        "label_font": "barlow_n5",
+        "label": "",
+        "statement": "",
+        "button_label": "",
+        "button_link": "",
+        "background": "#ffffff",
+        "text_color": "#000000"
+      }
     }
   },
   "order": [
     "pb_brand_header",
     "pb_brand_intro",
+    "pb_our_brands",
     "pb_brand_products",
     "pb_brand_rows",
     "pb_trust_strip",
     "pb_brand_banner",
-    "pb_our_brands"
+    "pb_our_brands_bottom"
   ]
 }
