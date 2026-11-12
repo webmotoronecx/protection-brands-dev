@@ -336,9 +336,9 @@
 
   /* Banner */
   .pb-feature-rows__row--banner {
-    /* The banner's height: "Banner height", but no taller than the screen, and at most 520px
+    /* The banner's height: "Banner height", but no taller than the screen, and at most 440px
        on phones (raised from 750px below). */
-    --pb-banner-min: min(var(--pb-feature-banner-h, 700px), 100vh, 520px);
+    --pb-banner-min: min(var(--pb-feature-banner-h, 700px), 100vh, 440px);
 
     display: grid;
     place-items: center;
@@ -389,9 +389,9 @@
     justify-items: center;
     gap: clamp(28px, 4vw, 56px);
     max-width: 62rem;
-    /* Sits 10% of the banner's height above centre (with or without a button). A margin, not a
-       transform: data-reveal animates the transform. */
-    margin-block-end: calc(var(--pb-banner-min) * 0.2);
+    /* Centred on phones; from 750px it sits 10% of the banner's height above centre (with or
+       without a button). A margin, not a transform: data-reveal animates the transform. */
+    margin-block-end: 0;
   }
 
   /* The banner's small line: pinned near the bottom, centred, over the watermark. */
@@ -491,6 +491,10 @@
 
     .pb-feature-rows__row--banner {
       --pb-banner-min: min(var(--pb-feature-banner-h, 700px), 100vh);
+    }
+
+    .pb-feature-rows__banner-content {
+      margin-block-end: calc(var(--pb-banner-min) * 0.2);
     }
   }
 
