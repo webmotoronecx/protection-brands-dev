@@ -31,10 +31,9 @@ const SHELL = [
   [1, 5.22], [0.97, 5.27], [0.92, 5.32], [0.79, 5.38], [0.68, 5.43], [0.57, 5.49],
   [0.47, 5.53], [0.41, 5.56], [0.4, 5.66],
 ];
-// Follows the shell 0.03 inside it, up into the shoulder (cut at LIQUID_LEVEL).
 const LIQUID = [
-  [0, 0.04], [0.58, 0.04], [0.85, 0.08], [0.94, 0.14], [0.97, 0.27], [0.97, 5.22],
-  [0.94, 5.27], [0.89, 5.32], [0.76, 5.38], [0.65, 5.43], [0.54, 5.49], [0, 5.49],
+  [0, 0.04], [0.58, 0.04], [0.85, 0.08], [0.94, 0.14], [0.97, 0.27], [0.97, 5.2],
+  [0.93, 5.26], [0.86, 5.3], [0, 5.3],
 ];
 // Side wall rows just outside and inside the ribbed band (CAP_RIBS), so the ribs have
 // vertices to push: a smooth lip at the bottom and top, ribbed in between.
@@ -76,13 +75,13 @@ const PERMAGARD = {
    through the clear plastic above the label.
    SLOSH: spring stiffness and damping, how strongly acceleration tips the surface, and the
    largest tilt (surface slope). */
-const LIQUID_LEVEL = 5.4;
+const LIQUID_LEVEL = 5.20;
 
 /* Sparkling liquid: small bubbles suspended in each bottle, as in a gel: they don't rise,
    they just drift slowly around where they are (one instanced draw per bottle), cut off at
    the moving surface, plus tiny glints twinkling in the liquid (shader). drift is how far a
    bubble wanders (scene units), speed how quickly (radians per second). */
-const BUBBLES = { count: 90, radius: [0.025, 0.07], drift: 0.07, speed: [0.25, 0.6], spread: 0.8, bottom: 0.1, top: 5.2 };
+const BUBBLES = { count: 90, radius: [0.025, 0.07], drift: 0.07, speed: [0.25, 0.6], spread: 0.8, bottom: 0.1 };
 const SPARKLE = 1.6; // glint brightness
 const SLOSH = { stiffness: 10, damping: 3.2, gain: 0.006, max: 0.6 };
 const HEIGHT = 6.27;
@@ -811,7 +810,7 @@ function makeBubbles(THREE, surface) {
     return {
       x: Math.cos(angle) * distance,
       z: Math.sin(angle) * distance,
-      y: random(BUBBLES.bottom, BUBBLES.top),
+      y: random(BUBBLES.bottom, LIQUID_LEVEL),
       radius: random(...BUBBLES.radius),
       speed: random(...BUBBLES.speed),
       phase: Math.random() * Math.PI * 2,
@@ -897,9 +896,11 @@ const LIQUID_FINISHES = {
     clearcoatRoughness: 0.02,
     surfaceTint: 0.2,
     rim: 0.25,
-    // A frosted band on the empty neck above the liquid (see frostNeck), so the background
-    // word doesn't show crisp through it; the plastic over the liquid stays clear.
-    neckFrost: 0.5,
+    // The plastic around it: dark smoked and more solid than the gel bottle's, so the
+    // background word doesn't show through the empty neck above the liquid (white at this
+    // opacity looked milky).
+    shellColor: 0x555555,
+    shellOpacity: 0.32,
   },
   gel: {
     opacity: 0.8,
@@ -911,7 +912,8 @@ const LIQUID_FINISHES = {
     iridescenceIOR: 1.3,
     surfaceTint: 0.4,
     rim: 0.75,
-    neckFrost: 0,
+    shellColor: 0xffffff,
+    shellOpacity: 0.16,
   },
 };
 
@@ -919,7 +921,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
   const liquid = new THREE.Color(liquidColour);
   // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint. Both sides
   // are drawn: the inside faces showing through the cut become the liquid's top surface.
-  const { surfaceTint, rim, neckFrost, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
+  const { surfaceTint, rim, shellColor, shellOpacity, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
   const liquidMaterial = new THREE.MeshPhysicalMaterial({
     color: liquid,
     emissive: liquid,
@@ -941,44 +943,16 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
       clearcoatRoughness: 0.3,
     }),
     cap: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55 }),
-    shell: frostNeck(
-      new THREE.MeshPhysicalMaterial({
-        color: 0xffffff,
-        roughness: 0.06,
-        transparent: true,
-        opacity: 0.16,
-        clearcoat: gloss,
-        clearcoatRoughness: 0.05,
-        depthWrite: false,
-      }),
-      neckFrost
-    ),
+    shell: new THREE.MeshPhysicalMaterial({
+      color: shellColor,
+      roughness: 0.06,
+      transparent: true,
+      opacity: shellOpacity,
+      clearcoat: gloss,
+      clearcoatRoughness: 0.05,
+      depthWrite: false,
+    }),
   };
-}
-
-/* Frosted neck: from just below the liquid's level up to the cap, the clear plastic turns a
-   soft grey and more solid (frost: its opacity there), fading in over a short band. The
-   canvas can't blur the page behind it, so this hazes the background word instead of
-   showing it crisp. Heights are the shell's own (from the base). */
-function frostNeck(material, frost) {
-  if (!frost) return material;
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.pbFrost = { value: frost };
-    shader.uniforms.pbFrostFrom = { value: LIQUID_LEVEL - 0.04 };
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying float vPbHeight;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPbHeight = position.y;');
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying float vPbHeight;\nuniform float pbFrost;\nuniform float pbFrostFrom;')
-      .replace(
-        '#include <dithering_fragment>',
-        '#include <dithering_fragment>\n' +
-          'float pbFrosted = smoothstep(pbFrostFrom, pbFrostFrom + 0.08, vPbHeight);\n' +
-          'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.55), pbFrosted * 0.7);\n' +
-          'gl_FragColor.a = mix(gl_FragColor.a, pbFrost, pbFrosted);'
-      );
-  };
-  return material;
 }
 
 /* An opaque bottle (Permagard): glossy white plastic, a high-gloss black label wrap and a
