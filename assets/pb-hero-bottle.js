@@ -304,6 +304,12 @@ class PBHeroBottle extends HTMLElement {
         mesh.position.y = -HEIGHT / 2;
         group.add(mesh);
       }
+      if (materials.shellBack) {
+        const back = new THREE.Mesh(geometries.get(models[index]).shell, materials.shellBack);
+        back.renderOrder = -1;
+        back.position.y = -HEIGHT / 2;
+        group.add(back);
+      }
       group.position.set(...spec.position);
       group.rotation.set(...spec.tilt);
       this.#scene.add(group);
@@ -903,6 +909,8 @@ const LIQUID_FINISHES = {
     shellOpacity: 0.32,
     // Studio reflections on the plastic, times the "Highlights" setting.
     shellReflection: 2.5,
+    // The inside of the far wall, seen through the bottle, reflects too (shellBack).
+    shellBack: true,
   },
   gel: {
     opacity: 0.8,
@@ -924,7 +932,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
   const liquid = new THREE.Color(liquidColour);
   // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint. Both sides
   // are drawn: the inside faces showing through the cut become the liquid's top surface.
-  const { surfaceTint, rim, shellColor, shellOpacity, shellReflection, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
+  const { surfaceTint, rim, shellColor, shellOpacity, shellReflection, shellBack, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
   const liquidMaterial = new THREE.MeshPhysicalMaterial({
     color: liquid,
     emissive: liquid,
@@ -936,7 +944,21 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
   });
   liquidMaterial.userData.surface = addLiquidSurface(THREE, liquidMaterial, liquid, surfaceTint, rim);
 
+  const shell = {
+    color: shellColor,
+    roughness: 0.06,
+    transparent: true,
+    opacity: shellOpacity,
+    envMapIntensity: shellReflection,
+    clearcoat: gloss,
+    clearcoatRoughness: 0.05,
+    depthWrite: false,
+  };
+
   return {
+    // Back wall: the same plastic's inner faces, drawn before the liquid so the liquid sits
+    // in front of it (see the mesh loop).
+    shellBack: shellBack ? new THREE.MeshPhysicalMaterial({ ...shell, side: THREE.BackSide }) : null,
     liquid: liquidMaterial,
     label: new THREE.MeshPhysicalMaterial({
       color: labelTexture ? 0xffffff : 0x111111,
@@ -946,16 +968,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
       clearcoatRoughness: 0.3,
     }),
     cap: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55 }),
-    shell: new THREE.MeshPhysicalMaterial({
-      color: shellColor,
-      roughness: 0.06,
-      transparent: true,
-      opacity: shellOpacity,
-      envMapIntensity: shellReflection,
-      clearcoat: gloss,
-      clearcoatRoughness: 0.05,
-      depthWrite: false,
-    }),
+    shell: new THREE.MeshPhysicalMaterial(shell),
   };
 }
 
