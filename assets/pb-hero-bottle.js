@@ -911,7 +911,7 @@ const LIQUID_FINISHES = {
     shellReflection: 2.5,
     // The inside of the far wall, seen through the bottle: more solid and shinier than the
     // front, with broader reflections, to hide more of the background word behind the bottle.
-    shellBack: { opacity: 0.5, envMapIntensity: 4, roughness: 0.18 },
+    shellBack: { opacity: 0.75, envMapIntensity: 4, roughness: 0.18 },
   },
   gel: {
     opacity: 0.8,
