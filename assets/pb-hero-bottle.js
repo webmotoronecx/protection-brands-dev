@@ -909,8 +909,9 @@ const LIQUID_FINISHES = {
     shellOpacity: 0.32,
     // Studio reflections on the plastic, times the "Highlights" setting.
     shellReflection: 2.5,
-    // The inside of the far wall, seen through the bottle, reflects too (shellBack).
-    shellBack: true,
+    // The inside of the far wall, seen through the bottle: more solid and shinier than the
+    // front, with broader reflections, to hide more of the background word behind the bottle.
+    shellBack: { opacity: 0.5, envMapIntensity: 4, roughness: 0.18 },
   },
   gel: {
     opacity: 0.8,
@@ -958,7 +959,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
   return {
     // Back wall: the same plastic's inner faces, drawn before the liquid so the liquid sits
     // in front of it (see the mesh loop).
-    shellBack: shellBack ? new THREE.MeshPhysicalMaterial({ ...shell, side: THREE.BackSide }) : null,
+    shellBack: shellBack ? new THREE.MeshPhysicalMaterial({ ...shell, ...shellBack, side: THREE.BackSide }) : null,
     liquid: liquidMaterial,
     label: new THREE.MeshPhysicalMaterial({
       color: labelTexture ? 0xffffff : 0x111111,
