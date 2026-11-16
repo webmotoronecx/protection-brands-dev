@@ -896,9 +896,11 @@ const LIQUID_FINISHES = {
     clearcoatRoughness: 0.02,
     surfaceTint: 0.2,
     rim: 0.25,
-    // The plastic around it: more solid than the gel bottle's, so the background word doesn't
-    // show through the empty neck above the liquid.
-    shellOpacity: 0.4,
+    // The plastic around it: dark smoked and more solid than the gel bottle's, so the
+    // background word doesn't show through the empty neck above the liquid (white at this
+    // opacity looked milky).
+    shellColor: 0x1a1a1a,
+    shellOpacity: 0.5,
   },
   gel: {
     opacity: 0.8,
@@ -910,6 +912,7 @@ const LIQUID_FINISHES = {
     iridescenceIOR: 1.3,
     surfaceTint: 0.4,
     rim: 0.75,
+    shellColor: 0xffffff,
     shellOpacity: 0.16,
   },
 };
@@ -918,7 +921,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
   const liquid = new THREE.Color(liquidColour);
   // Glossy amber: a little self-glow so it reads as lit-through liquid, not paint. Both sides
   // are drawn: the inside faces showing through the cut become the liquid's top surface.
-  const { surfaceTint, rim, shellOpacity, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
+  const { surfaceTint, rim, shellColor, shellOpacity, ...look } = LIQUID_FINISHES[finish] || LIQUID_FINISHES.liquid;
   const liquidMaterial = new THREE.MeshPhysicalMaterial({
     color: liquid,
     emissive: liquid,
@@ -941,7 +944,7 @@ function bottleMaterials(THREE, labelTexture, liquidColour, gloss, finish = 'liq
     }),
     cap: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55 }),
     shell: new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: shellColor,
       roughness: 0.06,
       transparent: true,
       opacity: shellOpacity,
