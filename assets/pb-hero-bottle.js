@@ -900,7 +900,7 @@ const LIQUID_FINISHES = {
     // background word doesn't show through the empty neck above the liquid (white at this
     // opacity looked milky).
     shellColor: 0x555555,
-    shellOpacity: 0.42,
+    shellOpacity: 0.6,
     // Frosted: matte enough that what's behind fades into a soft haze (the canvas can't blur
     // the page behind it, so this hides the background word rather than blurring it).
     shellRoughness: 0.45,
