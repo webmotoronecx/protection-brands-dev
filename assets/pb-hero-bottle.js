@@ -896,8 +896,9 @@ const LIQUID_FINISHES = {
     clearcoatRoughness: 0.02,
     surfaceTint: 0.2,
     rim: 0.25,
-    // The clear plastic around it: half the gel bottle's, so the amber shows through clearer.
-    shellOpacity: 0.08,
+    // The plastic around it: more solid than the gel bottle's, so the background word doesn't
+    // show through the empty neck above the liquid.
+    shellOpacity: 0.4,
   },
   gel: {
     opacity: 0.8,
