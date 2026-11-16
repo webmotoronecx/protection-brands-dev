@@ -899,7 +899,7 @@ const LIQUID_FINISHES = {
     // The plastic around it: dark smoked and more solid than the gel bottle's, so the
     // background word doesn't show through the empty neck above the liquid (white at this
     // opacity looked milky).
-    shellColor: 0x333333,
+    shellColor: 0x555555,
     shellOpacity: 0.32,
   },
   gel: {
