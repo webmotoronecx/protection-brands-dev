@@ -6,7 +6,7 @@ Read-only unless --apply. Run it with the store password-protected (go-live-chec
   1. Brand collections: delete the hand-picked permagard-car-care, cerface-ceramic and
      optivan-caravan-maintenance, then move the automatic replacements built on 17 Nov
      (<handle>-new) to those handles, so the URLs stay the same.
-  2. Publish to the Online Store: the 9 collections created hidden on 17 Nov, the 3 brand
+  2. Publish to the Online Store: 7 of the 9 collections created hidden on 17 Nov, the 3 brand
      collections from step 1, the 3 unpublished pages, and the 4 active Honda products.
   3. Page templates as on dev: About Us → about; Delivery & Returns, Privacy Policy, Terms &
      Conditions → default (Horizon has no templates of theirs; their text is in the page).
@@ -24,8 +24,9 @@ LIVE = 'protection-brands.myshopify.com'
 APPLY = '--apply' in sys.argv
 
 BRANDS = ['permagard-car-care', 'cerface-ceramic', 'optivan-caravan-maintenance']
+# Cleaners & Sprays and Bulk & Professional stay hidden, as on dev.
 HIDDEN_COLLECTIONS = ['protection-brands', 'honda-genuine-car-care', 'wash-detail', 'microfibre-drying',
-                      'value-packs', 'power-emergency', 'cleaners-sprays', 'bulk-professional', 'best-sellers']
+                      'value-packs', 'power-emergency', 'best-sellers']
 PAGES_TO_PUBLISH = ['safety-data-sheets', 'care-instructions', 'locate-dealership']
 HONDA_TO_PUBLISH = ['hgcc-detailing-spray-500ml', 'hgcc-multipurpose-cleaner-500ml',
                     'hgcc-ph-neutral-vehicle-wash-500ml', 'hgcc-gift-box']
