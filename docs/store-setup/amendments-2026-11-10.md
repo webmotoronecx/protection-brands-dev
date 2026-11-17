@@ -17,7 +17,7 @@ title.
 | 0 | Theme files (logos, header, tiles, Best Sellers, brand text section, scroll fix) | Done (local theme) | Push theme |
 | 1 | Categories: Wash & Detail, Microfibre & Drying, Value Packs, Power & Emergency | Done 11 Nov | To do |
 | 2 | Best Sellers collection | Done 11 Nov | To do |
-| 3 | HGCC: three dealer kits to Draft, Gift Box $99 | Done 11 Nov | To do |
+| 3 | HGCC: three dealer kits to Draft, Gift Box $99 | Done 11 Nov | Copied, hidden (17 Nov); publish at switch |
 | 4 | Brand page text | Done 11 Nov | To do |
 | 5 | Footer menus: Our Brands, Shop | Done 11 Nov | To do |
 | 6 | Footer menu: Information (remove two, add Warranty & Care, Privacy Policy link) | Done 11 Nov | To do |
@@ -105,6 +105,19 @@ is $29.95. All six prices already matched on dev. Not visible on Debut until som
    - `hgcc-exterior-ceramic-protection-giftbox`: Exterior Ceramic Protection & Gift Box
 2. `hgcc-gift-box`, *Honda Genuine Car Care Gift Box*: price **$99.00**. Prices include GST on dev
    (Settings → Taxes and duties → "Include tax in prices"); check the same on live.
+
+**Done on live 17 Nov, differently:** the seven Honda products didn't exist on live (they were only
+ever made on dev), so they were copied from dev with `productSet` (title, description, type,
+vendor, tag, price, images and alt text, *Suitable for*). Steps 1 and 2 are already true of the
+copies: the three kits are Draft, the Gift Box is $99. All seven are **not on the Online Store
+channel**, so Debut doesn't show them. At the switch:
+
+- [ ] **Publish to Online Store** the four active ones: `hgcc-detailing-spray-500ml`,
+      `hgcc-multipurpose-cleaner-500ml`, `hgcc-ph-neutral-vehicle-wash-500ml`, `hgcc-gift-box`
+      (Products → select → More actions → Include in sales channels). The kits stay Draft.
+- [ ] Their **SDS** links aren't set yet (the SDS entries don't exist on live; step 8 links them).
+- [ ] Shipping weight is 0 kg on all seven, as on dev. Set real weights if shipping rates use
+      weight.
 
 ## 4. Brand pages
 
