@@ -62,7 +62,7 @@ doesn't use them, but do them close to launch day.
 
 ### Product page extras
 
-- [ ] Product page tabs (README §2, *Product page tabs*): create the four Tab metafield
+- [x] **Done 17 Nov:** tab and *Suitable for* values copied from dev by handle (91 values on 35 products; live descriptions matched dev exactly, so the split was the same). Product page tabs (README §2, *Product page tabs*): create the four Tab metafield
       definitions in admin (rich text), dry-run `split-descriptions.py --store protection-brands`,
       read the report, then run it with `--apply`. Safe before launch: Debut doesn't show them.
 - [ ] **Card photos** (`custom.card_photo_media`, created by setup-store.mjs): which of a
