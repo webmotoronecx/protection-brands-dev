@@ -23,7 +23,7 @@ title.
 | 6 | Footer menu: Information (remove two, add Warranty & Care, Privacy Policy link) | Done 11 Nov | To do |
 | 7 | Contact form email to auto.admin@protectionbrands.com.au | Not on dev | At the switch |
 | 8 | Brand page images | Waiting on client | Waiting on client |
-| 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | To do |
+| 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | Done 17 Nov (40 entries, 9 products linked) |
 | 10 | Brand page layout (mock): one template per brand | Done 11 Nov | Set each collection's template |
 | 11 | Footer: Warranty & Care split into Warranty and a Care Instructions page (three PDFs) | Done 17 Nov | To do |
 | 12 | Brand pages: social links in the bottom banner | Done 17 Nov (theme) | Push theme |
@@ -247,10 +247,12 @@ folder, the *Old* folder left out; Mazda 4; Mitsubishi 9; Permagard 10; Protecti
 names, brands and dates from `sds-sheets.json`. Eight products now link to their sheet (list in
 `sds-products.json`). Not visible on Debut.
 
-**17 Nov:** the 40 SDS PDFs are on live (Content → Files, copied from dev). The scripted steps
-below need metaobject permission on live, which our staff account doesn't have yet (the client's
-store owner grants it under Settings → Users). Without it, create the entries by hand from
-[sds-live-entries.md](sds-live-entries.md).
+**Done on live 17 Nov.** The 40 PDFs were copied from dev's Files; the client added the
+metaobject permissions to our staff role; `setup-store.mjs --only metaobjects,metafields` created
+the SDS definition and the field definitions, and `upload-sds.mjs --link-products` created the 40
+entries and linked 9 products (the three Honda 500 ml products included). A re-run of the plan
+shows everything `ok`. The live definition needed **publishable** turned on (setup-store.mjs now
+creates it that way). [sds-live-entries.md](sds-live-entries.md) was the manual fallback; not needed.
 
 On live:
 

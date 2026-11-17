@@ -116,6 +116,9 @@ for (const def of config.metaobjectDefinitions) {
         name: def.name,
         displayNameKey: def.displayNameKey,
         access: { storefront: def.storefront },
+        // As a definition made in admin: entries have Active/Draft status (upload-sds.mjs creates
+        // them Active) and can be translated.
+        capabilities: { publishable: { enabled: true }, translatable: { enabled: true } },
         fieldDefinitions: def.fields.map((f) => ({
           key: f.key, name: f.name, type: f.type, required: !!f.required,
           ...(f.choices && { validations: choicesValidation(f.choices) }),
