@@ -15,9 +15,7 @@
         "watermark": true,
         "watermark_font": "barlow_n6",
         "fallback_title": "Our brands",
-        "product_size": 145,
-        "instagram_url": "https://www.instagram.com/permagard_australia/",
-        "linkedin_url": "https://www.linkedin.com/company/permagard_auto_au/"
+        "product_size": 145
       }
     },
     "pb_brand_intro": {
@@ -260,7 +258,9 @@
             "button_label": "Discover Permagard Automotive",
             "button_link": "https://permagardautomotive.com.au/",
             "button_new_tab": true,
-            "image": "shopify://shop_images/perma-feat-row.webp"
+            "image": "shopify://shop_images/perma-feat-row.webp",
+            "instagram_url": "https://www.instagram.com/permagard_australia/",
+            "linkedin_url": "https://www.linkedin.com/company/permagard_auto_au/"
           }
         }
       },

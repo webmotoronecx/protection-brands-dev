@@ -110,35 +110,6 @@
     {%- if section.settings.show_tagline and tagline != blank -%}
       <p class="pb-brand-header__tagline">{{ tagline | escape }}</p>
     {%- endif -%}
-
-    {%- comment -%} The brand's social accounts (Social links settings), as in the footer. {%- endcomment -%}
-    {%- liquid
-      assign socials = 'instagram,facebook,linkedin,youtube,tiktok' | split: ','
-      assign has_social = false
-      for platform in socials
-        assign key = platform | append: '_url'
-        if section.settings[key] != blank
-          assign has_social = true
-        endif
-      endfor
-    -%}
-    {%- if has_social -%}
-      <ul class="pb-brand-header__social" role="list">
-        {%- for platform in socials -%}
-          {%- assign key = platform | append: '_url' -%}
-          {%- assign url = section.settings[key] -%}
-          {%- if url != blank -%}
-            <li>
-              <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ title | escape }} on {{ platform | replace: 'linkedin', 'LinkedIn' | replace: 'youtube', 'YouTube' | replace: 'tiktok', 'TikTok' | capitalize }}">
-                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  {%- render 'icon', icon: platform -%}
-                </svg>
-              </a>
-            </li>
-          {%- endif -%}
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
   </div>
 
   {%- if section.settings.show_logo and logo != blank -%}
@@ -320,39 +291,6 @@
     font-size: 14px;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-  }
-
-  /* Social icons under the title: white outlines that fill on hover. */
-  .pb-brand-header__social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .pb-brand-header__social a {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgb(255 255 255 / 0.35);
-    border-radius: 50%;
-    color: #fff;
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-  }
-
-  .pb-brand-header__social a:is(:hover, :focus-visible) {
-    border-color: #fff;
-    background: #fff;
-    color: #000;
-  }
-
-  .pb-brand-header__social svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
   }
 
   /* Logo: within the right third, sized by the max width and height settings. */
@@ -586,17 +524,7 @@
       "id": "fallback_title",
       "label": "Title when there is no collection",
       "default": "Our brands"
-    },
-    {
-      "type": "header",
-      "content": "Social links",
-      "info": "Icons under the title, for this brand's own accounts. Leave empty for none."
-    },
-    { "type": "url", "id": "instagram_url", "label": "Instagram" },
-    { "type": "url", "id": "facebook_url", "label": "Facebook" },
-    { "type": "url", "id": "linkedin_url", "label": "LinkedIn" },
-    { "type": "url", "id": "youtube_url", "label": "YouTube" },
-    { "type": "url", "id": "tiktok_url", "label": "TikTok" }
+    }
   ]
 }
 {% endschema %}

@@ -15,8 +15,7 @@
         "watermark": true,
         "watermark_font": "barlow_n6",
         "fallback_title": "Our brands",
-        "product_size": 145,
-        "linkedin_url": "https://www.linkedin.com/company/protection-brands-pty-ltd/"
+        "product_size": 145
       }
     },
     "pb_brand_intro": {
@@ -265,7 +264,8 @@
           "settings": {
             "layout": "banner",
             "heading": "Protection Brands. Advanced Protection. Trusted Expertise. Lasting Results.",
-            "watermark": "Protection Brands"
+            "watermark": "Protection Brands",
+            "linkedin_url": "https://www.linkedin.com/company/protection-brands-pty-ltd/"
           }
         }
       },
