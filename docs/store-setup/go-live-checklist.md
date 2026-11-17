@@ -227,6 +227,8 @@ inside one short window with the store password-protected:
       (plan: 31 products get dev's images, 5 Permagard products get vendor *Permagard*), then
       `--apply`, then the plan again (it should list nothing). Product types and the Bulk tag
       were already copied on 17 Nov, so this replaces the CSV import in product-import.md.
+- [ ] Footer menu (shared with Debut): `python3 docs/store-setup/sync-menus.py footer --replace`
+      (plan), then add `--apply`. `footer-shop` and `footer-brands` were created on 17 Nov.
 - [ ] Card photos: `node docs/store-setup/card-photos.mjs --store protection-brands` (report),
       then `--apply`. Only after the images above: it points at the new image IDs.
 - [ ] **Publish** the Horizon theme.
