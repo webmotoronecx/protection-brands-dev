@@ -35,19 +35,11 @@
         assign light = false
       elsif template.name == 'collection' and template.suffix contains 'brand'
         assign light = false
-      elsif template.name == 'page' and template.suffix == 'sds'
-        assign light = false
-      elsif template.name == 'page' and template.suffix == blank
+      elsif template.name == 'page'
+        # Every page template opens with the full-width title bar (default, SDS, contact,
+        # dealer, about, care instructions), so new page templates get the dark header too.
         assign light = false
       elsif template.name == 'search'
-        assign light = false
-      elsif template.name == 'page' and template.suffix == 'contact'
-        assign light = false
-      elsif template.name == 'page' and template.suffix == 'dealer'
-        assign light = false
-      elsif template.name == 'page' and template.suffix == 'about'
-        assign light = false
-      elsif template.name == 'page' and template.suffix == 'care-instructions'
         assign light = false
       elsif template.name == '404' or template.name == 'blog' or template.name == 'article' or template.name == 'cart'
         assign light = false
