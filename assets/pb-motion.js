@@ -410,6 +410,23 @@
     // Fonts and lazy images change page height after load; re-measure once.
     window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
 
+    // Content that changes height without a window resize (the SDS page's brand filter and
+    // search, the collection grid loading more) moves everything below it, so re-measure once
+    // it settles. Otherwise the footer's trigger stays where the old page ended and its panel
+    // never slides in.
+    const main = document.querySelector('main');
+    if (main) {
+      let refreshTimer;
+      let lastHeight = main.offsetHeight;
+      new ResizeObserver(() => {
+        const height = main.offsetHeight;
+        if (height === lastHeight) return;
+        lastHeight = height;
+        clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 150);
+      }).observe(main);
+    }
+
     // The scroller changes at 990px. Rather than rebuild, show whatever hasn't revealed yet.
     squeeze.addEventListener('change', showAll, { once: true });
   }
