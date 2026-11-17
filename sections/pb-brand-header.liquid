@@ -255,6 +255,26 @@
     filter: drop-shadow(24px 8px 48px rgb(0 0 0 / 0.85));
   }
 
+  /* Entrance: the product starts small and low, as if far away, and rises to its place on
+     load. Only its size moves (from visible, nothing hidden), on the compositor; the wrapper's
+     `translate` stays free for the scroll parallax. No motion with reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pb-brand-header__product img {
+      transform-origin: 50% 100%;
+      animation: pb-brand-product-in 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+    }
+  }
+
+  @keyframes pb-brand-product-in {
+    from {
+      transform: translateY(14%) scale(0.4);
+    }
+
+    to {
+      transform: none;
+    }
+  }
+
   /* Left of the middle product: up to 40% of the banner, and words never break. */
   .pb-brand-header__text {
     position: relative;
