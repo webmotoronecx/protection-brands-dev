@@ -34,7 +34,6 @@
             "label": "Exterior · 2 pages",
             "title": "Exterior Care Instructions",
             "text": "<p>Paint and surface protection: the two-bucket wash, bird and bat droppings, water spotting, bore water, and what to avoid.</p>",
-            "preview": "shopify://shop_images/care-preview-exterior.webp",
             "pdf_file": "care-instructions-exterior.pdf"
           }
         },
@@ -44,7 +43,6 @@
             "label": "Interior · 1 page",
             "title": "Interior Care Instructions",
             "text": "<p>Fabric, leather, plastic and vinyl protection: regular cleaning, spills and liquids, and removing tanner, make-up, sunscreen and ink.</p>",
-            "preview": "shopify://shop_images/care-preview-interior.webp",
             "pdf_file": "care-instructions-interior.pdf"
           }
         },
@@ -54,7 +52,6 @@
             "label": "Tint & glass · 1 page",
             "title": "Window Tint & Glass Care Instructions",
             "text": "<p>The first 48 hours after tinting, window seals, and the opposite-wipe method for streak-free glass.</p>",
-            "preview": "shopify://shop_images/care-preview-tint-glass.webp",
             "pdf_file": "care-instructions-tint-glass.pdf"
           }
         }
