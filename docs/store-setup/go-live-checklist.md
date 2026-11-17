@@ -205,7 +205,19 @@ Use **Preview** (and the share-preview link on a phone, iOS and Android):
 
 ## 12. Launch
 
+**Maintenance window (agreed 17 Nov).** Everything before this point is invisible to customers.
+The steps that change what Debut shows (converting the brand collections to automatic, the
+product import, new categories, menus, publishing the Honda products) and the publish itself run
+inside one short window with the store password-protected:
+
+- [ ] **Online Store → Preferences → Password protection**: turn on, with a message such as
+      "We're updating our store and will be back shortly." Customers can't browse or check out
+      while it's on; staff still see the store and the theme preview.
+- [ ] Run the "changes Debut" steps (amendments §1, §3, §5, §6, brand collections).
 - [ ] **Publish** the Horizon theme.
+- [ ] Check the home page, a brand page, a product and the cart through the preview/staff view.
+- [ ] **Turn password protection off.** Aim for under an hour; while it's on, search engines get
+      the password page instead of the store.
 - [ ] Repeat the menu, add-to-cart and checkout checks on the live domain.
 - [ ] **Online Store → Navigation → URL redirects**: check the 404 report over the
       following week and add redirects for anything customers or Google still request.
