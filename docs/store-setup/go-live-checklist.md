@@ -11,11 +11,11 @@ Client amendments of 10 Nov 2026 (categories, Best Sellers, HGCC kits, brand tex
 
 ## 1. Before you start
 
-- [ ] Duplicate the live Debut theme (**Online Store → Themes → … → Duplicate**) and keep the
+- [x] Duplicate the live Debut theme (**Online Store → Themes → … → Duplicate**) and keep the
       copy unpublished as a rollback.
 - [ ] Delete the theme from the failed upload attempt (the one with the
       "already exists with liquid extension" errors), if it's still there.
-- [ ] **Products → Export** all products as a backup.
+- [x] **Products → Export** all products as a backup. (17 Nov: `shopprotectionbrands/CSV/products_export_BACKUP BEFORE THEM UPDATE.csv`, 35 products.)
 
 ## 2. Catalogue data (README §1–3)
 
