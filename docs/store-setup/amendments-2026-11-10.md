@@ -276,6 +276,17 @@ On live:
   Brands, CERFACE and OptiVAN 3 + 1; Permagard and HGCC 2 + 1. Landscape, at least 1600 px
   wide; banners at least 2400 px wide.
 
+## 11. Brand page social links (17 Nov, client)
+
+Theme only (the brand template's bottom banner row → Instagram / LinkedIn / … settings), nothing in
+the admin. Round icons under the banner's button:
+
+- Protection Brands: LinkedIn `https://www.linkedin.com/company/protection-brands-pty-ltd/`
+- OptiVAN: Instagram `https://www.instagram.com/protection_brands/`
+- Permagard: Instagram `https://www.instagram.com/permagard_australia/`, LinkedIn
+  `https://www.linkedin.com/company/permagard_auto_au/`
+- CERFACE and Honda Genuine Car Care: none supplied.
+
 ## Check on live after the switch
 
 - Homepage: five brand logos in order, Best Sellers shows the 6 products, four category tiles all
