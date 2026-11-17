@@ -553,6 +553,11 @@
     .pb-feature-rows__banner-content {
       margin-block-end: calc(var(--pb-banner-min) * 0.2);
     }
+
+    /* With social icons the group is taller, so it's lifted half as much (less space under it). */
+    .pb-feature-rows__banner-content:has(.pb-feature-rows__social) {
+      margin-block-end: calc(var(--pb-banner-min) * 0.1);
+    }
   }
 
   @media screen and (min-width: 990px) {
