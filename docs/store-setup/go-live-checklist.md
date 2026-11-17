@@ -223,6 +223,12 @@ inside one short window with the store password-protected:
       "We're updating our store and will be back shortly." Customers can't browse or check out
       while it's on; staff still see the store and the theme preview.
 - [ ] Run the "changes Debut" steps (amendments §1, §3, §5, §6, brand collections).
+- [ ] Product images and vendor from dev: `python3 docs/store-setup/sync-product-media.py`
+      (plan: 31 products get dev's images, 5 Permagard products get vendor *Permagard*), then
+      `--apply`, then the plan again (it should list nothing). Product types and the Bulk tag
+      were already copied on 17 Nov, so this replaces the CSV import in product-import.md.
+- [ ] Card photos: `node docs/store-setup/card-photos.mjs --store protection-brands` (report),
+      then `--apply`. Only after the images above: it points at the new image IDs.
 - [ ] **Publish** the Horizon theme.
 - [ ] Check the home page, a brand page, a product and the cart through the preview/staff view.
 - [ ] **Turn password protection off.** Aim for under an hour; while it's on, search engines get
