@@ -26,6 +26,7 @@ title.
 | 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | To do |
 | 10 | Brand page layout (mock): one template per brand | Done 11 Nov | Set each collection's template |
 | 11 | Footer: Warranty & Care split into Warranty and a Care Instructions page (three PDFs) | Done 17 Nov | To do |
+| 12 | Brand pages: social links under the title | Done 17 Nov (theme) | Push theme |
 
 ## 0. Theme
 

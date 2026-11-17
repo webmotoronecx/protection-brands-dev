@@ -15,7 +15,9 @@
         "watermark": true,
         "watermark_font": "barlow_n6",
         "fallback_title": "Our brands",
-        "product_size": 145
+        "product_size": 145,
+        "instagram_url": "https://www.instagram.com/permagard_australia/",
+        "linkedin_url": "https://www.linkedin.com/company/permagard_auto_au/"
       }
     },
     "pb_brand_intro": {
