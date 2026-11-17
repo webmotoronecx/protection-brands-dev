@@ -61,7 +61,7 @@
 
 <div
   class="pb-brand-header{% if hero_image != blank %} pb-brand-header--image{% unless show_title %} pb-brand-header--bare{% endunless %}{% endif %}"
-  style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};"
+  style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};{% if settings.pb_reveal and request.design_mode == false %} --pb-brand-grow: 0;{% endif %}"
 >
   {%- if hero_image != blank -%}
     <div class="pb-brand-header__photo">
@@ -255,23 +255,15 @@
     filter: drop-shadow(24px 8px 48px rgb(0 0 0 / 0.85));
   }
 
-  /* Entrance: the product starts small and low, as if far away, and rises to its place on
-     load. Only its size moves (from visible, nothing hidden), on the compositor; the wrapper's
-     `translate` stays free for the scroll parallax. No motion with reduced motion. */
+  /* Grow on scroll: the product starts small and low, as if far away, and rises to its full
+     size as the page scrolls (assets/pb-motion.js scrubs --pb-brand-grow from 0 to 1). The
+     markup sets 0 only when the motion script runs (Reveal on, not in the theme editor), so
+     without it the product is full size. Size only, from visible: nothing is hidden. */
   @media (prefers-reduced-motion: no-preference) {
     .pb-brand-header__product img {
       transform-origin: 50% 100%;
-      animation: pb-brand-product-in 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
-    }
-  }
-
-  @keyframes pb-brand-product-in {
-    from {
-      transform: translateY(14%) scale(0.4);
-    }
-
-    to {
-      transform: none;
+      transform: translateY(calc((1 - var(--pb-brand-grow, 1)) * 14%))
+        scale(calc(0.4 + 0.6 * var(--pb-brand-grow, 1)));
     }
   }
 
