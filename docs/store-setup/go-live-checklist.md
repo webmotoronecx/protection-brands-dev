@@ -31,12 +31,9 @@ doesn't use them, but do them close to launch day.
 - [ ] Set type and vendor on any hidden products that should go live, and publish them to
       the Online Store sales channel.
 - [ ] Give each collection from product-import.md §6 an image and description.
-- [ ] **Old Debut collections still on the store after the switch (17 Nov), waiting on the client:**
-      Car Care (35), Accessories (28), Professional (20), Reapplication (8), Warranty Transfer (0).
-      Suggested: take Car Care, Accessories, Professional off the Online Store and redirect them
-      (`/collections/car-care` → `/collections/all`, accessories → microfibre-drying); keep or
-      redirect Reapplication and Warranty Transfer. Cleaners & Sprays and Bulk & Professional are
-      hidden, as on dev.
+- [x] **Old Debut collections hidden to match dev (17 Nov)**, with URL redirects: car-care,
+      accessories, professional → `/collections/all`; reapplication, warranty-transfer → the
+      warranty claim page. The collections still exist (hidden) if the client wants one back.
 - [ ] Decide on **Accessories** (narrow it or hide it).
 - [ ] Fix **Reapplication** and **Warranty Transfer**: publish their products or point the
       links at pages.
