@@ -56,6 +56,14 @@ doesn't use them, but do them close to launch day.
 
 - [x] **Done 17 Nov for Permagard, CERFACE, OptiVAN** (copied from dev: hero product and logo; OptiVAN hero photo `hero-optivan.jpg` and hide title; no taglines). Honda Genuine Car Care and Protection Brands get theirs when their collections are created. Brand collection fields (README §3): create the definitions with setup-store.mjs and fill
       Brand logo (light version), Tagline, Hero product and, for a full-screen banner, Hero image.
+- [x] **17 Nov, created hidden on live** (not on the Online Store; copied from dev): Protection
+      Brands and Honda Genuine Car Care (template, description, logo, hero/watermark), Wash &
+      Detail, Microfibre & Drying, Value Packs, Power & Emergency, Cleaners & Sprays, Bulk &
+      Professional, Best Sellers (6 products, dev's order); `brand-logo-hgcc.png` and
+      `brand-logo-protectionbrands.png` copied to Files. Pages created **unpublished**: Safety Data
+      Sheets (`safety-data-sheets`, template sds), Care Instructions, Locate Dealership. In the
+      maintenance window: publish these to the Online Store, and give Permagard, CERFACE and
+      OptiVAN their brand template and automatic *Suitable for* rule.
 - [ ] Set each brand collection's template to its own `brand-<brand>` template
       ([amendments-2026-11-10.md](amendments-2026-11-10.md) §4, *Brand page layout*). Keep
       `collection.brand` in the theme: it is the brand's "View all" grid (`?view=brand`).
