@@ -1,6 +1,5 @@
 # Shopify CLI environments. Pick one with -e, e.g. `shopify theme dev -e dev`.
-# Nothing here names the live published theme (Debut, #91263697031), so no -e command can
-# push to it. Never add it.
+# Nothing here names Debut (#91263697031, the unpublished rollback since 17 Nov 2026). Never add it.
 
 # Dev store: protection-brands-dev.myshopify.com. Use for `theme dev` and day-to-day work.
 [environments.dev]
@@ -12,7 +11,8 @@ store = "protection-brands-dev"
 store = "protection-brands-dev"
 theme = "167151435879"
 
-# Live store's unpublished preview theme "PB Horizon (preview)": `shopify theme push -e live-preview`.
+# Live store's theme "PB Horizon (preview)", PUBLISHED since 17 Nov 2026 (the live site):
+# `shopify theme push -e live-preview --allow-live`. Debut (#91263697031) is the unpublished rollback.
 [environments.live-preview]
 store = "protection-brands"
 theme = "156118614151"

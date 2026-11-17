@@ -14,10 +14,10 @@ The new Protection Brands storefront theme for the 2026 revamp, built on **Shopi
 shopify theme check                                   # lint (stock Horizon baseline: 6 warnings)
 shopify theme dev -e dev                              # local preview on the dev store (hidden development theme)
 shopify theme push -e dev-theme --allow-live          # update "PB Horizon (dev)", the dev store's published theme
-shopify theme push -e live-preview                    # update "PB Horizon (preview)", unpublished on the live store
+shopify theme push -e live-preview --allow-live       # update "PB Horizon (preview)": the LIVE store's published theme since 17 Nov 2026
 ```
 
-Environments are in `shopify.theme.toml`. Never push to Debut (#91263697031), the live store's published theme.
+Environments are in `shopify.theme.toml`. Since 17 Nov 2026 the live store (protection-brands) runs this theme: `live-preview` is its **published** theme, so a push there changes the live site at once; only push it when explicitly asked. Debut (#91263697031) is unpublished, kept as the rollback; never push to it.
 
 ## Upstream
 
