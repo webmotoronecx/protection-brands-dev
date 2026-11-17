@@ -422,12 +422,12 @@
   }
 
   /* The banner's small line: pinned near the bottom, centred, over the watermark. */
-  /* Social icons under the banner's button: white outlines that fill on hover. */
+  /* Social icons under the banner's button: plain white icons, dimmed on hover. */
   .pb-feature-rows__social {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -438,21 +438,17 @@
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 1px solid rgb(255 255 255 / 0.4);
-    border-radius: 50%;
     color: #fff;
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   .pb-feature-rows__social a:is(:hover, :focus-visible) {
-    border-color: #fff;
-    background: #fff;
-    color: #000;
+    opacity: 0.7;
   }
 
   .pb-feature-rows__social svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     fill: currentColor;
   }
 
