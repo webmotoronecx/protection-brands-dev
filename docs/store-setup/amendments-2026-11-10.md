@@ -21,7 +21,7 @@ title.
 | 4 | Brand page text | Done 11 Nov | To do |
 | 5 | Footer menus: Our Brands, Shop | Done 11 Nov | To do |
 | 6 | Footer menu: Information (remove two, add Warranty & Care, Privacy Policy link) | Done 11 Nov | To do |
-| 7 | Contact form email to auto.admin@protectionbrands.com.au | Not on dev | At the switch |
+| 7 | Contact form email to auto.admin@protectionbrands.com.au | Not on dev | Waiting on client (A or B, §7) |
 | 8 | Brand page images | Waiting on client | Waiting on client |
 | 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | Done 17 Nov (40 entries, 9 products linked) |
 | 10 | Brand page layout (mock): one template per brand | Done 11 Nov | Set each collection's template |
@@ -234,11 +234,19 @@ the article still exists.
 The spark.permagard.com.au site blocks automated checks, so click the Warranty & Care link in a
 browser to confirm it opens.
 
-## 7. Contact Us email (at the switch)
+## 7. Contact Us email (waiting on the client)
 
-The Contact Us links go to `/pages/contact-page`. Its form sends to the store's contact email
-(**Settings → General → Store contact**). Change it to **auto.admin@protectionbrands.com.au**. It's
-also the reply-to address on customer notifications, so confirm with the client first.
+The amendments doc (Top Banner) says: "Change Locate Dealership to Contact Us – Link to
+auto.admin@protectionbrands.com.au. Should be same with Bottom Banner." The Contact Us links go to
+`/pages/contact-page`, whose form sends to the store contact email (**Settings → General → Store
+details**). On live that is **auto.accounts@permagard.com.au** (checked 17 Nov), and it stays as is
+until the client confirms which they want:
+
+- **A:** change the store contact email to auto.admin@protectionbrands.com.au. Form messages go
+  there; replies to customer notifications too (the sender email can be set separately). Shopify
+  asks for the new address to be verified.
+- **B:** point the Contact Us links at `mailto:auto.admin@protectionbrands.com.au` instead of the
+  contact page (store emails unchanged; visitors without an email app get nothing).
 
 ## 8. SDS sheets
 
