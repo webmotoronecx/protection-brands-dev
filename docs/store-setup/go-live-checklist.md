@@ -103,28 +103,32 @@ come with the theme upload. Download them from the dev store's Files and upload 
 live store **under the same file names** before installing the theme, or those spots show
 blank:
 
-- [ ] `favicon-pb.png`: favicon (Theme settings → Logo and favicon).
-- [ ] `bento-showroom.webp`, `bento-permagard.webp`, `bento-cerface.webp`,
+**Done 17 Nov:** all 32 files are on live (31 copied from dev under the same names, including the
+Permagard logo under its dev name `brand-logo-permagard_27fd2ac9-….png`, so the tile needs no
+re-pick; `AtHomeDetailersKit.png` was already there).
+
+- [x] `favicon-pb.png`: favicon (Theme settings → Logo and favicon).
+- [x] `bento-showroom.webp`, `bento-permagard.webp`, `bento-cerface.webp`,
       `bento-optivan.webp`: homepage bento tiles.
-- [ ] `brand-logo-cerface.png`, `brand-logo-optivan.png` and the Permagard logo: bento tile
+- [x] `brand-logo-cerface.png`, `brand-logo-optivan.png` and the Permagard logo: bento tile
       logos. On dev the Permagard one was renamed by Shopify
       (`brand-logo-permagard_27fd2ac9-….png`), so upload it as `brand-logo-permagard.png`
       and pick it again on the Permagard bento tile in step 8.
-- [ ] `AtHomeDetailersKit.png`: the default hero image on the brand page template.
-- [ ] `pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`,
+- [x] `AtHomeDetailersKit.png`: the default hero image on the brand page template.
+- [x] `pb-protection-every-surface.webp`, `pb-trusted-manufacturers.webp`,
       `pb-support-beyond.webp`: the Protection Brands page's three image rows
       (`collection.brand-protection-brands`). Copies are in the dev store's Files.
-- [ ] `optivan-advanced-protection.webp`, `optivan-design-australian.webp`,
+- [x] `optivan-advanced-protection.webp`, `optivan-design-australian.webp`,
       `optivan-protection-trust.webp` and `optivan-feat-row.webp` (banner): the OptiVAN page
       (`collection.brand-optivan`). Copies are in the dev store's Files.
-- [ ] `perma-comprehensive.webp`, `perma-professionally.webp` and `perma-feat-row.webp`
+- [x] `perma-comprehensive.webp`, `perma-professionally.webp` and `perma-feat-row.webp`
       (banner): the Permagard page (`collection.brand-permagard`). Copies are in the dev store's Files.
-- [ ] `cerface-protection-beyond.webp`, `cerface-professionally.webp`, `cerface-owners.webp` and
+- [x] `cerface-protection-beyond.webp`, `cerface-professionally.webp`, `cerface-owners.webp` and
       `cerface-feat-row.webp` (banner): the CERFACE page (`collection.brand-cerface`). Copies are in the dev store's Files.
-- [ ] `hgcc-genuine-protection.webp`, `hgcc-honda-approved.webp` and `hgcc-feat-row.webp`
+- [x] `hgcc-genuine-protection.webp`, `hgcc-honda-approved.webp` and `hgcc-feat-row.webp`
       (banner): the Honda Genuine Car Care page (`collection.brand-hgcc`). Copies are in the dev
       store's Files.
-- [ ] `care-instructions-exterior.pdf`, `care-instructions-interior.pdf`,
+- [x] `care-instructions-exterior.pdf`, `care-instructions-interior.pdf`,
       `care-instructions-tint-glass.pdf` and `care-preview-exterior.webp`,
       `care-preview-interior.webp`, `care-preview-tint-glass.webp`: the Care Instructions page
       ([amendments-2026-11-10.md](amendments-2026-11-10.md) §10). Copies are in the dev store's Files.
@@ -134,6 +138,10 @@ image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_i
 templates config sections | sort -u`.
 
 ## 7. Install the theme
+
+**17 Nov:** pushed to **PB Horizon (preview)** (#156118614151, unpublished on live) with
+`shopify theme push -e live-preview`. A local copy of Debut was pulled to
+`shopify-theme/backups/debut-91263697031-2026-11-17-1121/` first.
 
 - [ ] Add the theme as a **new, unpublished** theme: upload a zip of this repo
       (**Online Store → Themes → Add theme → Upload zip file**) or use
