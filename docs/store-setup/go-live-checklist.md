@@ -214,27 +214,27 @@ Use **Preview** (and the share-preview link on a phone, iOS and Android):
 
 ## 12. Launch
 
-**Maintenance window (agreed 17 Nov).** Everything before this point is invisible to customers.
-The steps that change what Debut shows (converting the brand collections to automatic, the
-product import, new categories, menus, publishing the Honda products) and the publish itself run
-inside one short window with the store password-protected:
+**Maintenance window (agreed 17 Nov).** Everything before this point is invisible to customers
+and was done on 17 Nov. The steps below change what Debut shows, so they run together with the
+store password-protected. Each script is a dry run without `--apply`: run the plan, read it, add
+`--apply`, then run the plan again (it should list no changes). From `docs/store-setup/`. About
+45 minutes.
 
-- [ ] **Online Store → Preferences → Password protection**: turn on, with a message such as
-      "We're updating our store and will be back shortly." Customers can't browse or check out
-      while it's on; staff still see the store and the theme preview.
-- [ ] Run the "changes Debut" steps (amendments §1, §3, §5, §6, brand collections).
-- [ ] Product images and vendor from dev: `python3 docs/store-setup/sync-product-media.py`
-      (plan: 31 products get dev's images, 5 Permagard products get vendor *Permagard*), then
-      `--apply`, then the plan again (it should list nothing). Product types and the Bulk tag
-      were already copied on 17 Nov, so this replaces the CSV import in product-import.md.
-- [ ] Footer menu (shared with Debut): `python3 docs/store-setup/sync-menus.py footer --replace`
-      (plan), then add `--apply`. `footer-shop` and `footer-brands` were created on 17 Nov.
-- [ ] Card photos: `node docs/store-setup/card-photos.mjs --store protection-brands` (report),
-      then `--apply`. Only after the images above: it points at the new image IDs.
-- [ ] **Publish** the Horizon theme.
-- [ ] Check the home page, a brand page, a product and the cart through the preview/staff view.
-- [ ] **Turn password protection off.** Aim for under an hour; while it's on, search engines get
-      the password page instead of the store.
+| # | Step | Command / where | Time |
+|---|---|---|---|
+| 0 | Merge `origin/main`, push the theme to the preview | `shopify theme push -e live-preview` | 5 min |
+| 1 | **Password protection on** | Online Store → Preferences → Password protection, message "We're updating our store and will be back shortly." | 1 min |
+| 2 | Brand collections swapped to automatic; collections, 3 pages, 4 Honda products published; page templates | `python3 go-live-window.py` (26 changes) | 3 min |
+| 3 | Product images and vendor | `python3 sync-product-media.py` (31 products, 5 vendors) | 5 min |
+| 4 | Card photos | `node card-photos.mjs --store protection-brands` | 5 min |
+| 5 | Footer menus | `python3 sync-menus.py footer footer-brands --replace` (footer-brands again: the brand collections have new IDs after step 2) | 2 min |
+| 6 | **Publish** the Horizon theme | Online Store → Themes → PB Horizon (preview) → Publish | 1 min |
+| 7 | Check as staff: home, each brand page, a category, a product (tabs, SDS link), SDS page, Care Instructions, cart | the store | 15 min |
+| 8 | Search & Discovery filters: Category (type), Brand (vendor), Suitable for; remove Tags | Search & Discovery app | 5 min |
+| 9 | **Password protection off** | Online Store → Preferences | 1 min |
+
+- [ ] Steps 0–9 done.
+- [ ] Contact form email (amendments §7) changed if the client confirmed it.
 - [ ] Repeat the menu, add-to-cart and checkout checks on the live domain.
 - [ ] **Online Store → Navigation → URL redirects**: check the 404 report over the
       following week and add redirects for anything customers or Google still request.
