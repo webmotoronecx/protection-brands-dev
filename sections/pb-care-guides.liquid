@@ -1,0 +1,546 @@
+{%- comment -%}
+  Care Instructions (templates/page.care-instructions.json), under the full-width title bar:
+  breadcrumb, a heading and short intro, then one card per guide (block): a preview of the
+  PDF's first page, the guide's name, what it covers, and View / Download links to the PDF.
+  A grey note at the bottom links to the warranty claim page.
+
+  The PDFs live in Content → Files. A guide's "PDF file name" is the file's name there
+  (e.g. care-instructions-exterior.pdf), so the same template works on any store that has
+  the file; "PDF link" overrides it with a full URL.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_font = settings.type_heading_font
+  assign title = page.title | default: section.settings.fallback_title
+-%}
+
+<div
+  class="pb-care-guides"
+  style="--pb-care-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-care-weight: {{ heading_font.weight }};"
+>
+  <nav class="pb-care-guides__crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a></li>
+      <li><span aria-current="page">{{ title }}</span></li>
+    </ol>
+  </nav>
+
+  {%- if section.settings.heading != blank or section.settings.intro != blank -%}
+    <div class="pb-care-guides__intro">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="pb-care-guides__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.intro != blank -%}
+        <div class="pb-care-guides__text rte">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if section.blocks.size > 0 -%}
+    <ul class="pb-care-guides__grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign pdf = b.pdf_url
+          if pdf == blank and b.pdf_file != blank
+            assign pdf = b.pdf_file | strip | file_url
+          endif
+        -%}
+        <li class="pb-care-guides__card" {{ block.shopify_attributes }}>
+          <div class="pb-care-guides__preview">
+            {%- if b.preview != blank -%}
+              {{-
+                b.preview
+                | image_url: width: 900
+                | image_tag:
+                  alt: '',
+                  loading: 'lazy',
+                  widths: '360, 540, 720, 900',
+                  sizes: '(min-width: 990px) 28vw, (min-width: 750px) 45vw, 90vw'
+              -}}
+            {%- else -%}
+              <span class="pb-care-guides__icon" aria-hidden="true">{{- 'icon-sds.svg' | inline_asset_content -}}</span>
+            {%- endif -%}
+          </div>
+
+          <div class="pb-care-guides__body">
+            {%- if b.label != blank -%}
+              <p class="pb-care-guides__label">{{ b.label | escape }}</p>
+            {%- endif -%}
+            <h3 class="pb-care-guides__title">
+              {%- if pdf != blank -%}
+                <a class="pb-care-guides__link" href="{{ pdf }}" target="_blank" rel="noopener">
+                  {{- b.title | escape -}}
+                  <span class="visually-hidden">, {{ section.settings.view_label }} (PDF)</span>
+                </a>
+              {%- else -%}
+                {{- b.title | escape -}}
+              {%- endif -%}
+            </h3>
+            {%- if b.text != blank -%}
+              <div class="pb-care-guides__summary">{{ b.text }}</div>
+            {%- endif -%}
+
+            {%- if pdf != blank -%}
+              <div class="pb-care-guides__actions">
+                <span class="pb-care-guides__view" aria-hidden="true">
+                  {{ section.settings.view_label }}
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                    <path d="M2 8h11M9 4l4 4-4 4"/>
+                  </svg>
+                </span>
+                <a class="pb-care-guides__download" href="{{ pdf }}" download>
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M10 2.5v10M5.5 8.5l4.5 4.5 4.5-4.5M3 13.5v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="visually-hidden">{{ section.settings.download_label }}: {{ b.title | escape }} (PDF)</span>
+                </a>
+              </div>
+            {%- endif -%}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  {%- if section.settings.note != blank -%}
+    <div class="pb-care-guides__note">
+      <div class="pb-care-guides__note-text">{{ section.settings.note }}</div>
+      {%- if section.settings.note_button_label != blank and section.settings.note_button_link != blank -%}
+        <a
+          class="pb-care-guides__note-button"
+          href="{{ section.settings.note_button_link }}"
+          {% if section.settings.note_button_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{- section.settings.note_button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  /* Section-specific styles for pb-care-guides. */
+
+  .pb-care-guides {
+    display: block;
+    /* Side margins and breadcrumb as the SDS library (sections/pb-sds-library.liquid). */
+    padding: 24px calc(clamp(20px, 3vw, 44px) + var(--pb-wide-inset, 0px)) clamp(56px, 8vw, 120px);
+    color: #000;
+  }
+
+  .pb-care-guides__crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 12px;
+    font-weight: var(--pb-button-weight, 700);
+    line-height: normal;
+    text-transform: uppercase;
+  }
+
+  .pb-care-guides__crumbs li {
+    display: flex;
+    gap: 4px;
+  }
+
+  .pb-care-guides__crumbs li + li::before {
+    content: '/';
+    color: #737373;
+  }
+
+  .pb-care-guides__crumbs a {
+    color: #737373;
+    text-decoration: none;
+  }
+
+  /* Heading on the left, intro on the right (one column on phones). */
+  .pb-care-guides__intro {
+    display: grid;
+    gap: 16px 48px;
+    margin-block: clamp(32px, 5vw, 72px) clamp(28px, 4vw, 56px);
+  }
+
+  .pb-care-guides__heading {
+    margin: 0;
+    font-family: var(--pb-care-font, inherit);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: var(--pb-care-weight, 400);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .pb-care-guides__text {
+    max-width: 40rem;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  .pb-care-guides__text > :first-child {
+    margin-block-start: 0;
+  }
+
+  .pb-care-guides__text > :last-child {
+    margin-block-end: 0;
+  }
+
+  .pb-care-guides__grid {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Light grey card, as the SDS cards; the PDF's first page sits on it like a sheet of paper. */
+  .pb-care-guides__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    background: var(--pb-card-bg, #f5f5f5);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .pb-care-guides__card:has(.pb-care-guides__link:hover) {
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.08);
+  }
+
+  .pb-care-guides__card:has(.pb-care-guides__link:focus-visible) {
+    outline: 2px solid var(--pb-accent, #ca0d0d);
+    outline-offset: 2px;
+  }
+
+  /* The top of the page shows, cut off along the bottom of the frame. */
+  .pb-care-guides__preview {
+    display: grid;
+    place-items: start center;
+    aspect-ratio: 4 / 3;
+    padding: clamp(20px, 3vw, 36px) clamp(28px, 4vw, 48px) 0;
+    overflow: hidden;
+  }
+
+  .pb-care-guides__preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+    transition: transform 0.3s ease;
+  }
+
+  .pb-care-guides__card:has(.pb-care-guides__link:hover) .pb-care-guides__preview img {
+    transform: translateY(-6px);
+  }
+
+  .pb-care-guides__icon {
+    display: block;
+    width: 64px;
+    margin-block-start: 15%;
+  }
+
+  .pb-care-guides__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 20px 18px;
+    border-block-start: 1px solid #e6e6e6;
+    background: #fff;
+  }
+
+  .pb-care-guides__label {
+    margin: 0;
+    color: var(--pb-accent, #ca0d0d);
+    font-family: var(--pb-button-font, inherit);
+    font-size: 12px;
+    font-weight: var(--pb-button-weight, 700);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .pb-care-guides__title {
+    margin: 0;
+    font-family: var(--pb-care-font, inherit);
+    font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+    font-weight: var(--pb-care-weight, 400);
+    line-height: 1.15;
+  }
+
+  .pb-care-guides__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* The whole card opens the PDF; the download button sits above this. */
+  .pb-care-guides__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .pb-care-guides__link:focus-visible {
+    outline: none;
+  }
+
+  .pb-care-guides__summary {
+    color: #4d4d4d;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .pb-care-guides__summary > * {
+    margin: 0;
+  }
+
+  .pb-care-guides__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-block-start: auto;
+    padding-block-start: 8px;
+  }
+
+  .pb-care-guides__view {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 13px;
+    font-weight: var(--pb-button-weight, 700);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pb-care-guides__view svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+  }
+
+  .pb-care-guides__card:has(.pb-care-guides__link:hover) .pb-care-guides__view svg {
+    transform: translateX(4px);
+  }
+
+  .pb-care-guides__download {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #000;
+    color: #fff;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-care-guides__download:is(:hover, :focus-visible) {
+    background: var(--pb-accent, #ca0d0d);
+  }
+
+  .pb-care-guides__download svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Warranty note: grey band, text and a red button. */
+  .pb-care-guides__note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+    margin-block-start: clamp(32px, 5vw, 64px);
+    padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 40px);
+    border-radius: 6px;
+    background: var(--pb-card-bg, #f5f5f5);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .pb-care-guides__note-text > * {
+    margin: 0;
+  }
+
+  .pb-care-guides__note-text strong {
+    font-family: var(--pb-care-font, inherit);
+    font-size: 1.25em;
+    font-weight: var(--pb-care-weight, 400);
+  }
+
+  .pb-care-guides__note-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 28px;
+    border-radius: 999px;
+    background: var(--pb-accent, #ca0d0d);
+    color: #fff;
+    font-family: var(--pb-button-font, inherit);
+    font-size: 14px;
+    font-weight: var(--pb-button-weight, 700);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease;
+  }
+
+  .pb-care-guides__note-button:is(:hover, :focus-visible) {
+    background: #000;
+  }
+
+  @media screen and (min-width: 750px) {
+    .pb-care-guides__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .pb-care-guides__intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: end;
+    }
+
+    .pb-care-guides__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-care-guides__card,
+    .pb-care-guides__preview img,
+    .pb-care-guides__view svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Care guides (PB)",
+  "tag": "section",
+  "class": "pb-care-guides-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "home_label",
+      "label": "Breadcrumb home label",
+      "default": "Home"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Page title (when there's no page)",
+      "default": "Care Instructions"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Keep your protection performing"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro"
+    },
+    {
+      "type": "text",
+      "id": "view_label",
+      "label": "View label",
+      "default": "View guide"
+    },
+    {
+      "type": "text",
+      "id": "download_label",
+      "label": "Download label (screen readers)",
+      "default": "Download"
+    },
+    {
+      "type": "header",
+      "content": "Note"
+    },
+    {
+      "type": "richtext",
+      "id": "note",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "note_button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "note_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "note_button_new_tab",
+      "label": "Open in a new tab",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "guide",
+      "name": "Guide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Small label",
+          "info": "E.g. \"Exterior · 2 pages\"."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Care instructions"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "What it covers"
+        },
+        {
+          "type": "image_picker",
+          "id": "preview",
+          "label": "Preview image",
+          "info": "The PDF's first page."
+        },
+        {
+          "type": "text",
+          "id": "pdf_file",
+          "label": "PDF file name",
+          "info": "The file's name in Content → Files, e.g. care-instructions-exterior.pdf."
+        },
+        {
+          "type": "url",
+          "id": "pdf_url",
+          "label": "PDF link",
+          "info": "Optional. A full link to the PDF, used instead of the file name."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Care guides (PB)",
+      "blocks": [{ "type": "guide" }, { "type": "guide" }, { "type": "guide" }]
+    }
+  ]
+}
+{% endschema %}

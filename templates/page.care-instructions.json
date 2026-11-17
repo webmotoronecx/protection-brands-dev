@@ -1,0 +1,144 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "pb_title_bar": {
+      "type": "pb-collection-header",
+      "settings": {
+        "fallback_title": "Care Instructions",
+        "search_title": "Search results",
+        "show_description": false,
+        "nav_label": "Categories",
+        "marquee": true,
+        "marquee_motion": "mouse",
+        "marquee_duration": 60,
+        "category_source": "none",
+        "all_label": "All",
+        "layout": "full",
+        "marquee_source": "title"
+      }
+    },
+    "care_guides": {
+      "type": "pb-care-guides",
+      "blocks": {
+        "exterior": {
+          "type": "guide",
+          "settings": {
+            "label": "Exterior · 2 pages",
+            "title": "Exterior Care Instructions",
+            "text": "<p>Paint and surface protection: the two-bucket wash, bird and bat droppings, water spotting, bore water, and what to avoid.</p>",
+            "preview": "shopify://shop_images/care-preview-exterior.webp",
+            "pdf_file": "care-instructions-exterior.pdf"
+          }
+        },
+        "interior": {
+          "type": "guide",
+          "settings": {
+            "label": "Interior · 1 page",
+            "title": "Interior Care Instructions",
+            "text": "<p>Fabric, leather, plastic and vinyl protection: regular cleaning, spills and liquids, and removing tanner, make-up, sunscreen and ink.</p>",
+            "preview": "shopify://shop_images/care-preview-interior.webp",
+            "pdf_file": "care-instructions-interior.pdf"
+          }
+        },
+        "tint_glass": {
+          "type": "guide",
+          "settings": {
+            "label": "Tint & glass · 1 page",
+            "title": "Window Tint & Glass Care Instructions",
+            "text": "<p>The first 48 hours after tinting, window seals, and the opposite-wipe method for streak-free glass.</p>",
+            "preview": "shopify://shop_images/care-preview-tint-glass.webp",
+            "pdf_file": "care-instructions-tint-glass.pdf"
+          }
+        }
+      },
+      "block_order": [
+        "exterior",
+        "interior",
+        "tint_glass"
+      ],
+      "settings": {
+        "home_label": "Home",
+        "fallback_title": "Care Instructions",
+        "heading": "Keep your protection performing",
+        "intro": "<p>Regular, gentle care keeps your coatings, interior protection and window tint looking their best for the life of your warranty. Choose a guide to view or download it.</p>",
+        "view_label": "View guide",
+        "download_label": "Download",
+        "note": "<p><strong>Need to make a warranty claim?</strong></p><p>Make a claim or request a reapplication online. The cleaning and maintenance products in these guides are available from your supplying dealer or in our <a href=\"/collections/all\">online shop</a>.</p>",
+        "note_button_label": "Make a warranty claim",
+        "note_button_link": "https://spark.permagard.com.au/warrantyclaim/",
+        "note_button_new_tab": true
+      }
+    },
+    "pb_our_brands_row": {
+      "type": "pb-who-we-are",
+      "blocks": {
+        "logo_protection_brands": {
+          "type": "logo",
+          "settings": {
+            "alt": "Protection Brands",
+            "link": "shopify://collections/protection-brands"
+          }
+        },
+        "logo_cerface": {
+          "type": "logo",
+          "settings": {
+            "alt": "CERFACE",
+            "link": "shopify://collections/cerface-ceramic"
+          }
+        },
+        "logo_optivan": {
+          "type": "logo",
+          "settings": {
+            "alt": "OptiVAN",
+            "link": "shopify://collections/optivan-caravan-maintenance"
+          }
+        },
+        "logo_permagard": {
+          "type": "logo",
+          "settings": {
+            "alt": "Permagard",
+            "link": "shopify://collections/permagard-car-care"
+          }
+        },
+        "logo_hgcc": {
+          "type": "logo",
+          "settings": {
+            "alt": "Honda Genuine Car Care",
+            "link": "shopify://collections/honda-genuine-car-care"
+          }
+        }
+      },
+      "block_order": [
+        "logo_protection_brands",
+        "logo_cerface",
+        "logo_optivan",
+        "logo_permagard",
+        "logo_hgcc"
+      ],
+      "settings": {
+        "logos_heading": "Our brands",
+        "logo_height": 80,
+        "label_font": "barlow_n5",
+        "label": "",
+        "statement": "",
+        "button_label": "",
+        "button_link": "",
+        "background": "#ffffff",
+        "text_color": "#000000"
+      }
+    }
+  },
+  "order": [
+    "pb_title_bar",
+    "care_guides",
+    "pb_our_brands_row"
+  ]
+}

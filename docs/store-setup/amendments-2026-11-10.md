@@ -25,6 +25,7 @@ title.
 | 8 | Brand page images | Waiting on client | Waiting on client |
 | 9 | SDS sheets (Honda, Mazda, Mitsubishi, Permagard, Protection Brands) | Done 11 Nov | To do |
 | 10 | Brand page layout (mock): one template per brand | Done 11 Nov | Set each collection's template |
+| 11 | Footer: Warranty & Care split into Warranty and a Care Instructions page (three PDFs) | Done 17 Nov | To do |
 
 ## 0. Theme
 
@@ -208,8 +209,9 @@ Final order on dev:
    client confirms which policy is current; the store's `privacy-policy` page and
    `Privacy Policy.docx` are on hold)
 6. Safety Data Sheets → the SDS page (`/pages/safety-data-sheets` on dev; check the handle on live)
-7. **Warranty & Care** → `https://spark.permagard.com.au/warrantyclaim/` (one link, as in the
-   doc's mock-up, to the old site's Warranty Claim page)
+7. **Warranty** → `https://spark.permagard.com.au/warrantyclaim/` (the old site's Warranty Claim
+   page; was "Warranty & Care" until 17 Nov, see step 10)
+8. **Care Instructions** → `/pages/care-instructions` (step 10)
 
 Removed: **Locate Dealership** and **Refer a Friend**. The old site's separate Care Instructions
 link (`/blogs/car-care-tips/exterior-interior-vehicle-care-tips`) isn't in the footer any more;
@@ -245,7 +247,28 @@ On live:
 4. The SDS page sidebar lists Protection Brands, CERFACE, OptiVAN, Permagard, Honda Genuine Car
    Care, Mazda, Mitsubishi (theme, `templates/page.sds.json`).
 
-## 9. Waiting on the client
+## 10. Care Instructions page (17 Nov, client; changes Debut for the menu)
+
+Done on dev 17 Nov. The footer's "Warranty & Care" is now **Warranty** (same link), with a new
+**Care Instructions** item under it. The page shows the three care PDFs as cards (a preview of
+page one, what each covers, View guide and Download) and a warranty-claim note
+(`sections/pb-care-guides.liquid`, `templates/page.care-instructions.json`).
+
+On live:
+
+1. **Content → Files**: upload, under these exact names (the template finds the PDFs by name):
+   - `care-instructions-exterior.pdf`, `care-instructions-interior.pdf`,
+     `care-instructions-tint-glass.pdf` (from `shopprotectionbrands/care-instructions/`, renamed)
+   - `care-preview-exterior.webp`, `care-preview-interior.webp`, `care-preview-tint-glass.webp`
+     (each PDF's first page; download them from dev's Files)
+2. **Online Store → Pages → Add page**: title *Care Instructions*, handle `care-instructions`,
+   template `page.care-instructions` (only listed once the Horizon theme is on the store).
+3. **Navigation → Footer menu**: rename *Warranty & Care* to **Warranty**; add **Care
+   Instructions** → the new page, straight under it.
+4. Open the page: three cards with previews; each card opens its PDF, the round button
+   downloads it.
+
+
 
 - **Brand page images:** each brand in the doc says "[Insert any … images where applicable]". None
   supplied yet. Slots per brand template (step 4): one per image row and one banner. Protection

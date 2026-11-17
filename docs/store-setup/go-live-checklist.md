@@ -124,6 +124,10 @@ blank:
 - [ ] `hgcc-genuine-protection.webp`, `hgcc-honda-approved.webp` and `hgcc-feat-row.webp`
       (banner): the Honda Genuine Car Care page (`collection.brand-hgcc`). Copies are in the dev
       store's Files.
+- [ ] `care-instructions-exterior.pdf`, `care-instructions-interior.pdf`,
+      `care-instructions-tint-glass.pdf` and `care-preview-exterior.webp`,
+      `care-preview-interior.webp`, `care-preview-tint-glass.webp`: the Care Instructions page
+      ([amendments-2026-11-10.md](amendments-2026-11-10.md) §10). Copies are in the dev store's Files.
 
 After installing, open the home page and a brand page in the theme editor and check every
 image slot is filled. To find the full list again: `grep -rhoE 'shopify://shop_images/[^"]+'
