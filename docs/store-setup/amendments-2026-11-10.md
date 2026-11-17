@@ -247,6 +247,11 @@ folder, the *Old* folder left out; Mazda 4; Mitsubishi 9; Permagard 10; Protecti
 names, brands and dates from `sds-sheets.json`. Eight products now link to their sheet (list in
 `sds-products.json`). Not visible on Debut.
 
+**17 Nov:** the 40 SDS PDFs are on live (Content → Files, copied from dev). The scripted steps
+below need metaobject permission on live, which our staff account doesn't have yet (the client's
+store owner grants it under Settings → Users). Without it, create the entries by hand from
+[sds-live-entries.md](sds-live-entries.md).
+
 On live:
 
 1. **Content → Metaobjects → SDS document → Manage definition → Brand**: add the choices `Mazda`
