@@ -54,7 +54,7 @@ doesn't use them, but do them close to launch day.
 
 ### Brand pages
 
-- [ ] Brand collection fields (README §3): create the definitions with setup-store.mjs and fill
+- [x] **Done 17 Nov for Permagard, CERFACE, OptiVAN** (copied from dev: hero product and logo; OptiVAN hero photo `hero-optivan.jpg` and hide title; no taglines). Honda Genuine Car Care and Protection Brands get theirs when their collections are created. Brand collection fields (README §3): create the definitions with setup-store.mjs and fill
       Brand logo (light version), Tagline, Hero product and, for a full-screen banner, Hero image.
 - [ ] Set each brand collection's template to its own `brand-<brand>` template
       ([amendments-2026-11-10.md](amendments-2026-11-10.md) §4, *Brand page layout*). Keep
@@ -128,6 +128,7 @@ re-pick; `AtHomeDetailersKit.png` was already there).
 - [x] `hgcc-genuine-protection.webp`, `hgcc-honda-approved.webp` and `hgcc-feat-row.webp`
       (banner): the Honda Genuine Car Care page (`collection.brand-hgcc`). Copies are in the dev
       store's Files.
+- [x] `hero-optivan.jpg`: OptiVAN collection's *Hero image* field (copied 17 Nov).
 - [x] `care-instructions-exterior.pdf`, `care-instructions-interior.pdf`,
       `care-instructions-tint-glass.pdf` and `care-preview-exterior.webp`,
       `care-preview-interior.webp`, `care-preview-tint-glass.webp`: the Care Instructions page
