@@ -255,15 +255,16 @@
     filter: drop-shadow(24px 8px 48px rgb(0 0 0 / 0.85));
   }
 
-  /* Grow on scroll: the product starts small and low, as if far away, and rises to its full
-     size as the page scrolls (assets/pb-motion.js scrubs --pb-brand-grow from 0 to 1). The
+  /* Grow on scroll: the product starts small, as if far away, and grows to its full size as
+     the page scrolls (assets/pb-motion.js scrubs --pb-brand-grow from 0 to 1). Scaled about
+     its middle, so the small bottle sits fully inside the banner (the product hangs a quarter
+     below the banner's bottom edge; scaled about its base it was nearly all cut off). The
      markup sets 0 only when the motion script runs (Reveal on, not in the theme editor), so
      without it the product is full size. Size only, from visible: nothing is hidden. */
   @media (prefers-reduced-motion: no-preference) {
     .pb-brand-header__product img {
-      transform-origin: 50% 100%;
-      transform: translateY(calc((1 - var(--pb-brand-grow, 1)) * 14%))
-        scale(calc(0.4 + 0.6 * var(--pb-brand-grow, 1)));
+      transform-origin: 50% 50%;
+      transform: scale(calc(0.4 + 0.6 * var(--pb-brand-grow, 1)));
     }
   }
 

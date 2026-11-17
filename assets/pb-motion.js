@@ -41,7 +41,7 @@
   const squeeze = window.matchMedia('(min-width: 990px)');
   const FOOTER_SCRUB = 1;
   const HERO_SCRUB = 0.4;
-  const BRAND_GROW_END = '60% top'; // where the brand banner's product reaches full size
+  const BRAND_GROW_END = '50% top'; // where the brand banner's product reaches full size
   const TILE_SCRUB = 1.2;
   const BODY_SCALE = 1.08;
   const BODY_SCRUB = 1;
@@ -314,7 +314,7 @@
       );
     });
 
-    // Brand banner's product: grows from small and low (far away) to full size over the first
+    // Brand banner's product: grows from small (far away) to full size, evenly, until
     // BRAND_GROW_END of the banner's scroll. Sets --pb-brand-grow (0 to 1; the markup starts it
     // at 0) and the banner's CSS scales the product by it.
     document.querySelectorAll('.pb-brand-header').forEach((banner) => {
@@ -324,7 +324,7 @@
         { '--pb-brand-grow': 0 },
         {
           '--pb-brand-grow': 1,
-          ease: 'power2.out',
+          ease: 'none',
           scrollTrigger: { trigger: banner, start: 'top top', end: BRAND_GROW_END, scrub: HERO_SCRUB, invalidateOnRefresh: true },
         }
       );
