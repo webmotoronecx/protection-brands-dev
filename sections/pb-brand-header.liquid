@@ -61,7 +61,7 @@
 
 <div
   class="pb-brand-header{% if hero_image != blank %} pb-brand-header--image{% unless show_title %} pb-brand-header--bare{% endunless %}{% endif %}"
-  style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};{% if settings.pb_reveal and request.design_mode == false %} --pb-brand-grow: 0;{% endif %}"
+  style="--pb-brand-h: {{ section.settings.height }}px; --pb-brand-product-size: {{ section.settings.product_size | divided_by: 100.0 }}; --pb-brand-h-mobile: {{ section.settings.height_mobile }}px; --pb-brand-logo-w: {{ section.settings.logo_width }}px; --pb-brand-logo-h: {{ section.settings.logo_height }}px; --pb-brand-font: {{ heading_font.family }}, {{ heading_font.fallback_families }}; --pb-brand-weight: {{ heading_font.weight }}; --pb-watermark-font: {{ section.settings.watermark_font.family }}, {{ section.settings.watermark_font.fallback_families }}; --pb-watermark-weight: {{ section.settings.watermark_font.weight }};"
 >
   {%- if hero_image != blank -%}
     <div class="pb-brand-header__photo">
@@ -253,19 +253,6 @@
 
   .pb-brand-header__product img {
     filter: drop-shadow(24px 8px 48px rgb(0 0 0 / 0.85));
-  }
-
-  /* Grow on scroll: the product starts small, as if far away, and grows to its full size as
-     the page scrolls (assets/pb-motion.js scrubs --pb-brand-grow from 0 to 1). Scaled about
-     its middle, so the small bottle sits fully inside the banner (the product hangs a quarter
-     below the banner's bottom edge; scaled about its base it was nearly all cut off). The
-     markup sets 0 only when the motion script runs (Reveal on, not in the theme editor), so
-     without it the product is full size. Size only, from visible: nothing is hidden. */
-  @media (prefers-reduced-motion: no-preference) {
-    .pb-brand-header__product img {
-      transform-origin: 50% 50%;
-      transform: scale(calc(0.4 + 0.6 * var(--pb-brand-grow, 1)));
-    }
   }
 
   /* Left of the middle product: up to 40% of the banner, and words never break. */
